@@ -1,0 +1,4 @@
+tests/tests_art_t-log_stub.o: tests/log_stub.cpp \
+ /usr/include/stdc-predef.h
+
+/usr/include/stdc-predef.h:
