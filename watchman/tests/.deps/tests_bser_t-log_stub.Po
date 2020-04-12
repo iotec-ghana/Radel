@@ -1,4 +1,0 @@
-tests/tests_bser_t-log_stub.o: tests/log_stub.cpp \
- /usr/include/stdc-predef.h
-
-/usr/include/stdc-predef.h:
