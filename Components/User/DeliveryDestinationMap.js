@@ -1,4 +1,6 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import {
   View,
   Text,
@@ -23,7 +25,7 @@ import BottomDrawer from 'rn-bottom-drawer';
 const {width, height} = Dimensions.get('window');
 const DestLATITUDE = 5.65216019;
 const DestLONGITUDE = -0.21357053;
-const TAB_BAR_HEIGHT = 120;
+const TAB_BAR_HEIGHT = 80;
 
 export default class DeliveryDestinationMap extends Component {
   constructor(props) {
@@ -55,6 +57,18 @@ export default class DeliveryDestinationMap extends Component {
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
+
+  topCard = () => {
+    return (
+      <View style={styles.top}>
+        <View style={styles.topItems}>
+          <Text style={{marginRight: 8}}>Westland</Text>
+          <Icon name="arrow-right" size={12} color="#000" style={{margin: 2}} />
+          <Text style={{marginLeft: 8}}>Kasoa</Text>
+        </View>
+      </View>
+    );
+  };
   render() {
     return (
       <View style={styles.container}>
@@ -76,14 +90,14 @@ export default class DeliveryDestinationMap extends Component {
           />
         </MapView>
         <BottomDrawer
-          containerHeight={height}
+          containerHeight={height / 3}
           offset={TAB_BAR_HEIGHT}
-          startUp={false}
+          startUp={true}
           onExpanded={ex => {}}
           shadow={true}>
           {this.renderContent()}
         </BottomDrawer>
-
+        {this.topCard()}
         <View style={styles.buttons}>
           <TouchableOpacity
             style={styles.bookButton}
@@ -100,6 +114,22 @@ export default class DeliveryDestinationMap extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  top: {
+    width: width,
+    position: 'absolute',
+    backgroundColor: '#00000000',
+    top: 0,
+  },
+  topItems: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    padding: 10,
+    margin: 20,
+    borderRadius: 8,
+    elevation: 68,
   },
   buttons: {
     width: width,

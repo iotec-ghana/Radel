@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -9,12 +10,39 @@ export default class RidersCard extends Component {
   }
 
   render() {
+    // eslint-disable-next-line no-lone-blocks
+    {
+      this.props.arr.indexOf(this.props.data) === 0
+        ? ((this.border = [
+            {
+              borderWidth: 2,
+              borderColor: '#e7564c',
+              backgroundColor: '#fafafa',
+            },
+          ]),
+          (this.image = 80))
+        : ((this.border = [{backgroundColor: '#fafafa'}]), (this.image = 50));
+    }
+    console.log(this.border[0]);
     return (
       // row
-      <TouchableOpacity style={styles.container}>
+
+      <TouchableOpacity
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{
+          ...this.border[0],
+          flex: 1,
+          flexDirection: 'row',
+          padding: 10,
+          margin: 2,
+          borderRadius: 5,
+        }}>
         <View style={styles.radelGo}>
           <Text style={styles.radelGoText}>RadelGO</Text>
-          <Text style={styles.bestText}>Best Save</Text>
+
+          {this.props.arr.indexOf(this.props.data) === 0 ? (
+            <Text style={styles.bestText}>Best Save</Text>
+          ) : null}
 
           <View style={styles.PriceTime}>
             <Text style={styles.price}>GHC{this.props.data.price}</Text>
@@ -26,8 +54,8 @@ export default class RidersCard extends Component {
         <Image
           source={require('../../../assets/motor.png')}
           style={{
-            height: 80,
-            width: 80,
+            height: this.image,
+            width: this.image,
             margin: 5,
             position: 'absolute',
             right: 0,
@@ -39,14 +67,7 @@ export default class RidersCard extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-    padding: 10,
-    backgroundColor: '#fafafa',
-    margin: 2,
-    borderRadius: 5,
-  },
+  container: {},
   radelGo: {
     padding: 2,
   },
