@@ -25,6 +25,7 @@ import MapsActivity from './Components/User/MapsActivity';
 import EnterDestinationActivity from './Components/User/EnterDestinationActivity';
 import DeliveryDestinationMap from './Components/User/DeliveryDestinationMap';
 import PaymentMethodsActivity from './Components/User/PaymentMethodsActivity';
+import AddCardActivity from './Components/User/AddCardActivity';
 
 const Stack = createStackNavigator();
 
@@ -33,7 +34,7 @@ const App: () => React$Node = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="PaymentMethodsActivity"
+        initialRouteName="Home"
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="Home" component={Intro} />
         <Stack.Screen name="Login" component={Login} />
@@ -43,10 +44,12 @@ const App: () => React$Node = () => {
           name="DeliveryDestinationMap"
           component={DeliveryDestinationMap}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="PaymentMethodsActivity"
           component={PaymentMethodsActivity}
         />
+
+        <Stack.Screen name="AddCardActivity" component={AddCardActivity} />
 
         <Stack.Screen name="destination" component={EnterDestinationActivity} />
       </Stack.Navigator>

@@ -5,10 +5,29 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  SafeAreaView,
+  FlatList,
 } from 'react-native';
 const {width, height} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MomoCard from './Layouts/MomoCard';
+import CreditCardLayout from './Layouts/CreditCardLayout';
+const DATA = [
+  {
+    id: 1,
+    last4: '3354',
+    expdate: '09/25',
+    image: 'cc-mastercard',
+    color: '#ffaa00',
+  },
+  {
+    id: 2,
+    last4: '148',
+    expdate: '01/24',
+    image: 'cc-visa',
+    color: '#192061',
+  },
+];
 export default class PaymentMethodsActivity extends Component {
   constructor(props) {
     super(props);
@@ -30,7 +49,18 @@ export default class PaymentMethodsActivity extends Component {
         <View style={styles.toolbar}>
           <View style={styles.toolContent}>
             <Icon name="times" size={20} color="#000" style={styles.back} />
-            <Text style={styles.addpaymet}>Add Payment Method</Text>
+            <Text
+              onPress={() =>
+                this.props.navigation.navigate('DeliveryDestinationMap')
+              }
+              style={{marginLeft: 30, fontSize: 20, fontWeight: 'bold'}}>
+              Cancel
+            </Text>
+            <Text
+              style={styles.addpaymet}
+              onPress={() => this.props.navigation.navigate('AddCardActivity')}>
+              Add Payment Method
+            </Text>
           </View>
         </View>
 
@@ -59,6 +89,26 @@ export default class PaymentMethodsActivity extends Component {
         </Text>
 
         <MomoCard />
+        <Text
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{
+            fontSize: 12,
+            textAlign: 'left',
+            marginLeft: 20,
+            marginTop: 10,
+            fontWeight: 'bold',
+            opacity: 0.5,
+          }}>
+          Choose a desired payment method. We offer payment methods suitable for
+          everyone
+        </Text>
+        <SafeAreaView>
+          <FlatList
+            data={DATA}
+            renderItem={({item}) => <CreditCardLayout item={item} />}
+            keyExtractor={item => item.id}
+          />
+        </SafeAreaView>
       </View>
     );
   }
@@ -66,7 +116,7 @@ export default class PaymentMethodsActivity extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'#fff'
+    backgroundColor: '#fff',
   },
   toolbar: {
     flex: 1,
@@ -80,7 +130,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
 
-    padding: 10,
     margin: 20,
   },
   back: {

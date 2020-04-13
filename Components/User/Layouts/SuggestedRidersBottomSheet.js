@@ -15,7 +15,7 @@ import {
 import RidersCard from './RidersCard';
 const DATA = [
   {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
+    id: 'bd7acbea-c1b1-46c2u-aed5-3ad53abb28ba',
     price: 35,
     time: '1-5 min',
   },
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingRight: 12,
     paddingLeft: 12,
-    borderRadius:10,
+    borderRadius: 10,
   },
   suggestedText: {
     fontSize: 18,
