@@ -38,7 +38,7 @@ export default class EnterDestinationActivity extends Component {
   render() {
     return (
       <View style={styles.main}>
-        <View style={styles.buttons}>
+        <View style={styles.button}>
           <TouchableOpacity
             style={styles.setButton}
             onPress={() =>
@@ -83,19 +83,17 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
 
-  buttons: {
-    width: windowWidth,
-
-    position: 'absolute', //Here is the trick
-    bottom: 0, //Here is the trick
-  },
-
   input: {
     height: 50,
     padding: 10,
     elevation: 1,
     backgroundColor: '#fafafa',
     marginTop: 10,
+  },
+  button: {
+    width: windowWidth,
+    position: 'absolute', //Here is the trick
+    bottom: 0, //Here is the trick
   },
   setButton: {
     margin: 10,

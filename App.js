@@ -24,14 +24,16 @@ import Register from './Components/User/Register';
 import MapsActivity from './Components/User/MapsActivity';
 import EnterDestinationActivity from './Components/User/EnterDestinationActivity';
 import DeliveryDestinationMap from './Components/User/DeliveryDestinationMap';
+import PaymentMethodsActivity from './Components/User/PaymentMethodsActivity';
 
 const Stack = createStackNavigator();
 
 const App: () => React$Node = () => {
+  console.disableYellowBox = true;
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Home"
+        initialRouteName="PaymentMethodsActivity"
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="Home" component={Intro} />
         <Stack.Screen name="Login" component={Login} />
@@ -40,6 +42,10 @@ const App: () => React$Node = () => {
         <Stack.Screen
           name="DeliveryDestinationMap"
           component={DeliveryDestinationMap}
+        />
+         <Stack.Screen
+          name="PaymentMethodsActivity"
+          component={PaymentMethodsActivity}
         />
 
         <Stack.Screen name="destination" component={EnterDestinationActivity} />

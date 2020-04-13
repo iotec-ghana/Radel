@@ -102,7 +102,7 @@ export default class DeliveryDestinationMap extends Component {
           <TouchableOpacity
             style={styles.bookButton}
             onPress={() =>
-              this.props.navigation.navigate('DeliveryDestinationMap')
+              this.props.navigation.navigate('PaymentMethodsActivity')
             }>
             <Text style={styles.bookButtonText}>BOOK NOW</Text>
           </TouchableOpacity>
