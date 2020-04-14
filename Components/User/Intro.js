@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {
   View,
   Text,
+  Image,
   Dimensions,
   TouchableOpacity,
   StyleSheet,
@@ -16,18 +17,46 @@ export default class Intro extends Component {
 
   render() {
     return (
-      <View style={styles.buttons}>
-        <TouchableOpacity
-          style={styles.signup}
-          onPress={() => this.props.navigation.navigate('SignUp')}>
-          <Text style={styles.signupText}>Sign Up </Text>
-        </TouchableOpacity>
+      <View style={styles.container}>
+        <Image
+          source={require('../../assets/deedat.jpg')}
+          style={{height: 100, width: 100, borderRadius: 100, marginTop: 40}}
+        />
+        <Text
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{
+            fontSize: 40,
+            marginTop: 0,
+            textAlign: 'left',
+            fontWeight: 'bold',
+            opacity: 0.5,
+          }}>
+          Radel
+        </Text>
+        <View style={styles.buttons}>
+          <Text
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{
+              fontSize: 20,
+              marginTop: 0,
+              textAlign: 'center',
+              fontWeight: 'bold',
+              opacity: 0.5,
+            }}>
+            An Easy, Reliable and quick way to get items around
+          </Text>
+          <TouchableOpacity
+            style={styles.signup}
+            onPress={() => this.props.navigation.navigate('SignUp')}>
+            <Text style={styles.signupText}>Sign Up </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.login}
-          onPress={() => this.props.navigation.navigate('Login')}>
-          <Text style={styles.loginText}>Login</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.login}
+            onPress={() => this.props.navigation.navigate('Login')}>
+            <Text style={styles.loginText}>Login</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -36,25 +65,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // backgroundColor: "#ff8900",
+    alignItems: 'center',
+    backgroundColor: '#fff',
 
     width: windowWidth,
   },
   buttons: {
     width: windowWidth,
-    backgroundColor: '#e7564c',
+    backgroundColor: '#fff',
     position: 'absolute', //Here is the trick
     bottom: 0, //Here is the trick
     padding: 20,
   },
 
   signup: {
-    backgroundColor: '#fff',
+    backgroundColor: '#e7564c',
     paddingVertical: 15,
     borderRadius: 3,
     marginTop: 10,
   },
   signupText: {
-    color: '#ff8900',
+    color: '#fff',
     textAlign: 'center',
     fontWeight: 'bold',
 
@@ -64,11 +95,11 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 3,
     marginTop: 10,
-    borderColor: '#fff',
+    borderColor: '#e7564c',
     borderWidth: 1,
   },
   loginText: {
-    color: '#fff',
+    color: '#e7564c',
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 16,

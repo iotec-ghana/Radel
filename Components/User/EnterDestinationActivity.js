@@ -38,6 +38,13 @@ export default class EnterDestinationActivity extends Component {
   render() {
     return (
       <View style={styles.main}>
+         <Toolbar
+          icon={'chevron-left'}
+          // right={'Sign Up'}
+          rightTextColor={'#e7564c'}
+          navigation={this.props.navigation}
+          // righSideRoute={'SignUp'}
+        />
         <View style={styles.button}>
           <TouchableOpacity
             style={styles.setButton}
@@ -80,7 +87,7 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 3,
-    marginTop: 50,
+    
   },
 
   input: {

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   PermissionsAndroid,
+  TouchableOpacity,
   Platform,
   Image,
 } from 'react-native';
@@ -25,6 +26,8 @@ const LONGITUDE_DELTA = 0.009;
 const LATITUDE = 18.7934829;
 const LONGITUDE = 98.9867401;
 import PolylineDirection from '@react-native-maps/polyline-direction';
+import Sidebar from './Layouts/Sidebar';
+import {Drawer} from 'native-base';
 const origin = {latitude: 19.363631, longitude: -99.182545};
 const destination = {latitude: 19.2932543, longitude: -99.1794758};
 const DestLATITUDE = 18.7934829;
@@ -60,6 +63,12 @@ export default class MapsActivity extends Component {
       }),
     };
   }
+  closeDrawer = () => {
+    this.drawer._root.close();
+  };
+  openDrawer = () => {
+    this.drawer._root.open();
+  };
   componentWillUnmount() {
     Geolocation.clearWatch(this.watchID);
   }
@@ -171,16 +180,25 @@ export default class MapsActivity extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <MapView
-          provider={PROVIDER_GOOGLE}
-          showUserLocation
-          followUserLocation
-          loadingEnabled
-          region={this.getCurrentRegion()}
-          style={{...StyleSheet.absoluteFillObject}}>
-          <Polyline coordinates={this.state.routeCoordinates} strokeWidth={5} />
-          {/* <Marker.Animated
+      <Drawer
+        ref={ref => {
+          this.drawer = ref;
+        }}
+        content={<Sidebar navigator={this.navigator} />}
+        onClose={() => this.closeDrawer()}>
+        <View style={styles.container}>
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            showUserLocation
+            followUserLocation
+            loadingEnabled
+            region={this.getCurrentRegion()}
+            style={{...StyleSheet.absoluteFillObject}}>
+            <Polyline
+              coordinates={this.state.routeCoordinates}
+              strokeWidth={5}
+            />
+            {/* <Marker.Animated
             ref={marker => {
               this.marker = marker;
             }}
@@ -192,44 +210,45 @@ export default class MapsActivity extends Component {
             
           </Marker.Animated> */}
 
-          <Marker coordinate={this.getCurrentRegion()} />
-          {/* <Marker coordinate={this.getDestinationReagion()} /> */}
-          {/* will be used in DeliveryDestinationMap */}
-          {/* <PolylineDirection
+            <Marker coordinate={this.getCurrentRegion()} />
+            {/* <Marker coordinate={this.getDestinationReagion()} /> */}
+            {/* will be used in DeliveryDestinationMap */}
+            {/* <PolylineDirection
             origin={origin}
             destination={destination}
             apiKey={'AIzaSyCF1Jur9qHYa6q07JWBMyVjQ2DqOlSJ2qc'}
             strokeWidth={4}
             strokeColor="#12bc00"
           /> */}
-        </MapView>
-        <BottomDrawer
-          containerHeight={this.state.bottomSheetHeight}
-          offset={TAB_BAR_HEIGHT}
-          shadow={true}>
-          {this.renderContent()}
-        </BottomDrawer>
-      </View>
+          </MapView>
+          <Toolbar
+            icon={'bars'}
+            notbackAction={true}
+            opendrawer={this.openDrawer}
+            navigation={this.props.navigation}
+          />
+
+          <BottomDrawer
+            containerHeight={this.state.bottomSheetHeight}
+            offset={TAB_BAR_HEIGHT}
+            shadow={true}>
+            {this.renderContent()}
+          </BottomDrawer>
+        </View>
+        
+      </Drawer>
     );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    flex: 1,
   },
   map: {
     ...StyleSheet.absoluteFillObject,
   },
-  bubble: {
-    flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.7)',
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderRadius: 20,
-  },
+
   latlng: {
     width: 200,
     alignItems: 'stretch',

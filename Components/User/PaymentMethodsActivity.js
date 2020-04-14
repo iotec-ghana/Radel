@@ -9,6 +9,7 @@ import {
   FlatList,
 } from 'react-native';
 const {width, height} = Dimensions.get('window');
+import Toolbar from './Layouts/Toolbar';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MomoCard from './Layouts/MomoCard';
 import CreditCardLayout from './Layouts/CreditCardLayout';
@@ -46,28 +47,17 @@ export default class PaymentMethodsActivity extends Component {
             <Text style={styles.ConfirmButton}>CONFIRM</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.toolbar}>
-          <View style={styles.toolContent}>
-            <Icon name="times" size={20} color="#000" style={styles.back} />
-            <Text
-              onPress={() =>
-                this.props.navigation.navigate('DeliveryDestinationMap')
-              }
-              style={{marginLeft: 30, fontSize: 20, fontWeight: 'bold'}}>
-              Cancel
-            </Text>
-            <Text
-              style={styles.addpaymet}
-              onPress={() => this.props.navigation.navigate('AddCardActivity')}>
-              Add Payment Method
-            </Text>
-          </View>
-        </View>
-
+        <Toolbar
+          icon={'chevron-left'}
+          right={'Add Payment Method'}
+          rightTextColor={'#e7564c'}
+          navigation={this.props.navigation}
+          righSideRoute={'AddCardActivity'}
+        />
         <Text
           // eslint-disable-next-line react-native/no-inline-styles
           style={{
-            marginTop: 70,
+            marginTop: 0,
             fontSize: 38,
             marginLeft: 20,
             textAlign: 'left',

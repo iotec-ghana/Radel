@@ -5,9 +5,12 @@ import {
   StyleSheet,
   TextInput,
   Dimensions,
+  SafeAreaView,
+  ScrollView,
   TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Toolbar from './Layouts/Toolbar';
 const {width, height} = Dimensions.get('window');
 
 export default class AddCardActivity extends Component {
@@ -20,7 +23,7 @@ export default class AddCardActivity extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.button}>
-          <Text
+          {/* <Text
             // eslint-disable-next-line react-native/no-inline-styles
             style={{
               fontSize: 14,
@@ -30,8 +33,8 @@ export default class AddCardActivity extends Component {
               opacity: 0.5,
             }}>
             Accepted Cards
-          </Text>
-          <View style={{flex: 1, flexDirection: 'row'}}>
+          </Text> */}
+          {/* <View style={{flex: 1, flexDirection: 'row'}}>
             <Icon
               name="cc-mastercard"
               size={40}
@@ -46,35 +49,22 @@ export default class AddCardActivity extends Component {
               style={{flex: 2}}
             />
             <Icon name="cc-amex" size={40} color="#27AEE3" style={{flex: 2}} />
-          </View>
+          </View> */}
           <TouchableOpacity
             style={styles.setButton}
             onPress={() => dosomething()}>
             <Text style={styles.ConfirmButton}>SAVE</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.toolbar}>
-          <View style={styles.toolContent}>
-            <Icon
-              name="chevron-left"
-              size={20}
-              color="#000"
-              style={styles.back}
-            />
-            <Text
-              onPress={() =>
-                this.props.navigation.navigate('PaymentMethodsActivity')
-              }
-              style={{marginLeft: 30, fontSize: 20, fontWeight: 'bold'}}>
-              Back
-            </Text>
-          </View>
-        </View>
+        <Toolbar
+          icon={'chevron-left'}
+          rightTextColor={'#e7564c'}
+          navigation={this.props.navigation}
+        />
 
         <Text
           // eslint-disable-next-line react-native/no-inline-styles
           style={{
-            marginTop: 60,
             fontSize: 38,
             marginLeft: 20,
             textAlign: 'left',
@@ -86,7 +76,7 @@ export default class AddCardActivity extends Component {
         <Text
           // eslint-disable-next-line react-native/no-inline-styles
           style={{
-            marginTop: 60,
+            marginTop: 0,
             fontSize: 15,
             marginLeft: 20,
             textAlign: 'left',
