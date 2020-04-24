@@ -1,20 +1,19 @@
-import React, { Component } from 'react';
-import { View, Text } from 'react-native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
+import React, {Component} from 'react';
+import {View, Text} from 'react-native';
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import {NavigationContainer} from '@react-navigation/native';
 import Settings from '../Settings';
 const DrawerC = createDrawerNavigator();
 
 export default class Drawer extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
   render() {
     return (
-        <NavigationContainer>
+      <NavigationContainer>
         <DrawerC.Navigator initialRouteName="Home">
           <DrawerC.Screen name="Home" component={Settings} />
           <DrawerC.Screen name="Notifications" component={Settings} />

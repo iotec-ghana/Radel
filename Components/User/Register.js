@@ -6,16 +6,72 @@ import {
   Dimensions,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {RegisterUser} from '../../Actions/authAction';
+import {connect} from 'react-redux';
 const windowWidth = Dimensions.get('window').width;
 import Toolbar from './Layouts/Toolbar';
 
-export default class Register extends Component {
+class Register extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      fname: '',
+      lname: '',
+      phone: '',
+      email: '',
+      showPassword: false,
+      password: '',
+      loading: false,
+    };
   }
+  toggleSwitch = () => {
+    this.setState({showPassword: !this.state.showPassword});
+  };
+  onFirstnameChange = fname => {
+    this.setState({
+      fname: fname,
+    });
+  };
+  onLastnameChange = lname => {
+    this.setState({
+      lname: lname,
+    });
+  };
+  onEmailChange = email => {
+    this.setState({email: email});
+  };
+  onPhoneChange = phone => {
+    this.setState({phone: phone});
+  };
+  onPasswordChange = pass => {
+    this.setState({password: pass});
+  };
+  onSubmit = async () => {
+    const {fname, lname, phone, email, password} = this.state;
+    if (
+      fname == '' &&
+      lname == '' &&
+      phone == '' &&
+      email == '' &&
+      password == ''
+    ) {
+      alert('one or more fields is empty');
+    } else {
+      this.setState({loading: true});
+      const payload = {
+        first_name: fname,
+        last_name: lname,
+        email: email,
+        phone_number: phone,
+        password: password,
+      };
+      await this.props.RegisterUser(payload, this.props.navigation);
+      this.setState({loading: false});
+    }
+  };
 
   render() {
     return (
@@ -26,27 +82,9 @@ export default class Register extends Component {
           rightTextColor={'#e7564c'}
           routeBack={'Home'}
           navigation={this.props.navigation}
-          righSideRoute={"Login"}
+          righSideRoute={'Login'}
         />
         <View style={styles.container}>
-          {/* <View style={styles.toolbar}>
-          <View style={styles.toolContent}>
-            <Icon
-              name="chevron-left"
-              size={20}
-              color="#000"
-              style={styles.back}
-            />
-            <Text 
-              onPress={() =>
-                this.props.navigation.navigate('PaymentMethodsActivity')
-              }
-              style={{marginLeft: 20, fontSize: 20, fontWeight: 'bold'}}>
-              Back
-            </Text>
-          </View>
-        </View>
-        */}
           <Text
             // eslint-disable-next-line react-native/no-inline-styles
             style={{
@@ -55,58 +93,80 @@ export default class Register extends Component {
               marginBottom: 12,
               textAlign: 'left',
               fontWeight: 'bold',
-              marginTop: 20,
             }}>
             Sign up
           </Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Full Name"
-            //onChangeText={text}
-            // defaultValue={text}
-          />
-
+          <View style={{flexDirection: 'row'}}>
+            <TextInput
+              style={styles.inputf}
+              placeholder="First Name"
+              onChangeText={text => this.onFirstnameChange(text)}
+              // defaultValue={text}
+            />
+            <TextInput
+              style={styles.inputl}
+              placeholder="Last Name"
+              onChangeText={text => this.onLastnameChange(text)}
+              // defaultValue={text}
+            />
+          </View>
           <TextInput
             style={styles.input}
             placeholder="Email"
-            // onChangeText={text}
+            onChangeText={text => this.onEmailChange(text)}
             // defaultValue={text}
           />
 
           <TextInput
             style={styles.input}
             placeholder="Phone Number"
-            // onChangeText={text}
+            onChangeText={text => this.onPhoneChange(text)}
             //defaultValue={text}
           />
           <TextInput
             style={styles.input}
             placeholder="Password"
             secureTextEntry={true}
-            // onChangeText={text}
+            onChangeText={text => this.onPasswordChange(text)}
             //defaultValue={text}
           />
 
-          <TextInput
+          {/* <TextInput
             style={styles.input}
             placeholder="Confirm Password"
             secureTextEntry={true}
             // onChangeText={text}
             //defaultValue={text}
-          />
-
+          /> */}
+          {this.state.loading ? (
+            <ActivityIndicator size="large" color="#e7564c" />
+          ) : null}
+          {!this.props.error == '' ? (
+            <View style={styles.error}>
+              <Icon name="exclamation-circle" size={18} color="#e7564c" />
+              <Text style={styles.errorText}>{this.props.error}</Text>
+            </View>
+          ) : null}
           <TouchableOpacity
             style={styles.SignUpButton}
-            onPress={this._onPressButton}>
+            onPress={() =>
+              this.props.navigation.navigate('PhoneVerificationActivity')
+            }>
             <Text style={styles.SignUpButtonText}>Register</Text>
           </TouchableOpacity>
         </View>
-   
       </View>
     );
   }
 }
-
+const mapStateToProps = state => ({
+  authStatus: state.auth.isAuthenticated,
+  error: state.auth.error,
+});
+export default connect(
+  mapStateToProps,
+  {RegisterUser},
+)(Register);
 const styles = StyleSheet.create({
   container: {
     padding: 30,
@@ -117,8 +177,38 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#fafafa',
     marginBottom: 15,
+    borderRadius: 3,
   },
-
+  inputf: {
+    height: 50,
+    padding: 10,
+    backgroundColor: '#fafafa',
+    marginBottom: 15,
+    marginRight: 8,
+    borderRadius: 3,
+    flex: 1,
+  },
+  inputl: {
+    height: 50,
+    padding: 10,
+    backgroundColor: '#fafafa',
+    marginBottom: 15,
+    borderRadius: 3,
+    flex: 1,
+  },
+  error: {
+    flexDirection: 'row',
+    marginTop: 7,
+    padding: 15,
+    borderColor: '#e7564c',
+    borderWidth: 1,
+  },
+  errorText: {
+    marginLeft: 8,
+    color: '#e7564c',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
   SignUpButton: {
     marginTop: 10,
     backgroundColor: '#4f69a2',

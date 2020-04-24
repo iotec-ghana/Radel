@@ -23,6 +23,11 @@ const menuItems = [
     icon: 'comment',
     text: 'Support',
   },
+  {
+    id: 5,
+    icon: 'sign-out',
+    text: 'Log out',
+  },
 ];
 
 export default class Sidebar extends Component {
@@ -42,7 +47,9 @@ export default class Sidebar extends Component {
         <SafeAreaView>
           <FlatList
             data={menuItems}
-            renderItem={({item}) => <SideBarItems item={item} />}
+            renderItem={({item}) => (
+              <SideBarItems item={item} navigation={this.props.navigation} />
+            )}
             keyExtractor={item => item.id}
           />
         </SafeAreaView>

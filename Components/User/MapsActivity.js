@@ -3,6 +3,7 @@ import axios from 'axios';
 import {
   View,
   Text,
+  BackHandler,
   StyleSheet,
   Dimensions,
   PermissionsAndroid,
@@ -23,30 +24,27 @@ import BottomSheet from './Layouts/BottomSheet';
 import BottomDrawer from 'rn-bottom-drawer';
 const LATITUDE_DELTA = 0.009;
 const LONGITUDE_DELTA = 0.009;
-const LATITUDE = 18.7934829;
-const LONGITUDE = 98.9867401;
-import PolylineDirection from '@react-native-maps/polyline-direction';
+const LATITUDE = 0.009;
+const LONGITUDE = 0.009;
+import Config from 'react-native-config';
+const GOOGLE_MAPS_APIKEY = 'AIzaSyCWNecG4xgKaW3_RGqgGT5QZnk9knUesCA';
 import Sidebar from './Layouts/Sidebar';
 import {Drawer} from 'native-base';
-const origin = {latitude: 19.363631, longitude: -99.182545};
-const destination = {latitude: 19.2932543, longitude: -99.1794758};
-const DestLATITUDE = 18.7934829;
-const DestLONGITUDE = 98.9867401;
+import {getCurrentLocation} from '../../Actions/locationAction';
+import {connect} from 'react-redux';
 const TAB_BAR_HEIGHT = 0;
 const {width, height} = Dimensions.get('window');
-
-export default class MapsActivity extends Component {
+class MapsActivity extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      latitude: LATITUDE,
-      longitude: LONGITUDE,
-      Destlatitude: DestLATITUDE,
-      Destlongitude: DestLONGITUDE,
+      latitude: props.origin.latitude,
+      longitude: props.origin.longitude,
       bottomSheetHeight: height / 4,
       routeCoordinates: [],
       distanceTravelled: 0,
       locationName: '',
+      originName: props.originName,
       prevLatLng: {},
       coordinate: new AnimatedRegion({
         latitude: LATITUDE,
@@ -54,14 +52,8 @@ export default class MapsActivity extends Component {
         latitudeDelta: 0,
         longitudeDelta: 0,
       }),
-
-      Destinationcoordinate: new AnimatedRegion({
-        latitude: LATITUDE,
-        longitude: LONGITUDE,
-        latitudeDelta: 0,
-        longitudeDelta: 0,
-      }),
     };
+    this.drawer = null;
   }
   closeDrawer = () => {
     this.drawer._root.close();
@@ -75,29 +67,46 @@ export default class MapsActivity extends Component {
   renderContent = () => {
     return <BottomSheet navigation={this.props.navigation} />;
   };
-  async getLocationName() {
-    const {latitude, longitude} = this.state;
-    const key = 'AIzaSyCF1Jur9qHYa6q07JWBMyVjQ2DqOlSJ2qc';
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${key}`;
-    const res = await axios.get(url);
-    console.log(res.data);
+  async getLocationName(position) {
+    try {
+      const {latitude, longitude} = position.coords;
+      const key = GOOGLE_MAPS_APIKEY;
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${key}`;
+      const res = await axios.get(url);
+      return res.data.results[2].formatted_address;
+    } catch (e) {
+      console.log(e.message);
+    }
   }
-  componentDidMount() {
-    Geolocation.getCurrentPosition(
-      position => {
-        console.log(position);
+  handleBackButton() {
+    BackHandler.exitApp();
+  }
+  componentDidMount = async () => {
+    // BackHandler.addEventListener(
+    //   'hardwareBackPress',
+    //   this.handleBackButton.bind(this),
+    // );
 
-        this.setState({
+    // this.requestLocationPermission();
+
+    Geolocation.getCurrentPosition(
+      async position => {
+        // console.log(position.coords.latitude);
+        const Oname = await this.getLocationName(position);
+        const data = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
-          error: null,
-        });
+          originName: Oname,
+        };
+
+        this.props.getCurrentLocation(data);
       },
       error => this.setState({error: error.message}),
       {enableHighAccuracy: true, timeout: 200000, maximumAge: 1000},
     );
+
     const {coordinate} = this.state;
-    //this.getLocationName();
+
     this.watchID = Geolocation.watchPosition(
       position => {
         const {routeCoordinates, distanceTravelled} = this.state;
@@ -106,7 +115,10 @@ export default class MapsActivity extends Component {
         const newCoordinate = {
           latitude,
           longitude,
+          originName: this.state.originName,
         };
+
+        this.props.getCurrentLocation(newCoordinate);
         console.log({newCoordinate});
 
         // if (Platform.OS === 'android') {
@@ -137,38 +149,30 @@ export default class MapsActivity extends Component {
         distanceFilter: 10,
       },
     );
-  }
+  };
 
-  //   requestCameraPermission = async () => {
-  //     try {
-  //       const granted = await PermissionsAndroid.request(
-  //         PermissionsAndroid.PERMISSIONS.CAMERA,
-  //         {
-  //           title: 'Location Access Permission',
-  //           buttonNeutral: 'Ask Me Later',
-  //           buttonNegative: 'Cancel',
-  //           buttonPositive: 'OK',
-  //         },
-  //       );
-  //       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-  //         console.log('You can use the camera');
-  //       } else {
-  //         console.log('Camera permission denied');
-  //       }
-  //     } catch (err) {
-  //       console.warn(err);
-  //     }
-  //   };
+  requestLocationPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Location Access Permission',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      } else {
+        console.log('permission denied');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
   getCurrentRegion = () => ({
     latitude: this.state.latitude,
     longitude: this.state.longitude,
-    latitudeDelta: LATITUDE_DELTA,
-    longitudeDelta: LONGITUDE_DELTA,
-  });
-
-  getDestinationReagion = () => ({
-    latitude: this.state.Destlatitude,
-    longitude: this.state.Destlongitude,
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
@@ -184,7 +188,7 @@ export default class MapsActivity extends Component {
         ref={ref => {
           this.drawer = ref;
         }}
-        content={<Sidebar navigator={this.navigator} />}
+        content={<Sidebar navigation={this.props.navigation} />}
         onClose={() => this.closeDrawer()}>
         <View style={styles.container}>
           <MapView
@@ -194,10 +198,6 @@ export default class MapsActivity extends Component {
             loadingEnabled
             region={this.getCurrentRegion()}
             style={{...StyleSheet.absoluteFillObject}}>
-            <Polyline
-              coordinates={this.state.routeCoordinates}
-              strokeWidth={5}
-            />
             {/* <Marker.Animated
             ref={marker => {
               this.marker = marker;
@@ -207,10 +207,16 @@ export default class MapsActivity extends Component {
               source={require('../../assets/map-pin.png')}
               style={{height: 40, width: 40}}
             />
-            
+            //will be used to show riders on the mapp
+            {this.state.coordinates.map((coordinate, index) =>
+          <MapView.Marker key={`coordinate_${index}`} coordinate={coordinate} />
+        )}
+        //will be used to show riders on the mapp
+
+        
           </Marker.Animated> */}
 
-            <Marker coordinate={this.getCurrentRegion()} />
+            {/* <Marker coordinate={this.getCurrentRegion()} /> */}
             {/* <Marker coordinate={this.getDestinationReagion()} /> */}
             {/* will be used in DeliveryDestinationMap */}
             {/* <PolylineDirection
@@ -235,12 +241,18 @@ export default class MapsActivity extends Component {
             {this.renderContent()}
           </BottomDrawer>
         </View>
-        
       </Drawer>
     );
   }
 }
-
+const mapStateToProps = state => ({
+  origin: state.locationData.OriginCoordinates,
+  error: state.locationData.error,
+});
+export default connect(
+  mapStateToProps,
+  {getCurrentLocation},
+)(MapsActivity);
 const styles = StyleSheet.create({
   container: {
     flex: 1,

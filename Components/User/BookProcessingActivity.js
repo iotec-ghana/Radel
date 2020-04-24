@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Hr from 'react-native-hr-component';
+
 import {
   View,
   Text,
@@ -17,42 +17,45 @@ import MapView, {
   Polyline,
 } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
-import PolylineDirection from '@react-native-maps/polyline-direction';
-const origin = {latitude: 19.363631, longitude: -99.182545};
-const destination = {latitude: 19.2932543, longitude: -99.1794758};
 const LATITUDE_DELTA = 0.009;
 const LONGITUDE_DELTA = 0.009;
-import SuggestedRidersBottomSheet from './Layouts/SuggestedRidersBottomSheet';
+import {connect} from 'react-redux';
+import {
+  getCurrentLocation,
+  getDestinationCoordinates,
+} from '../../Actions/locationAction';
+import MapViewDirections from 'react-native-maps-directions';
 import BottomDrawer from 'rn-bottom-drawer';
 const {width, height} = Dimensions.get('window');
-const DestLATITUDE = 5.65216019;
-const DestLONGITUDE = -0.21357053;
-
-export default class BookProcessingActivity extends Component {
+const GOOGLE_MAPS_APIKEY = 'AIzaSyCWNecG4xgKaW3_RGqgGT5QZnk9knUesCA';
+class BookProcessingActivity extends Component {
   constructor(props) {
     super(props);
     this.state = {
       showCancelBtn: false,
       btnText: 'Cancel',
       processing: false,
+      currentloclat: this.props.origin.latitude,
+      currentloclong: this.props.origin.longitude,
+      Destlatitude: this.props.destination.latitude,
+      Destlongitude: this.props.destination.longitude,
+      distance: 0,
+      duration: 0,
+      originName: this.props.originName.substr(
+        0,
+        this.props.originName.indexOf(','),
+      ),
+      destinationName: this.props.destinationName.substr(
+        0,
+        this.props.destinationName.indexOf(','),
+      ),
       bottomDrawerParams: {
         offset: 0,
         height: height / 3,
       },
-      Destlatitude: DestLATITUDE,
-      Destlongitude: DestLONGITUDE,
-      routeCoordinates: [],
-      distanceTravelled: 0,
-      locationName: '',
-      prevLatLng: {},
-
-      // Destinationcoordinate: new AnimatedRegion({
-      //   latitude: LATITUDE,
-      //   longitude: LONGITUDE,
-      //   latitudeDelta: 0,
-      //   longitudeDelta: 0,
-      // }),
     };
+
+    this.mapView = null;
   }
 
   process = async () => {
@@ -150,9 +153,15 @@ export default class BookProcessingActivity extends Component {
     );
   };
 
-  getDestinationReagion = () => ({
+  getDestinationRegion = () => ({
     latitude: this.state.Destlatitude,
     longitude: this.state.Destlongitude,
+    latitudeDelta: LATITUDE_DELTA,
+    longitudeDelta: LONGITUDE_DELTA,
+  });
+  getCurrentRegion = () => ({
+    latitude: this.state.currentloclat,
+    longitude: this.state.currentloclong,
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
@@ -161,9 +170,18 @@ export default class BookProcessingActivity extends Component {
     return (
       <View style={styles.top}>
         <View style={styles.topItems}>
-          <Text style={{marginRight: 8}}>Westland</Text>
+          <Text style={{marginRight: 8}}>{this.state.originName}</Text>
           <Icon name="arrow-right" size={12} color="#000" style={{margin: 2}} />
-          <Text style={{marginLeft: 8}}>Kasoa</Text>
+          <Text style={{marginLeft: 8}}>{this.state.destinationName}</Text>
+          <Text
+            style={{
+              position: 'absolute',
+              right: 0,
+              margin: 10,
+              fontWeight: 'bold',
+            }}>
+            {this.state.distance}KM
+          </Text>
         </View>
       </View>
     );
@@ -176,16 +194,45 @@ export default class BookProcessingActivity extends Component {
           showUserLocation
           followUserLocation
           loadingEnabled
-          region={this.getDestinationReagion()}
+          ref={c => (this.mapView = c)}
+          initialRegion={this.getCurrentRegion()}
           style={{...StyleSheet.absoluteFillObject}}>
-          {/* <Marker coordinate={this.getDestinationReagion} /> */}
+          <MapView.Marker coordinate={this.getCurrentRegion()} />
+          <MapView.Marker coordinate={this.getDestinationRegion()} />
+          <MapViewDirections
+            origin={this.props.origin}
+            destination={this.props.destination}
+            strokeWidth={5}
+            strokeColor="hotpink"
+            optimizeWaypoints={true}
+            apikey={GOOGLE_MAPS_APIKEY}
+            onStart={params => {
+              console.log(
+                `Started routing between "${params.origin}" and "${
+                  params.destination
+                }"`,
+              );
+            }}
+            onReady={result => {
+              this.setState({
+                distance: result.distance,
+                duration: result.duration,
+              });
+              console.log(`Distance: ${result.distance} km`);
+              console.log(`Duration: ${result.duration} min.`);
 
-          <PolylineDirection
-            origin={origin}
-            destination={destination}
-            apiKey={'AIzaSyCF1Jur9qHYa6q07JWBMyVjQ2DqOlSJ2qc'}
-            strokeWidth={4}
-            strokeColor="#12bc00"
+              this.mapView.fitToCoordinates(result.coordinates, {
+                edgePadding: {
+                  right: width / 100,
+                  bottom: height / 100,
+                  left: width / 100,
+                  top: height / 100,
+                },
+              });
+            }}
+            onError={errorMessage => {
+              console.log('GOT AN ERROR');
+            }}
           />
         </MapView>
         <BottomDrawer
@@ -214,6 +261,18 @@ export default class BookProcessingActivity extends Component {
     );
   }
 }
+const mapStateToProps = state => ({
+  origin: state.locationData.OriginCoordinates,
+  destination: state.locationData.DestinationCoordinates,
+  destinationName: state.locationData.destinationName,
+  originName: state.locationData.originName,
+  error: state.locationData.error,
+});
+
+export default connect(
+  mapStateToProps,
+  {getCurrentLocation, getDestinationCoordinates},
+)(BookProcessingActivity);
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -11,7 +11,7 @@ export default class UserDeliveryLocationHistoryList extends Component {
           style={styles.image}
         />
         <View style={styles.textsView}>
-          <Text style={styles.Location}>Marwarko Fast Food - Labadi</Text>
+    <Text style={styles.Location}>{this.props.item.decription}</Text>
           <Text style={styles.area}>
             Near Polyclinic Bus stop, La Road, Accra
           </Text>

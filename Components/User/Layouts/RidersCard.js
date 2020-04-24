@@ -23,7 +23,7 @@ export default class RidersCard extends Component {
           (this.image = 80))
         : ((this.border = [{backgroundColor: '#fafafa'}]), (this.image = 50));
     }
-    console.log(this.border[0]);
+    
     return (
       // row
 
@@ -45,7 +45,7 @@ export default class RidersCard extends Component {
           ) : null}
 
           <View style={styles.PriceTime}>
-            <Text style={styles.price}>GHC{this.props.data.price}</Text>
+            <Text style={styles.price}>GHC{this.props.price}</Text>
             <Icon name="clock-o" size={14} color="#000" style={{margin: 2}} />
             <Text style={styles.time}>{this.props.data.time}</Text>
           </View>

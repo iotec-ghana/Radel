@@ -22,7 +22,6 @@ export default class BottomSheet extends Component {
             placeholder={'Enter delivery destination'}
             onFocus={() => this.props.navigation.navigate('destination')}
           />
-           
         </View>
       </View>
     );
@@ -34,7 +33,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
 
-     borderRadius: 20,
+    borderRadius: 20,
   },
   container: {
     flex: 13,

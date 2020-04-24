@@ -39,7 +39,9 @@ export default class SuggestedRidersBottomSheet extends Component {
         <SafeAreaView>
           <FlatList
             data={DATA}
-            renderItem={({item}) => <RidersCard data={item} arr={DATA} />}
+            renderItem={({item}) => (
+              <RidersCard data={item} price={this.props.price} arr={DATA} />
+            )}
             keyExtractor={item => item.id}
           />
         </SafeAreaView>

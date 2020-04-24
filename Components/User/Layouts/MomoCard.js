@@ -22,6 +22,9 @@ export default class MomoCard extends Component {
           <Text style={{fontWeight: 'bold', fontSize: 12, opacity: 0.5}}>
             Default Method
           </Text>
+          <Text style={{fontWeight: 'bold', fontSize: 12, opacity: 0.5}}>
+            {this.props.network}: {this.props.number}
+          </Text>
         </View>
 
         <View style={styles.tickWrapper}>

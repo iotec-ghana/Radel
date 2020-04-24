@@ -6,18 +6,41 @@ import {
   StyleSheet,
   Button,
   TouchableOpacity,
+  ActivityIndicator,
   Alert,
   Dimensions,
 } from 'react-native';
 import Toolbar from './Layouts/Toolbar';
 const windowWidth = Dimensions.get('window').width;
-export default class Login extends Component {
-  state = {
-    text: '',
-  };
 
+import {isSignedIn} from '../../Actions/authAction';
+import {connect} from 'react-redux';
+import Icon from 'react-native-vector-icons/FontAwesome';
+class Login extends Component {
+  state = {
+    email: '',
+    password: '',
+    loading: false,
+  }; 
+  onSubmit = async () => {
+    this.setState({loading: true});
+    await this.props.isSignedIn(this.state, this.props.navigation);
+    this.setState({loading: false});
+  };
+  onemailChange = email => {
+    this.setState({email: email});
+  };
+  onPasswordChange = password => {
+    this.setState({password: password});
+  };
+  componentDidMount() {
+    if (this.props.authStatus) {
+      this.props.navigation.navigate('Main');
+    }
+    
+  }
   render() {
-    const {text} = this.state;
+    const {email} = this.state;
     return (
       <View>
         <Toolbar
@@ -48,19 +71,17 @@ export default class Login extends Component {
               marginBottom: 4,
               opacity: 0.5,
             }}>
-            Email
+            email
           </Text>
           <TextInput
             style={styles.input}
-            placeholder="Email"
-
-            // onChangeText={text}
+            placeholder="email"
+            onChangeText={text => this.onemailChange(text)}
           />
           <Text
             // eslint-disable-next-line react-native/no-inline-styles
             style={{
               fontSize: 15,
-              marginTop: 0,
               textAlign: 'left',
               fontWeight: 'bold',
               marginTop: 7,
@@ -73,12 +94,18 @@ export default class Login extends Component {
             style={styles.input}
             placeholder="Password"
             secureTextEntry={true}
-            // onChangeText={text}
+            onChangeText={text => this.onPasswordChange(text)}
           />
-
+          {this.state.loading ?   <ActivityIndicator  size="large" color="#e7564c" /> : null}
+          {!this.props.error == '' ? (
+            <View style={styles.error}>
+              <Icon name="exclamation-circle" size={18} color="#e7564c" />
+              <Text style={styles.errorText}>{this.props.error}</Text>
+            </View>
+          ) : null}
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => this.props.navigation.navigate('Main')}>
+            onPress={() => this.onSubmit()}>
             <Text style={styles.loginText}>Login</Text>
           </TouchableOpacity>
 
@@ -103,7 +130,7 @@ export default class Login extends Component {
             style={styles.normalSignUpButton}
             onPress={this._onPressButton}>
             <Text style={styles.normalSignUpButtonText}>
-              Sign Up with Username and Password
+              Sign Up with email and Password
             </Text>
           </TouchableOpacity>
         </View>
@@ -111,7 +138,14 @@ export default class Login extends Component {
     );
   }
 }
-
+const mapStateToProps = state => ({
+  authStatus: state.auth.isAuthenticated,
+  error: state.auth.error,
+});
+export default connect(
+  mapStateToProps,
+  {isSignedIn},
+)(Login);
 const styles = StyleSheet.create({
   container: {
     padding: 30,
@@ -123,7 +157,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#fafafa',
     marginBottom: 15,
   },
-
+  error: {
+    flexDirection: 'row',
+    marginTop: 7,
+    padding: 15,
+    borderColor: '#e7564c',
+    borderWidth: 1,
+  },
+  errorText: {
+    marginLeft: 8,
+    color: '#e7564c',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
   loginButton: {
     marginTop: 10,
 

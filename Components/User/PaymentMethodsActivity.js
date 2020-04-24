@@ -23,7 +23,7 @@ const DATA = [
   },
   {
     id: 2,
-    last4: '148',
+    last4: '1488',
     expdate: '01/24',
     image: 'cc-visa',
     color: '#192061',
@@ -42,8 +42,12 @@ export default class PaymentMethodsActivity extends Component {
           <TouchableOpacity
             style={styles.setButton}
             onPress={() =>
-              this.props.navigation.navigate('DeliveryDestinationMap')
-            }>
+              this.props.navigation.navigate('WaitingForMomoPaymentActivity', {
+                type: 'momo',
+                network: 'MTN',
+                number: '0546055647',
+              })
+            }> 
             <Text style={styles.ConfirmButton}>CONFIRM</Text>
           </TouchableOpacity>
         </View>
@@ -78,7 +82,7 @@ export default class PaymentMethodsActivity extends Component {
           Current Method
         </Text>
 
-        <MomoCard />
+        <MomoCard network={'MTN'} number={'0546055647'} />
         <Text
           // eslint-disable-next-line react-native/no-inline-styles
           style={{
@@ -86,6 +90,7 @@ export default class PaymentMethodsActivity extends Component {
             textAlign: 'left',
             marginLeft: 20,
             marginTop: 10,
+            marginRight: 20,
             fontWeight: 'bold',
             opacity: 0.5,
           }}>
