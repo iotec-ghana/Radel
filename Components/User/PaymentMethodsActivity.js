@@ -56,7 +56,7 @@ export default class PaymentMethodsActivity extends Component {
           right={'Add Payment Method'}
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}
-          righSideRoute={'AddCardActivity'}
+          righSideRoute={'SelectPaymentActivity'}
         />
         <Text
           // eslint-disable-next-line react-native/no-inline-styles

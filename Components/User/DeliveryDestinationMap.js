@@ -16,8 +16,7 @@ import MapView, {
   Polyline,
 } from 'react-native-maps';
 
-import Config from 'react-native-config';
-import Geolocation from '@react-native-community/geolocation';
+
 import MapViewDirections from 'react-native-maps-directions';
 import {connect} from 'react-redux';
 import {
@@ -32,7 +31,7 @@ import SuggestedRidersBottomSheet from './Layouts/SuggestedRidersBottomSheet';
 import BottomDrawer from 'rn-bottom-drawer';
 const {width, height} = Dimensions.get('window');
 const TAB_BAR_HEIGHT = 80;
-const GOOGLE_MAPS_APIKEY = 'AIzaSyCWNecG4xgKaW3_RGqgGT5QZnk9knUesCA';
+import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
 //addy.substr(0, addy.indexOf(','));
 class DeliveryDestinationMap extends Component {
   constructor(props) {
@@ -82,7 +81,7 @@ class DeliveryDestinationMap extends Component {
       };
       console.log(dist);
       const res = await axios.post(BASE_URL + '/pricing/', dist);
-      this.setState({price: res.data.price});
+      this.setState({price: res.data.rounded_price});
       console.log(res.data);
     } catch (e) {
       console.log(e.message);
@@ -126,7 +125,7 @@ class DeliveryDestinationMap extends Component {
               origin={this.props.origin}
               destination={this.props.destination}
               strokeWidth={5}
-              strokeColor="hotpink"
+              strokeColor="black"
               optimizeWaypoints={true}
               apikey={GOOGLE_MAPS_APIKEY}
               onStart={params => {

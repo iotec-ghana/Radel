@@ -26,8 +26,7 @@ const LATITUDE_DELTA = 0.009;
 const LONGITUDE_DELTA = 0.009;
 const LATITUDE = 0.009;
 const LONGITUDE = 0.009;
-import Config from 'react-native-config';
-const GOOGLE_MAPS_APIKEY = 'AIzaSyCWNecG4xgKaW3_RGqgGT5QZnk9knUesCA';
+import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv'
 import Sidebar from './Layouts/Sidebar';
 import {Drawer} from 'native-base';
 import {getCurrentLocation} from '../../Actions/locationAction';
@@ -44,6 +43,7 @@ class MapsActivity extends Component {
       routeCoordinates: [],
       distanceTravelled: 0,
       locationName: '',
+      showBS: false,
       originName: props.originName,
       prevLatLng: {},
       coordinate: new AnimatedRegion({
@@ -63,6 +63,17 @@ class MapsActivity extends Component {
   };
   componentWillUnmount() {
     Geolocation.clearWatch(this.watchID);
+    console.log('unmounted');
+  }
+  componentDidUpdate(prevstateprops, nextstate) {
+    console.log(
+      'updated ' +
+        prevstateprops.origin.longitude +
+        ' and ' +
+        prevstateprops.origin.longitude,
+    );
+    console.log(GOOGLE_MAPS_APIKEY);
+    // alert('updated ' + JSON.stringify(prevstateprops.origin));
   }
   renderContent = () => {
     return <BottomSheet navigation={this.props.navigation} />;
@@ -99,7 +110,8 @@ class MapsActivity extends Component {
           originName: Oname,
         };
 
-        this.props.getCurrentLocation(data);
+        await this.props.getCurrentLocation(data);
+        this.setState({showBS: true});
       },
       error => this.setState({error: error.message}),
       {enableHighAccuracy: true, timeout: 200000, maximumAge: 1000},
@@ -108,16 +120,16 @@ class MapsActivity extends Component {
     const {coordinate} = this.state;
 
     this.watchID = Geolocation.watchPosition(
-      position => {
+      async position => {
         const {routeCoordinates, distanceTravelled} = this.state;
         const {latitude, longitude} = position.coords;
-
+        const Oname = await this.getLocationName(position);
         const newCoordinate = {
           latitude,
           longitude,
-          originName: this.state.originName,
+          originName: Oname,
         };
-
+        await this.props.getCurrentLocation(newCoordinate);
         this.props.getCurrentLocation(newCoordinate);
         console.log({newCoordinate});
 
@@ -196,6 +208,7 @@ class MapsActivity extends Component {
             showUserLocation
             followUserLocation
             loadingEnabled
+            onKmlReady={results => console.log(results + 'kk')}
             region={this.getCurrentRegion()}
             style={{...StyleSheet.absoluteFillObject}}>
             {/* <Marker.Animated
@@ -233,13 +246,14 @@ class MapsActivity extends Component {
             opendrawer={this.openDrawer}
             navigation={this.props.navigation}
           />
-
-          <BottomDrawer
-            containerHeight={this.state.bottomSheetHeight}
-            offset={TAB_BAR_HEIGHT}
-            shadow={true}>
-            {this.renderContent()}
-          </BottomDrawer>
+          {this.state.showBS ? (
+            <BottomDrawer
+              containerHeight={this.state.bottomSheetHeight}
+              offset={TAB_BAR_HEIGHT}
+              shadow={true}>
+              {this.renderContent()}
+            </BottomDrawer>
+          ) : null}
         </View>
       </Drawer>
     );

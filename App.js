@@ -25,7 +25,8 @@ import BookProcessingActivity from './Components/User/BookProcessingActivity';
 import PhoneVerificationActivity from './Components/User/PhoneVerificationActivity';
 import GetStartedActivity from './Components/User/GetStartedActivity';
 import WaitingForMomoPaymentActivity from './Components/User/WaitingForMomoPaymentActivity';
-
+import SelectPaymentActivity from './Components/User/SelectPaymentActivity';
+import AddMomoNumber from './Components/User/AddMomoNumber';
 const Stack = createStackNavigator();
 const MyStatusBar = ({backgroundColor, ...props}) => (
   <View style={[styles.statusBar, {backgroundColor}]}>
@@ -56,11 +57,16 @@ const App: () => React$Node = () => {
             name="BookProcessingActivity"
             component={BookProcessingActivity}
           />
+          <Stack.Screen name="AddCardActivity" component={AddCardActivity} />
           <Stack.Screen
             name="PaymentMethodsActivity"
             component={PaymentMethodsActivity}
           />
-          <Stack.Screen name="AddCardActivity" component={AddCardActivity} />
+          <Stack.Screen
+            name="SelectPaymentActivity"
+            component={SelectPaymentActivity}
+          />
+          <Stack.Screen name="AddMomoNumber" component={AddMomoNumber} />
           <Stack.Screen
             name="PhoneVerificationActivity"
             component={PhoneVerificationActivity}

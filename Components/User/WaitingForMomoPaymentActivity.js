@@ -5,6 +5,8 @@ import Toolbar from './Layouts/Toolbar';
 import AsyncStorage from '@react-native-community/async-storage';
 import axios from 'axios';
 import {BASE_URL} from '../../constants';
+import {StackActions} from '@react-navigation/native';
+
 export default class WaitingForMomoPaymentActivity extends Component {
   constructor(props) {
     super(props);
@@ -14,62 +16,99 @@ export default class WaitingForMomoPaymentActivity extends Component {
       number: props.route.params.number,
       paymentID: 0,
       runCount: 0, //used to make sure the payment api is not called more than once
+      pollcount: 0,
+      hasPaid: false,
     };
   }
+  //   componentWillUnmount() {
+  //     this.setState({hasPaid: true});
+  //   }
+
+  componentDidUpdate = async (prevProps, prevState, snapshot) => {
+    // if ((await AsyncStorage.getItem('paymentCheck')) !== null) {
+    //   console.log(prevState.hasPaid);
+    // }
+  };
+
+  componentWillUnmount() {
+    
+    console.log('unmounted');
+  }
   componentDidMount = async () => {
+    console.log('cdm called');
     try {
+      //await AsyncStorage.removeItem('paymentCheck');
       //check if paymentcheck is set to localstorage
-      if (AsyncStorage.getItem('paymentCheck') == null) {
+      if ((await AsyncStorage.getItem('paymentCheck')) === null) {
+        console.log('localstorage is empty');
         const data = {
           runCount: 0,
           hasPaid: false,
+          paymentID: null,
         };
+        this.setState({runCount: 0});
         await AsyncStorage.setItem('paymentCheck', JSON.stringify(data));
-      } else {
-        // if set and runCount is 0 then run makePaymentRequest once
-        const read = await AsyncStorage.getItem('paymentCheck');
-        const data = JSON.parse(read);
-        const {paymentID} = this.state;
-        if (data.runCount === 0) {
-          this.makePaymentRequest();
-          const updateLocalstorage = {
-            runCount: 1,
-            hasPaid: false,
-          };
-          await AsyncStorage.setItem(
-            'paymentCheck',
-            JSON.stringify(updateLocalstorage),
-          );
-        } else {
-          //if user has not yet paid keep checking the databse for a successful payment every 2seconds
-          setInterval(this.checkPaymentStatus(paymentID), 2000);
-        }
       }
-    } catch (e) {}
-  };
+      // if set and runCount is 0 then run makePaymentRequest once
+      // const read = await AsyncStorage.getItem('paymentCheck');
+      // const data = JSON.parse(read);
+      if (this.state.runCount === 0) {
+        // console.log(data);
 
-  checkPaymentStatus = async id => {
-    try {
-      const response = await axios.get(`${BASE_URL}/payment/${id}`);
-      console.log(response.data);
-      if (response.data.status === 'success') {
-        this.props.navigation.navigate('BookProcessingActivity');
+        const pid = await this.makePaymentRequest();
+        this.setState({runCount: 1});
         const updateLocalstorage = {
           runCount: 1,
-          hasPaid: true,
+          hasPaid: false,
+          paymentID: pid,
         };
-        //update local storage and set has paid to true so that the
-        // user is redirected to BookProcessingActivity even when app closes unexpectedly
+
         await AsyncStorage.setItem(
           'paymentCheck',
           JSON.stringify(updateLocalstorage),
         );
       }
+
+      if (this.state.runCount === 1) {
+        const readdata = await AsyncStorage.getItem('paymentCheck');
+        const pid = JSON.parse(readdata);
+        //if user has not yet paid keep checking the databse for a successful payment every 2seconds
+
+        const pollingID = setInterval(() => {
+          this.checkPaymentStatus(pid.paymentID);
+          if (this.state.hasPaid) {
+            clearInterval(pollingID);
+          }
+        }, 4000);
+        console.log(pid.paymentID + ' this is current paymentid');
+
+        // setInterval(() => console.log('yes'), 300);
+      }
+    } catch (e) {}
+  };
+
+  //polls the database every 4 seconds
+  checkPaymentStatus = async id => {
+    try {
+      this.setState({pollcount: this.state.pollcount + 1});
+      console.log(`${BASE_URL}/checkstatuspayment/${id}`);
+      const response = await axios.get(`${BASE_URL}/checkstatuspayment/${id}`);
+      //console.log(this.state.pollcount + 'this is pollcount');
+      console.log(response.data.status);
+      if (response.data.status === 'success') {
+        this.setState({hasPaid: true});
+        //console.log('yess');
+        await AsyncStorage.removeItem('paymentCheck');
+        this.props.navigation.dispatch(
+          StackActions.replace('BookProcessingActivity'),
+        );
+        // this.props.navigation.pop(2);
+      }
     } catch (e) {
       console.log(e.message);
     }
   };
-
+  // make initial payment request. this function runs only once
   makePaymentRequest = async () => {
     try {
       const data = await AsyncStorage.getItem('authdata');
@@ -83,7 +122,9 @@ export default class WaitingForMomoPaymentActivity extends Component {
         network: this.state.network,
       };
       const sendPayment = await axios.post(BASE_URL + '/paywithMomo/', payload);
-      this.setState({paymentID: sendPayment.data.id});
+      this.setState({paymentID: sendPayment.data.paymentid});
+      //console.log(sendPayment.data.paymentid);
+      return sendPayment.data.paymentid;
     } catch (e) {
       console.log(e.message);
     }

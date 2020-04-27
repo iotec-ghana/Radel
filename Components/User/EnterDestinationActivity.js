@@ -12,8 +12,6 @@ import {
   Image,
 } from 'react-native';
 
-import Config from 'react-native-config';
-
 import {PV_API} from '../../constants';
 import axios from 'axios';
 import {connect} from 'react-redux';
@@ -26,7 +24,7 @@ import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete'
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 import UserDeliveryLocationHistoryList from './Layouts/UserDeliveryLocationHistoryList';
-const GOOGLE_MAPS_APIKEY = 'AIzaSyCWNecG4xgKaW3_RGqgGT5QZnk9knUesCA';
+import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
 
 class EnterDestinationActivity extends Component {
   constructor(props) {
@@ -39,16 +37,13 @@ class EnterDestinationActivity extends Component {
   }
 
   Next = () => {
-    
     this.props.navigation.navigate('DeliveryDestinationMap');
   };
   componentDidMount = async () => {
     //this.props.getCurrentLocation();
     console.log(this.props.origin);
-
   };
 
-  
   render() {
     return (
       <View style={styles.main}>

@@ -27,7 +27,7 @@ import {
 import MapViewDirections from 'react-native-maps-directions';
 import BottomDrawer from 'rn-bottom-drawer';
 const {width, height} = Dimensions.get('window');
-const GOOGLE_MAPS_APIKEY = 'AIzaSyCWNecG4xgKaW3_RGqgGT5QZnk9knUesCA';
+import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
 class BookProcessingActivity extends Component {
   constructor(props) {
     super(props);
@@ -203,7 +203,7 @@ class BookProcessingActivity extends Component {
             origin={this.props.origin}
             destination={this.props.destination}
             strokeWidth={5}
-            strokeColor="hotpink"
+            strokeColor="black"
             optimizeWaypoints={true}
             apikey={GOOGLE_MAPS_APIKEY}
             onStart={params => {

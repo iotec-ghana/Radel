@@ -29,7 +29,13 @@ export default class Toolbar extends Component {
           </Left>
           {this.props.body ? (
             <Body>
-              <Title>Header</Title>
+              <Title
+                style={{
+                  color: this.props.titleColor,
+                  margin: 0,
+                }}>
+                {this.props.body}
+              </Title>
             </Body>
           ) : null}
           <Right>

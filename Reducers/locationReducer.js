@@ -1,4 +1,5 @@
 import {GET_CURRENT_LOCATION, GET_DESTINATION_LOCATION} from '../Actions/types';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const initialState = {
   OriginCoordinates: {
