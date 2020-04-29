@@ -48,7 +48,7 @@ export const isSignedOut = navigation => async dispatch => {
       type: SIGN_OUT,
     });
 
-    navigation.navigate('Home');
+    navigation.navigate('Intro');
   } catch (e) {}
 };
 

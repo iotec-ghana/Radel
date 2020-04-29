@@ -25,6 +25,7 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 import UserDeliveryLocationHistoryList from './Layouts/UserDeliveryLocationHistoryList';
 import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
+import {Toast} from 'native-base';
 
 class EnterDestinationActivity extends Component {
   constructor(props) {
@@ -32,6 +33,7 @@ class EnterDestinationActivity extends Component {
     this.state = {
       origin: this.props.origin,
       destination: {},
+      disableButton: true,
       originName: props.originName,
     };
   }
@@ -48,7 +50,7 @@ class EnterDestinationActivity extends Component {
     return (
       <View style={styles.main}>
         <Toolbar
-          icon={'times'}
+          icon={'chevron-left'}
           // right={'Sign Up'}
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}
@@ -63,7 +65,15 @@ class EnterDestinationActivity extends Component {
         <View style={styles.button}>
           <TouchableOpacity
             style={styles.setButton}
-            onPress={() => this.Next()}>
+            onPress={() => {
+              this.state.disableButton
+                ? Toast.show({
+                    text: 'You must set a delivery destination first',
+                    buttonText: 'Okay',
+                    duration: 2000,
+                  })
+                : this.Next();
+            }}>
             <Text style={styles.setButtonText}>SET DESTINATION</Text>
           </TouchableOpacity>
         </View>
@@ -77,7 +87,7 @@ class EnterDestinationActivity extends Component {
           listViewDisplayed="auto" // true/false/undefined
           fetchDetails={true}
           renderDescription={row => row.description} // custom description render
-          onPress={(data, details = null) => {
+          onPress={async (data, details = null) => {
             // 'details' is provided when fetchDetails = true
 
             const dest = {
@@ -85,7 +95,10 @@ class EnterDestinationActivity extends Component {
               longitude: details.geometry.location.lng,
               destinationName: details.formatted_address,
             };
-            this.props.getDestinationCoordinates(dest);
+            await this.props.getDestinationCoordinates(dest);
+            if (details.formatted_address !== null) {
+              this.setState({disableButton: false});
+            }
           }}
           getDefaultValue={() => ''}
           query={{
@@ -107,10 +120,12 @@ class EnterDestinationActivity extends Component {
               padding: 10,
               backgroundColor: '#fafafa',
               margin: 10,
+              borderRadius:0
             },
             predefinedPlacesDescription: {
               color: '#1faadb',
               height: 200,
+              
             },
           }}
           //currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
@@ -164,6 +179,7 @@ export default connect(
 const styles = StyleSheet.create({
   main: {
     flex: 1,
+    backgroundColor:'#fff'
   },
   container: {
     padding: 3,

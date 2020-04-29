@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import {Header, Left, Body, Right, Button, Title} from 'native-base';
 import {StyleSheet, TouchableOpacity, View, Text} from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Feather';
 
 export default class Toolbar extends Component {
   render() {
@@ -19,9 +19,9 @@ export default class Toolbar extends Component {
               }}>
               <Icon
                 name={this.props.icon}
-                size={20}
+                size={30}
                 color="#000"
-                style={{margin: 2}}
+                style={{margin: 0}}
               />
 
               {/* <Text>Back</Text> */}

@@ -1,0 +1,19 @@
+{this.state.showBS ? this.RBSheet.open() : null}
+          <RBSheet
+            ref={ref => {
+              this.RBSheet = ref;
+            }}
+            closeOnPressBack={false}
+            closeOnPressMask={false}
+            animationType={'slide'}
+            height={this.state.bottomSheetHeight}
+            duration={400}
+            customStyles={{
+              wrapper: {
+                backgroundColor: 'transparent',
+              },
+              container: {
+                borderRadius: 12,
+              },
+            }}>
+            {this.renderContent()}

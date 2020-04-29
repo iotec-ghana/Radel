@@ -26,13 +26,13 @@ import MapViewDirections from 'react-native-maps-directions';
 import BottomDrawer from 'rn-bottom-drawer';
 const {width, height} = Dimensions.get('window');
 import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
-class BookProcessingActivity extends Component {
+class LookingForRiderActivity extends Component {
   constructor(props) {
     super(props);
     this.state = {
       showCancelBtn: false,
       btnText: 'Cancel',
-      processing: false,
+      processing: true,
       currentloclat: this.props.origin.latitude,
       currentloclong: this.props.origin.longitude,
       Destlatitude: this.props.destination.latitude,
@@ -48,7 +48,7 @@ class BookProcessingActivity extends Component {
         this.props.destinationName.indexOf(','),
       ),
       bottomDrawerParams: {
-        offset: 0,
+        offset: 40,
         height: height / 3,
       },
     };
@@ -142,7 +142,7 @@ class BookProcessingActivity extends Component {
           style={{height: 100, width: 100}}
         />
         <Text style={{fontWeight: 'bold', fontSize: 18}}>
-          WE ARE PROCESSING YOUR BOOKING
+          WE ARE LOOKING FOR THE CLOSEST RIDER FOR YOU
         </Text>
         <Text style={{fontWeight: 'bold', fontSize: 14, marginTop: 20}}>
           Your rider will be there soon
@@ -189,9 +189,6 @@ class BookProcessingActivity extends Component {
       <View style={styles.container}>
         <MapView
           provider={PROVIDER_GOOGLE}
-          showUserLocation
-          followUserLocation
-          loadingEnabled
           ref={c => (this.mapView = c)}
           initialRegion={this.getCurrentRegion()}
           style={{...StyleSheet.absoluteFillObject}}>
@@ -248,8 +245,8 @@ class BookProcessingActivity extends Component {
           />
         </MapView>
         <BottomDrawer
-          containerHeight={this.state.bottomDrawerParams.height}
-          offset={this.state.bottomDrawerParams.offset}
+          containerHeight={height / 3}
+          offset={40}
           startUp={true}
           onExpanded={ex => {}}
           shadow={true}>
@@ -258,17 +255,16 @@ class BookProcessingActivity extends Component {
             : this.DriverDetailsLayout()}
         </BottomDrawer>
         {this.topCard()}
-        {/* {this.state.showCancelBtn ? (
-          <View style={styles.buttons}>
-            <TouchableOpacity
-              style={styles.bookButton}
-              onPress={() =>
-                this.props.navigation.navigate('PaymentMethodsActivity')
-              }>
-              <Text style={styles.bookButtonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        ) : null} */}
+
+        <View style={styles.buttons}>
+          <TouchableOpacity
+            style={styles.bookButton}
+            onPress={() =>
+              this.props.navigation.navigate('PaymentMethodsActivity')
+            }>
+            <Text style={styles.bookButtonText}>BOOK NOW</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -284,7 +280,7 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   {getCurrentLocation, getDestinationCoordinates},
-)(BookProcessingActivity);
+)(LookingForRiderActivity);
 const styles = StyleSheet.create({
   container: {
     flex: 1,

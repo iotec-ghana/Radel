@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import MapView, {
   PROVIDER_GOOGLE,
@@ -15,8 +16,6 @@ import MapView, {
   AnimatedRegion,
   Polyline,
 } from 'react-native-maps';
-
-
 import MapViewDirections from 'react-native-maps-directions';
 import {connect} from 'react-redux';
 import {
@@ -44,6 +43,11 @@ class DeliveryDestinationMap extends Component {
       distance: 0,
       duration: 0,
       price: 0,
+      processing: false,
+      buttonDisabled: true,
+      loadingPrice: true,
+      found: false,
+      loadingLayout: false,
       originName: this.props.originName.substr(
         0,
         this.props.originName.indexOf(','),
@@ -55,8 +59,106 @@ class DeliveryDestinationMap extends Component {
     };
     this.mapView = null;
   }
+  process = async () => {
+    //fetch driver details
+    this.setState({
+      loadingLayout: false,
+      found: true,
+    });
+  };
+  DriverDetailsLayout = () => {
+    return (
+      <View style={{flex: 1, alignItems: 'center'}}>
+        <Text style={{fontWeight: 'bold', fontSize: 16, marginTop: 15}}>
+          WE HAVE FOUND YOU A RIDER
+        </Text>
+        <Text
+          style={{
+            fontWeight: 'bold',
+            color: '#e7564c',
+            fontSize: 14,
+            marginTop: 10,
+          }}>
+          Rider will pickup your items in {'02:45'}
+        </Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            marginTop: 15,
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              padding: 20,
+              backgroundColor: '#fafafa',
+              borderRadius: 40,
+              marginRight: 30,
+            }}>
+            <Icon name="phone" size={24} color="#000" style={{margin: 2}} />
+          </View>
+
+          <View style={{}}>
+            <Image
+              source={require('../../assets/deedat.jpg')}
+              style={{height: 100, width: 100, borderRadius: 100}}
+            />
+          </View>
+          <View
+            style={{
+              padding: 20,
+              backgroundColor: '#fafafa',
+              borderRadius: 40,
+              marginLeft: 30,
+            }}>
+            <Icon name="phone" size={24} color="#000" style={{}} />
+          </View>
+        </View>
+
+        <Text
+          style={{
+            fontWeight: 'bold',
+            color: '#000',
+            fontSize: 16,
+            marginTop: 10,
+          }}>
+          Deedat Billa
+        </Text>
+        <Text
+          style={{
+            fontWeight: 'bold',
+            color: '#000',
+            fontSize: 16,
+            marginTop: 20,
+          }}>
+          {'GR-34-18'} - {'Honda'}
+        </Text>
+      </View>
+    );
+  };
+  loadingLayout = () => {
+    setTimeout(this.process, 4000);
+    return (
+      <View style={{flex: 1, alignItems: 'center'}}>
+        <Image
+          source={require('../../assets/spinner.gif')}
+          style={{height: 100, width: 100}}
+        />
+        <Text style={{fontWeight: 'bold', fontSize: 18}}>
+          WE ARE LOOKING FOR THE CLOSEST RIDER FOR YOU
+        </Text>
+        <Text style={{fontWeight: 'bold', fontSize: 14, marginTop: 20}}>
+          Your rider will be there soon
+        </Text>
+      </View>
+    );
+  };
   renderContent = () => {
-    return <SuggestedRidersBottomSheet price={this.state.price} />;
+    return (
+      <SuggestedRidersBottomSheet
+        price={this.state.price}
+        loading={this.state.loadingPrice}
+      />
+    );
   };
 
   getCurrentRegion = () => ({
@@ -73,7 +175,7 @@ class DeliveryDestinationMap extends Component {
     longitudeDelta: LONGITUDE_DELTA,
   });
 
-  componentDidMount = async () => {};
+  componentDidMount() {}
   calculatePrice = async () => {
     try {
       const dist = {
@@ -81,10 +183,15 @@ class DeliveryDestinationMap extends Component {
       };
       console.log(dist);
       const res = await axios.post(BASE_URL + '/pricing/', dist);
-      this.setState({price: res.data.rounded_price});
+      this.setState({
+        price: res.data.rounded_price,
+        buttonDisabled: false,
+        loadingPrice: false,
+      });
       console.log(res.data);
     } catch (e) {
       console.log(e.message);
+      alert('please check your internet connection');
     }
   };
 
@@ -118,13 +225,27 @@ class DeliveryDestinationMap extends Component {
           initialRegion={this.getCurrentRegion()}
           ref={c => (this.mapView = c)}
           style={{...StyleSheet.absoluteFillObject}}>
-          <MapView.Marker coordinate={this.getCurrentRegion()} />
-          <MapView.Marker coordinate={this.getDestinationRegion()} />
+          <MapView.Marker coordinate={this.getCurrentRegion()}>
+            <Icon
+              name="map-marker"
+              size={24}
+              color="#000"
+              style={{margin: 2}}
+            />
+          </MapView.Marker>
+          <MapView.Marker coordinate={this.getDestinationRegion()}>
+            <Icon
+              name="stop-circle"
+              size={24}
+              color="#000"
+              style={{margin: 2}}
+            />
+          </MapView.Marker>
           {this.state.currentloclat && (
             <MapViewDirections
               origin={this.props.origin}
               destination={this.props.destination}
-              strokeWidth={5}
+              strokeWidth={3}
               strokeColor="black"
               optimizeWaypoints={true}
               apikey={GOOGLE_MAPS_APIKEY}
@@ -165,16 +286,32 @@ class DeliveryDestinationMap extends Component {
           startUp={true}
           onExpanded={ex => {}}
           shadow={true}>
-          {this.renderContent()}
+          {!this.state.loadingLayout && !this.state.found
+            ? this.renderContent()
+            : this.state.found
+            ? this.DriverDetailsLayout()
+            : this.loadingLayout()}
         </BottomDrawer>
         {this.topCard()}
         <View style={styles.buttons}>
           <TouchableOpacity
+            disabled={this.state.buttonDisabled}
             style={styles.bookButton}
             onPress={() =>
-              this.props.navigation.navigate('PaymentMethodsActivity')
+              this.setState(
+                {loadingLayout: true},
+                this.state.found
+                  ? this.props.navigation.navigate('PaymentMethodsActivity')
+                  : null,
+              )
             }>
-            <Text style={styles.bookButtonText}>BOOK NOW</Text>
+            {!this.state.loadingLayout && !this.state.found ? (
+              <Text style={styles.bookButtonText}>SELECT RIDER</Text>
+            ) : this.state.found ? (
+              <Text style={styles.bookButtonText}>COMFRIM</Text>
+            ) : (
+              <ActivityIndicator size="small" color="#fff" />
+            )}
           </TouchableOpacity>
         </View>
       </View>

@@ -14,8 +14,8 @@ export default class Drawer extends Component {
   render() {
     return (
       <NavigationContainer>
-        <DrawerC.Navigator initialRouteName="Home">
-          <DrawerC.Screen name="Home" component={Settings} />
+        <DrawerC.Navigator initialRouteName="Intro">
+          <DrawerC.Screen name="Intro" component={Settings} />
           <DrawerC.Screen name="Notifications" component={Settings} />
         </DrawerC.Navigator>
       </NavigationContainer>

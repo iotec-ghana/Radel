@@ -6,13 +6,19 @@ import {
   Dimensions,
   TouchableOpacity,
   SafeAreaView,
+  ActivityIndicator,
   FlatList,
 } from 'react-native';
 const {width, height} = Dimensions.get('window');
 import Toolbar from './Layouts/Toolbar';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import MomoCard from './Layouts/MomoCard';
+import AsyncStorage from '@react-native-community/async-storage';
+import axios from 'axios';
+import {BASE_URL} from '../../constants';
+import MomoCard from './Layouts/MomoCardDefault';
 import CreditCardLayout from './Layouts/CreditCardLayout';
+import MomoCardOther from './Layouts/MomoCardOther';
+import {ScrollView} from 'react-native-gesture-handler';
 const DATA = [
   {
     id: 1,
@@ -32,13 +38,53 @@ const DATA = [
 export default class PaymentMethodsActivity extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      cards: [],
+      momo: [],
+      payments: [],
+      loading: false,
+    };
   }
 
+  componentDidMount = async () => {
+    try {
+      this.setState({loading: true});
+      const user = await AsyncStorage.getItem('authdata');
+      const token = JSON.parse(user);
+
+      const config = {
+        headers: {Authorization: `Bearer ${token.user.token}`},
+      };
+      const response = await axios.get(BASE_URL + '/paymentMethods/', config);
+      const payments = response.data;
+
+      payments.forEach(element => {
+        if (element.paymentType === 'momo') {
+          this.setState({momo: this.state.momo.concat(element)});
+        }
+        if (element.paymentType === 'card') {
+          this.setState({cards: this.state.cards.concat(element)});
+        }
+      });
+      const momo = {
+        mobileMoney: this.state.momo,
+      };
+      this.setState({payments: this.state.payments.concat(momo)});
+      const cards = {
+        userCards: this.state.cards,
+      };
+      this.setState({
+        payments: this.state.payments.concat(cards),
+        loading: false,
+      });
+
+      //console.log(JSON.stringify(this.state.payments[1].userCards));
+    } catch (e) {}
+  };
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.button}>
+        {/* <View style={styles.button}>
           <TouchableOpacity
             style={styles.setButton}
             onPress={() =>
@@ -47,10 +93,10 @@ export default class PaymentMethodsActivity extends Component {
                 network: 'MTN',
                 number: '0546055647',
               })
-            }> 
+            }>
             <Text style={styles.ConfirmButton}>CONFIRM</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
         <Toolbar
           icon={'chevron-left'}
           right={'Add Payment Method'}
@@ -83,27 +129,48 @@ export default class PaymentMethodsActivity extends Component {
         </Text>
 
         <MomoCard network={'MTN'} number={'0546055647'} />
-        <Text
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{
-            fontSize: 12,
-            textAlign: 'left',
-            marginLeft: 20,
-            marginTop: 10,
-            marginRight: 20,
-            fontWeight: 'bold',
-            opacity: 0.5,
-          }}>
-          Choose a desired payment method. We offer payment methods suitable for
-          everyone
-        </Text>
-        <SafeAreaView>
-          <FlatList
-            data={DATA}
-            renderItem={({item}) => <CreditCardLayout item={item} />}
-            keyExtractor={item => item.id}
-          />
-        </SafeAreaView>
+
+        {this.state.loading ? (
+          <ActivityIndicator size="large" color="#e7564c" />
+        ) : (
+          <SafeAreaView style={{flex: 1}}>
+            <ScrollView>
+              <Text
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{
+                  fontSize: 12,
+                  textAlign: 'left',
+                  marginLeft: 20,
+                  marginTop: 10,
+                  marginRight: 20,
+                  fontWeight: 'bold',
+                  opacity: 0.5,
+                }}>
+                Choose a desired payment method. We offer payment methods
+                suitable for everyone
+              </Text>
+              <FlatList
+                data={this.state.cards}
+                renderItem={({item}) => (
+                  <View>
+                    <CreditCardLayout item={item} />
+                  </View>
+                )}
+                keyExtractor={item => item.id}
+              />
+
+              <FlatList
+                data={this.state.momo}
+                renderItem={({item}) => (
+                  <View>
+                    <MomoCardOther item={item} />
+                  </View>
+                )}
+                keyExtractor={item => item.id}
+              />
+            </ScrollView>
+          </SafeAreaView>
+        )}
       </View>
     );
   }
@@ -113,25 +180,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  toolbar: {
-    flex: 1,
-    width: width,
-    position: 'absolute',
-    top: 0,
-    elevation: 5,
-    backgroundColor: '#00000000',
-  },
-  toolContent: {
-    flex: 1,
-    flexDirection: 'row',
 
-    margin: 20,
-  },
-  back: {
-    position: 'absolute',
-    left: 0,
-    margin: 2,
-  },
   addpaymet: {
     position: 'absolute',
     right: 0,

@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-export default class CreditCardLayout extends Component {
+export default class MomoCardOther extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -13,18 +13,16 @@ export default class CreditCardLayout extends Component {
   render() {
     return (
       <TouchableOpacity style={styles.container}>
-        <Icon
-          name={"credit-card"}
-          size={50}
-          color={this.props.item.color}
-          style={{margin: 2}}
+        <Image
+          source={require('../../../assets/momo.png')}
+          style={styles.img}
         />
         <View style={styles.misc}>
           <Text style={{fontWeight: 'bold', fontSize: 18, marginBottom: 4}}>
-            **** **** **** {this.props.item.details.number.slice(-4)}
+            Mobile Number
           </Text>
           <Text style={{fontWeight: 'bold', fontSize: 12, opacity: 0.5}}>
-            Expires {this.props.item.details.expirymonth} / {this.props.item.details.expiryyear}
+            {this.props.item.details.number}
           </Text>
         </View>
       </TouchableOpacity>
@@ -59,5 +57,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     margin: 30,
     right: 0,
+  },
+  img: {
+    height: 50,
+    width: 50,
   },
 });

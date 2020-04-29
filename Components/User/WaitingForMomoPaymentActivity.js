@@ -15,7 +15,7 @@ export default class WaitingForMomoPaymentActivity extends Component {
       network: props.route.params.network,
       number: props.route.params.number,
       paymentID: 0,
-      runCount: 0, //used to make sure the payment api is not called more than once
+      runCount: null, //used to make sure the payment api is not called more than once
       pollcount: 0,
       hasPaid: false,
     };
@@ -31,11 +31,10 @@ export default class WaitingForMomoPaymentActivity extends Component {
   };
 
   componentWillUnmount() {
-    
     console.log('unmounted');
   }
   componentDidMount = async () => {
-    console.log('cdm called');
+    console.log('cdm called ');
     try {
       //await AsyncStorage.removeItem('paymentCheck');
       //check if paymentcheck is set to localstorage
@@ -46,14 +45,16 @@ export default class WaitingForMomoPaymentActivity extends Component {
           hasPaid: false,
           paymentID: null,
         };
-        this.setState({runCount: 0});
+
         await AsyncStorage.setItem('paymentCheck', JSON.stringify(data));
+        this.setState({runCount: 0});
       }
+      console.log('runcount is ' + this.state.runCount);
       // if set and runCount is 0 then run makePaymentRequest once
       // const read = await AsyncStorage.getItem('paymentCheck');
       // const data = JSON.parse(read);
       if (this.state.runCount === 0) {
-        // console.log(data);
+        console.log('has been called');
 
         const pid = await this.makePaymentRequest();
         this.setState({runCount: 1});

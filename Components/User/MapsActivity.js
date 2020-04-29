@@ -17,6 +17,7 @@ import MapView, {
   AnimatedRegion,
   Polyline,
 } from 'react-native-maps';
+import {PV_API} from '../../constants';
 import Geolocation from '@react-native-community/geolocation';
 import Toolbar from './Layouts/Toolbar';
 import haversine from 'haversine';
@@ -26,13 +27,15 @@ const LATITUDE_DELTA = 0.009;
 const LONGITUDE_DELTA = 0.009;
 const LATITUDE = 0.009;
 const LONGITUDE = 0.009;
-import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv'
+import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
 import Sidebar from './Layouts/Sidebar';
 import {Drawer} from 'native-base';
 import {getCurrentLocation} from '../../Actions/locationAction';
 import {connect} from 'react-redux';
+import {Toast} from 'native-base';
 const TAB_BAR_HEIGHT = 0;
 const {width, height} = Dimensions.get('window');
+import io from 'socket.io-client';
 class MapsActivity extends Component {
   constructor(props) {
     super(props);
@@ -65,14 +68,33 @@ class MapsActivity extends Component {
     Geolocation.clearWatch(this.watchID);
     console.log('unmounted');
   }
+  socketIO = async () => {
+    try {
+      const payload = {
+        latitude: 0.009,
+        longitude: 0.009,
+        riderEmail: 'deedat5@gmail.com',
+      };
+
+      // const res = await axios.post(PV_API + '/sendUserLocation', payload);
+      // console.log(res.data) 
+      // this.socket = io(PV_API);
+      // this.socket.on('clientlocation - ' + payload.riderEmail, mylocation => {
+      //   console.log(mylocation);
+      //   //this.setState({chatMessages: [...this.state.chatMessages, msg]});
+      // });
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
   componentDidUpdate(prevstateprops, nextstate) {
-    console.log(
-      'updated ' +
-        prevstateprops.origin.longitude +
-        ' and ' +
-        prevstateprops.origin.longitude,
-    );
-    console.log(GOOGLE_MAPS_APIKEY);
+    // console.log(
+    //   'updated ' +
+    //     prevstateprops.origin.longitude +
+    //     ' and ' +
+    //     prevstateprops.origin.longitude,
+    // );
+    // console.log(GOOGLE_MAPS_APIKEY);
     // alert('updated ' + JSON.stringify(prevstateprops.origin));
   }
   renderContent = () => {
@@ -87,6 +109,14 @@ class MapsActivity extends Component {
       return res.data.results[2].formatted_address;
     } catch (e) {
       console.log(e.message);
+      if (e.message === 'Network Error') {
+        this.setState({showBS: false});
+        Toast.show({
+          text: 'Please check your internet connection',
+          buttonText: 'Okay',
+          duration: 5000,
+        });
+      }
     }
   }
   handleBackButton() {
@@ -112,6 +142,7 @@ class MapsActivity extends Component {
 
         await this.props.getCurrentLocation(data);
         this.setState({showBS: true});
+        this.socketIO();
       },
       error => this.setState({error: error.message}),
       {enableHighAccuracy: true, timeout: 200000, maximumAge: 1000},
@@ -241,7 +272,7 @@ class MapsActivity extends Component {
           /> */}
           </MapView>
           <Toolbar
-            icon={'bars'}
+            icon={'menu'}
             notbackAction={true}
             opendrawer={this.openDrawer}
             navigation={this.props.navigation}
