@@ -36,7 +36,8 @@ const DATA = [
 
 export default class SuggestedRidersBottomSheet extends Component {
   state = {
-    itemPressed: -1,
+    itemPressed: DATA[0].id,
+    
   };
   typeSelected(value) {
     //.alert(value);

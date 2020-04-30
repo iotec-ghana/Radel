@@ -27,7 +27,6 @@ import GetStartedActivity from './Components/User/GetStartedActivity';
 import WaitingForMomoPaymentActivity from './Components/User/WaitingForMomoPaymentActivity';
 import SelectPaymentActivity from './Components/User/SelectPaymentActivity';
 import AddMomoNumber from './Components/User/AddMomoNumber';
-import LookingForRiderActivity from './Components/User/LookingForRiderActivity';
 import {Root} from 'native-base';
 const config = {
   animation: 'spring',
@@ -105,16 +104,7 @@ function MainStackScreen() {
         name="PhoneVerificationActivity"
         component={PhoneVerificationActivity}
       />
-      <MainStack.Screen
-        name="LookingForRiderActivity"
-        component={LookingForRiderActivity}
-        options={{
-          transitionSpec: {
-            open: config,
-            close: config,
-          },
-        }}
-      />
+      
       <MainStack.Screen
         name="GetStartedActivity"
         component={GetStartedActivity}

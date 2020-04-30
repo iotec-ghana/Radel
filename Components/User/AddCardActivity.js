@@ -7,17 +7,79 @@ import {
   Dimensions,
   SafeAreaView,
   ScrollView,
+  ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Toolbar from './Layouts/Toolbar';
+import AsyncStorage from '@react-native-community/async-storage';
+import axios from 'axios';
 const {width, height} = Dimensions.get('window');
+import {BASE_URL} from '../../constants';
+import {
+  CreditCardInput,
+  LiteCreditCardInput,
+} from 'react-native-input-credit-card';
 
 export default class AddCardActivity extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      loading: false,
+      valid: false,
+      values: {
+        // will be in the sanitized and formatted form
+        number: '',
+        expiry: '',
+        cvc: '',
+        type: '', // will be one of [null, "visa", "master-card", "american-express", "diners-club", "discover", "jcb", "unionpay", "maestro"]
+        name: '',
+      },
+    };
   }
+  _onChange = form => {
+    this.setState({
+      ...form,
+    });
+    console.log(this.state.values);
+  };
+
+  onSubmit = async () => {
+    try {
+      this.setState({loading: true});
+      const user = await AsyncStorage.getItem('authdata');
+      const token = JSON.parse(user);
+      console.log(token.user.token);
+      if (this.state.valid) {
+        //set header authorization token
+        const config = {
+          headers: {Authorization: `Bearer ${token.user.token}`},
+        };
+        this.setState({loading: true});
+
+        const payload = {
+          type: 'card',
+          details: {
+            ...this.state.values,
+          },
+        };
+        const response = await axios.post(
+          BASE_URL + '/createPayment/',
+          payload,
+          config,
+        );
+        console.log(response.data);
+        this.props.navigation.navigate('PaymentMethodsActivity');
+      } else {
+        alert('please select a network');
+      }
+      this.setState({loading: false});
+    } catch (e) {
+      console.log(e.message);
+      alert('there was a problem');
+      this.setState({loading: false});
+    }
+  };
 
   render() {
     return (
@@ -52,8 +114,12 @@ export default class AddCardActivity extends Component {
           </View> */}
           <TouchableOpacity
             style={styles.setButton}
-            onPress={() => dosomething()}>
-            <Text style={styles.ConfirmButton}>SAVE</Text>
+            onPress={() => this.onSubmit()}>
+            {this.state.loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.SaveButtonText}>SAVE</Text>
+            )}
           </TouchableOpacity>
         </View>
         <Toolbar
@@ -61,96 +127,7 @@ export default class AddCardActivity extends Component {
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}
         />
-
-        <Text
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{
-            fontSize: 38,
-            marginLeft: 20,
-            textAlign: 'left',
-            fontWeight: 'bold',
-          }}>
-          Add Credit Card
-        </Text>
-
-        <Text
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{
-            marginTop: 0,
-            fontSize: 15,
-            marginLeft: 20,
-            textAlign: 'left',
-            fontWeight: 'bold',
-            opacity: 0.5,
-          }}>
-          Card Holder Name
-        </Text>
-
-        <TextInput
-          style={styles.inputNameCard}
-          placeholder={'Card holder Name'}
-        />
-
-        <Text
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{
-            marginTop: 10,
-            fontSize: 15,
-            marginLeft: 20,
-            textAlign: 'left',
-            fontWeight: 'bold',
-            opacity: 0.5,
-          }}>
-          Card Number
-        </Text>
-
-        <TextInput
-          style={styles.inputNameCard}
-          placeholder={' Card Number'}
-          keyboardType={'number-pad'}
-        />
-
-        <View style={styles.expcvv}>
-          <View style={{flex: 1}}>
-            <Text
-              // eslint-disable-next-line react-native/no-inline-styles
-              style={{
-                marginTop: 10,
-                fontSize: 15,
-                marginLeft: 20,
-                textAlign: 'left',
-                fontWeight: 'bold',
-                opacity: 0.5,
-              }}>
-              Expires
-            </Text>
-            <TextInput
-              style={styles.inputNameCard}
-              placeholder={'Expires'}
-              keyboardType={'number-pad'}
-            />
-          </View>
-
-          <View style={{flex: 1}}>
-            <Text
-              // eslint-disable-next-line react-native/no-inline-styles
-              style={{
-                marginTop: 10,
-                fontSize: 15,
-                marginLeft: 20,
-                textAlign: 'left',
-                fontWeight: 'bold',
-                opacity: 0.5,
-              }}>
-              CVV
-            </Text>
-            <TextInput
-              style={styles.inputNameCard}
-              placeholder={'CVV'}
-              keyboardType={'number-pad'}
-            />
-          </View>
-        </View>
+        <CreditCardInput requiresName onChange={this._onChange} />
       </View>
     );
   }
@@ -211,7 +188,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 2,
   },
-  ConfirmButton: {
+  SaveButtonText: {
     color: '#fff',
     textAlign: 'center',
     fontWeight: 'bold',

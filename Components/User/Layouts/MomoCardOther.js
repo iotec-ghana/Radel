@@ -1,7 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/jsx-no-comment-textnodes */
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class MomoCardOther extends Component {
@@ -11,12 +18,53 @@ export default class MomoCardOther extends Component {
   }
 
   render() {
+    console.log(this.props.item.thumbnail);
     return (
-      <TouchableOpacity style={styles.container}>
-        <Image
-          source={require('../../../assets/momo.png')}
-          style={styles.img}
-        />
+      <TouchableOpacity
+        style={styles.container}
+        onPress={() =>
+          Alert.alert(
+            'Confirm',
+            `proceed to pay with ${this.props.item.details.number}?`,
+            [
+              {
+                text: 'Cancel',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel',
+              },
+              {
+                text: 'Yes',
+                onPress: () =>
+                  this.props.navigation.navigate(
+                    'WaitingForMomoPaymentActivity',
+                    {
+                      type: 'momo',
+                      network: this.props.item.details.network,
+                      number: this.props.item.details.number,
+                    },
+                  ),
+              },
+            ],
+            {cancelable: false},
+          )
+        }>
+        {this.props.item.details.network === 'mtn' ? (
+          <Image
+            source={require('../../../assets/mtn.png')}
+            style={styles.img}
+          />
+        ) : this.props.item.network === 'airtel' ? (
+          <Image
+            source={require('../../../assets/airtel.jpg')}
+            style={styles.img}
+          />
+        ) : (
+          <Image
+            source={require('../../../assets/vodafone.png')}
+            style={styles.img}
+          />
+        )}
+
         <View style={styles.misc}>
           <Text style={{fontWeight: 'bold', fontSize: 18, marginBottom: 4}}>
             Mobile Number
@@ -61,5 +109,6 @@ const styles = StyleSheet.create({
   img: {
     height: 50,
     width: 50,
+    borderRadius:50
   },
 });

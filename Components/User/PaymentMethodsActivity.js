@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Alert,
   SafeAreaView,
   ActivityIndicator,
   FlatList,
@@ -19,6 +20,7 @@ import MomoCard from './Layouts/MomoCardDefault';
 import CreditCardLayout from './Layouts/CreditCardLayout';
 import MomoCardOther from './Layouts/MomoCardOther';
 import {ScrollView} from 'react-native-gesture-handler';
+
 const DATA = [
   {
     id: 1,
@@ -66,19 +68,12 @@ export default class PaymentMethodsActivity extends Component {
           this.setState({cards: this.state.cards.concat(element)});
         }
       });
-      const momo = {
-        mobileMoney: this.state.momo,
-      };
-      this.setState({payments: this.state.payments.concat(momo)});
-      const cards = {
-        userCards: this.state.cards,
-      };
+
       this.setState({
-        payments: this.state.payments.concat(cards),
         loading: false,
       });
 
-      //console.log(JSON.stringify(this.state.payments[1].userCards));
+      console.log(JSON.stringify(this.state.momo));
     } catch (e) {}
   };
   render() {
@@ -149,7 +144,7 @@ export default class PaymentMethodsActivity extends Component {
                 Choose a desired payment method. We offer payment methods
                 suitable for everyone
               </Text>
-              <FlatList
+              {/* <FlatList
                 data={this.state.cards}
                 renderItem={({item}) => (
                   <View>
@@ -157,13 +152,16 @@ export default class PaymentMethodsActivity extends Component {
                   </View>
                 )}
                 keyExtractor={item => item.id}
-              />
+              /> */}
 
               <FlatList
                 data={this.state.momo}
                 renderItem={({item}) => (
                   <View>
-                    <MomoCardOther item={item} />
+                    <MomoCardOther
+                      navigation={this.props.navigation}
+                      item={item}
+                    />
                   </View>
                 )}
                 keyExtractor={item => item.id}

@@ -58,7 +58,7 @@ class EnterDestinationActivity extends Component {
         />
         <TextInput
           style={styles.input}
-          placeholder={'Current Location'}
+          placeholder={'Pickup Location'}
           value={this.state.originName}
         />
 

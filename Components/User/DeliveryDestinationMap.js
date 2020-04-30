@@ -72,7 +72,7 @@ class DeliveryDestinationMap extends Component {
         <Text style={{fontWeight: 'bold', fontSize: 16, marginTop: 15}}>
           WE HAVE FOUND YOU A RIDER
         </Text>
-        <Text
+        {/* <Text
           style={{
             fontWeight: 'bold',
             color: '#e7564c',
@@ -80,7 +80,7 @@ class DeliveryDestinationMap extends Component {
             marginTop: 10,
           }}>
           Rider will pickup your items in {'02:45'}
-        </Text>
+        </Text> */}
         <View
           style={{
             flexDirection: 'row',
@@ -308,7 +308,7 @@ class DeliveryDestinationMap extends Component {
             {!this.state.loadingLayout && !this.state.found ? (
               <Text style={styles.bookButtonText}>SELECT RIDER</Text>
             ) : this.state.found ? (
-              <Text style={styles.bookButtonText}>COMFRIM</Text>
+              <Text style={styles.bookButtonText}>CONFRIM</Text>
             ) : (
               <ActivityIndicator size="small" color="#fff" />
             )}

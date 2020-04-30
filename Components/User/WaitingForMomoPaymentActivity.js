@@ -34,6 +34,7 @@ export default class WaitingForMomoPaymentActivity extends Component {
     console.log('unmounted');
   }
   componentDidMount = async () => {
+    console.log(this.state)
     console.log('cdm called ');
     try {
       //await AsyncStorage.removeItem('paymentCheck');
