@@ -1,3 +1,4 @@
+/* eslint-disable no-lone-blocks */
 import React, {Component} from 'react';
 import axios from 'axios';
 import {
@@ -9,6 +10,7 @@ import {
   PermissionsAndroid,
   TouchableOpacity,
   Platform,
+  StatusBar,
   Image,
 } from 'react-native';
 import MapView, {
@@ -32,6 +34,7 @@ import Sidebar from './Layouts/Sidebar';
 import {Drawer} from 'native-base';
 import {getCurrentLocation} from '../../Actions/locationAction';
 import {connect} from 'react-redux';
+import {getRiders} from '../../Actions/getAllRidersAction';
 import {Toast} from 'native-base';
 const TAB_BAR_HEIGHT = 0;
 const {width, height} = Dimensions.get('window');
@@ -44,6 +47,7 @@ class MapsActivity extends Component {
       longitude: props.origin.longitude,
       bottomSheetHeight: height / 4,
       routeCoordinates: [],
+      riders: [],
       distanceTravelled: 0,
       locationName: '',
       showBS: false,
@@ -68,35 +72,46 @@ class MapsActivity extends Component {
     Geolocation.clearWatch(this.watchID);
     console.log('unmounted');
   }
-  socketIO = async () => {
-    try {
-      const payload = {
-        latitude: 0.009,
-        longitude: 0.009,
-        riderEmail: 'deedat5@gmail.com',
-      };
+  getAllRiders = () => {
+    this.socket = io(PV_API, {
+      secure: true,
+      transports: ['websocket'],
+    });
 
-      // const res = await axios.post(PV_API + '/sendUserLocation', payload);
-      // console.log(res.data) 
-      // this.socket = io(PV_API);
-      // this.socket.on('clientlocation - ' + payload.riderEmail, mylocation => {
-      //   console.log(mylocation);
-      //   //this.setState({chatMessages: [...this.state.chatMessages, msg]});
-      // });
-    } catch (e) {
-      console.log(e.message);
+    this.socket.on('riderDetails', det => {
+      this.setState({
+        riders: this.state.riders.filter(
+          rider => rider.riderEmail !== det.riderEmail,
+        ),
+      });
+      this.setState({riders: [...this.state.riders, det]});
+      this.props.getRiders(this.state.riders);
+       console.log(this.state.riders);
+    });
+  };
+  animateRiderMovement = () => {
+    const {coordinate} = this.state;
+    if (Platform.OS === 'android') {
+      if (this.marker) {
+        {
+          this.state.riders.map(riders =>
+            this.marker._component.animateMarkerToCoordinate(
+              {latitude: riders.latitude, longitude: riders.longitude},
+              500,
+            ),
+          );
+        }
+      }
+    } else {
+      {
+        this.state.riders.map(riders =>
+          coordinate
+            .timing({latitude: riders.latitude, longitude: riders.longitude})
+            .start(),
+        );
+      }
     }
   };
-  componentDidUpdate(prevstateprops, nextstate) {
-    // console.log(
-    //   'updated ' +
-    //     prevstateprops.origin.longitude +
-    //     ' and ' +
-    //     prevstateprops.origin.longitude,
-    // );
-    // console.log(GOOGLE_MAPS_APIKEY);
-    // alert('updated ' + JSON.stringify(prevstateprops.origin));
-  }
   renderContent = () => {
     return <BottomSheet navigation={this.props.navigation} />;
   };
@@ -123,13 +138,15 @@ class MapsActivity extends Component {
     BackHandler.exitApp();
   }
   componentDidMount = async () => {
+    console.log(this.state.riders.length);
     // BackHandler.addEventListener(
     //   'hardwareBackPress',
     //   this.handleBackButton.bind(this),
     // );
 
     // this.requestLocationPermission();
-
+    this.getAllRiders();
+    this.animateRiderMovement();
     Geolocation.getCurrentPosition(
       async position => {
         // console.log(position.coords.latitude);
@@ -142,7 +159,7 @@ class MapsActivity extends Component {
 
         await this.props.getCurrentLocation(data);
         this.setState({showBS: true});
-        this.socketIO();
+        //this.socketIO();
       },
       error => this.setState({error: error.message}),
       {enableHighAccuracy: true, timeout: 200000, maximumAge: 1000},
@@ -227,22 +244,23 @@ class MapsActivity extends Component {
 
   render() {
     return (
-      <Drawer
-        ref={ref => {
-          this.drawer = ref;
-        }}
-        content={<Sidebar navigation={this.props.navigation} />}
-        onClose={() => this.closeDrawer()}>
-        <View style={styles.container}>
-          <MapView
-            provider={PROVIDER_GOOGLE}
-            showUserLocation
-            followUserLocation
-            loadingEnabled
-            onKmlReady={results => console.log(results + 'kk')}
-            region={this.getCurrentRegion()}
-            style={{...StyleSheet.absoluteFillObject}}>
-            {/* <Marker.Animated
+      <View style={{flex: 1}}>
+        <Drawer
+          ref={ref => {
+            this.drawer = ref;
+          }}
+          content={<Sidebar navigation={this.props.navigation} />}
+          onClose={() => this.closeDrawer()}>
+          <View style={styles.container}>
+            <MapView
+              provider={PROVIDER_GOOGLE}
+              showUserLocation
+              followUserLocation
+              loadingEnabled
+              onKmlReady={results => console.log(results + 'kk')}
+              region={this.getCurrentRegion()}
+              style={{...StyleSheet.absoluteFillObject}}>
+              {/* <Marker.Animated
             ref={marker => {
               this.marker = marker;
             }}
@@ -259,34 +277,56 @@ class MapsActivity extends Component {
 
         
           </Marker.Animated> */}
+              {this.state.riders.map(riders => (
+                <Marker.Animated
+                  ref={marker => {
+                    this.marker = marker;
+                  }}
+                  coordinate={{
+                    latitude: riders.latitude,
+                    longitude: riders.longitude,
+                  }}>
+                  <Image
+                    source={require('../../assets/motor.png')}
+                    style={{height: 40, width: 40}}
+                  />
 
-            {/* <Marker coordinate={this.getCurrentRegion()} /> */}
-            {/* <Marker coordinate={this.getDestinationReagion()} /> */}
-            {/* will be used in DeliveryDestinationMap */}
-            {/* <PolylineDirection
+                  <Marker
+                    coordinate={{
+                      latitude: riders.latitude,
+                      longitude: riders.longitude,
+                    }}
+                  />
+                </Marker.Animated>
+              ))}
+
+              <Marker coordinate={this.getCurrentRegion()} />
+              {/* will be used in DeliveryDestinationMap */}
+              {/* <PolylineDirection
             origin={origin}
             destination={destination}
             apiKey={'AIzaSyCF1Jur9qHYa6q07JWBMyVjQ2DqOlSJ2qc'}
             strokeWidth={4}
             strokeColor="#12bc00"
           /> */}
-          </MapView>
-          <Toolbar
-            icon={'menu'}
-            notbackAction={true}
-            opendrawer={this.openDrawer}
-            navigation={this.props.navigation}
-          />
-          {this.state.showBS ? (
-            <BottomDrawer
-              containerHeight={this.state.bottomSheetHeight}
-              offset={TAB_BAR_HEIGHT}
-              shadow={true}>
-              {this.renderContent()}
-            </BottomDrawer>
-          ) : null}
-        </View>
-      </Drawer>
+            </MapView>
+            <Toolbar
+              icon={'align-left'}
+              notbackAction={true}
+              opendrawer={this.openDrawer}
+              navigation={this.props.navigation}
+            />
+            {this.state.showBS ? (
+              <BottomDrawer
+                containerHeight={this.state.bottomSheetHeight}
+                offset={TAB_BAR_HEIGHT}
+                shadow={true}>
+                {this.renderContent()}
+              </BottomDrawer>
+            ) : null}
+          </View>
+        </Drawer>
+      </View>
     );
   }
 }
@@ -296,7 +336,7 @@ const mapStateToProps = state => ({
 });
 export default connect(
   mapStateToProps,
-  {getCurrentLocation},
+  {getCurrentLocation, getRiders},
 )(MapsActivity);
 const styles = StyleSheet.create({
   container: {

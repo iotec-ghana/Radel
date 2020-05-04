@@ -14,7 +14,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Feather';
 import RidersCard from './RidersCard';
 const DATA = [
   {
@@ -37,7 +37,6 @@ const DATA = [
 export default class SuggestedRidersBottomSheet extends Component {
   state = {
     itemPressed: DATA[0].id,
-    
   };
   typeSelected(value) {
     //.alert(value);
@@ -51,12 +50,12 @@ export default class SuggestedRidersBottomSheet extends Component {
         <Text style={styles.suggestedText}>Suggested Riders</Text>
         <SafeAreaView>
           <FlatList
-            data={DATA}
+            data={this.props.riders}
             renderItem={({item}) => (
               // <RidersCard data={item} price={this.props.price} arr={DATA} />
               <TouchableOpacity
                 // eslint-disable-next-line react-native/no-inline-styles
-                onPress={() => this.typeSelected(item.id)}
+                onPress={() => this.typeSelected(item.riderEmail)}
                 style={{
                   flex: 1,
                   flexDirection: 'row',
@@ -64,13 +63,16 @@ export default class SuggestedRidersBottomSheet extends Component {
                   margin: 2,
                   borderRadius: 5,
                   borderColor:
-                    this.state.itemPressed === item.id ? '#e7564c' : 'black',
-                  borderWidth: this.state.itemPressed === item.id ? 2 : 0,
+                    this.state.itemPressed === item.riderEmail
+                      ? '#e7564c'
+                      : 'black',
+                  borderWidth:
+                    this.state.itemPressed === item.riderEmail ? 2 : 0,
                 }}>
                 <View style={styles.radelGo}>
                   <Text style={styles.radelGoText}>RadelGO</Text>
 
-                  {DATA.indexOf(item) === 0 ? (
+                  {this.state.riders.indexOf(item) === 0 ? (
                     <Text style={styles.bestText}>Best Save</Text>
                   ) : null}
 
@@ -82,7 +84,7 @@ export default class SuggestedRidersBottomSheet extends Component {
                     )}
 
                     <Icon
-                      name="clock-o"
+                      name="navigation-2"
                       size={14}
                       color="#000"
                       style={{margin: 2}}
@@ -103,7 +105,7 @@ export default class SuggestedRidersBottomSheet extends Component {
                 />
               </TouchableOpacity>
             )}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.riderEmail}
           />
         </SafeAreaView>
       </View>

@@ -1,7 +1,15 @@
 import React, {Component} from 'react';
-import {View, Text, SafeAreaView, FlatList, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  SafeAreaView,
+  FlatList,
+  StyleSheet,
+  StatusBar,
+} from 'react-native';
 import SideBarItems from './SideBarItems';
 import SideBarHeader from './SideBarHeader';
+import {StatusBarColor} from '../../../constants';
 const menuItems = [
   {
     id: 1,
@@ -39,6 +47,7 @@ export default class Sidebar extends Component {
   render() {
     return (
       <View style={styles.container}>
+        
         <SideBarHeader
           image={'../../../assets/deedat.jpg'}
           name={'Deedat Idriss Nuhu Billa'}
@@ -56,10 +65,11 @@ export default class Sidebar extends Component {
       </View>
     );
   }
-}
+} 
 
 const styles = StyleSheet.create({
   container: {
+   
     flex: 4,
     backgroundColor: '#fff',
   },

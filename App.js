@@ -27,6 +27,7 @@ import GetStartedActivity from './Components/User/GetStartedActivity';
 import WaitingForMomoPaymentActivity from './Components/User/WaitingForMomoPaymentActivity';
 import SelectPaymentActivity from './Components/User/SelectPaymentActivity';
 import AddMomoNumber from './Components/User/AddMomoNumber';
+
 import {Root} from 'native-base';
 const config = {
   animation: 'spring',
@@ -53,9 +54,9 @@ const App: () => React$Node = () => {
 
   return (
     <Root>
+      {/* <StatusBar backgroundColor="#E9665D" barStyle="dark-content" /> */}
       <Provider store={store}>
         <NavigationContainer>
-          {/* <MyStatusBar backgroundColor="#e7564c" barStyle="light-content" /> */}
           <RootStack.Navigator mode="modal">
             <RootStack.Screen
               name="Main"
@@ -104,7 +105,7 @@ function MainStackScreen() {
         name="PhoneVerificationActivity"
         component={PhoneVerificationActivity}
       />
-      
+
       <MainStack.Screen
         name="GetStartedActivity"
         component={GetStartedActivity}

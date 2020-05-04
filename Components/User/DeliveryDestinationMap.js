@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {getLatLonDiffInMeters} from '../../helpers';
 import {
   View,
   Text,
@@ -31,6 +32,7 @@ import BottomDrawer from 'rn-bottom-drawer';
 const {width, height} = Dimensions.get('window');
 const TAB_BAR_HEIGHT = 80;
 import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
+import {getRiders} from '../../Actions/getAllRidersAction';
 //addy.substr(0, addy.indexOf(','));
 class DeliveryDestinationMap extends Component {
   constructor(props) {
@@ -153,10 +155,27 @@ class DeliveryDestinationMap extends Component {
     );
   };
   renderContent = () => {
+    var modifiedArr = [];
+    var data = {};
+    this.props.riders.forEach(element => {
+      data = {
+        latitude: element.latitude,
+        longitude: element.longitude,
+        riderEmail: element.riderEmail,
+        distanceFromUser: getLatLonDiffInMeters(
+          element.latitude,
+          element.longitude,
+          this.state.currentloclat,
+          this.state.currentloclong,
+        ),
+      };
+      modifiedArr.push(data);
+    });
     return (
       <SuggestedRidersBottomSheet
         price={this.state.price}
         loading={this.state.loadingPrice}
+        riders={modifiedArr}
       />
     );
   };
@@ -175,28 +194,30 @@ class DeliveryDestinationMap extends Component {
     longitudeDelta: LONGITUDE_DELTA,
   });
 
-  componentDidMount() {}
+  componentDidMount() {
+    console.log(this.props.riders);
+  }
   calculatePrice = async () => {
     try {
       const dist = {
         distance: this.state.distance,
       };
-      console.log(dist);
+      //console.log(dist);
       const res = await axios.post(BASE_URL + '/pricing/', dist);
       this.setState({
         price: res.data.rounded_price,
         buttonDisabled: false,
         loadingPrice: false,
       });
-      console.log(res.data);
+      // console.log(res.data);
     } catch (e) {
-      console.log(e.message);
+      // console.log(e.message);
       alert('please check your internet connection');
     }
   };
 
   topCard = () => {
-    console.log(this.state.originName);
+    // console.log(this.state.originName);
     return (
       <View style={styles.top}>
         <View style={styles.topItems}>
@@ -210,7 +231,7 @@ class DeliveryDestinationMap extends Component {
               margin: 10,
               fontWeight: 'bold',
             }}>
-            {this.state.distance}KM
+            {this.state.distance}Km
           </Text>
         </View>
       </View>
@@ -250,11 +271,11 @@ class DeliveryDestinationMap extends Component {
               optimizeWaypoints={true}
               apikey={GOOGLE_MAPS_APIKEY}
               onStart={params => {
-                console.log(
-                  `Started routing between "${params.origin}" and "${
-                    params.destination
-                  }"`,
-                );
+                // console.log(
+                //   `Started routing between "${params.origin}" and "${
+                //     params.destination
+                //   }"`,
+                // );
               }}
               onReady={async result => {
                 await this.setState({
@@ -262,8 +283,8 @@ class DeliveryDestinationMap extends Component {
                   duration: result.duration,
                 });
                 this.calculatePrice();
-                console.log(`Distance: ${result.distance} km`);
-                console.log(`Duration: ${result.duration} min.`);
+                // console.log(`Distance: ${result.distance} km`);
+                // console.log(`Duration: ${result.duration} min.`);
 
                 this.mapView.fitToCoordinates(result.coordinates, {
                   edgePadding: {
@@ -324,16 +345,18 @@ const mapStateToProps = state => ({
   destination: state.locationData.DestinationCoordinates,
   destinationName: state.locationData.destinationName,
   originName: state.locationData.originName,
+  riders: state.nearby_riders.nearby,
   //error: state.locationData.error,
 });
 
 export default connect(
   mapStateToProps,
-  {getCurrentLocation, getDestinationCoordinates},
+  {getCurrentLocation, getDestinationCoordinates, getRiders},
 )(DeliveryDestinationMap);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 20,
   },
   top: {
     width: width,

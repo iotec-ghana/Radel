@@ -8,10 +8,12 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  StatusBar,
   Dimensions,
 } from 'react-native';
 import Toolbar from './Layouts/Toolbar';
 const windowWidth = Dimensions.get('window').width;
+import {StatusBarColor} from '../../constants';
 
 import {isSignedIn} from '../../Actions/authAction';
 import {connect} from 'react-redux';
@@ -21,7 +23,7 @@ class Login extends Component {
     email: '',
     password: '',
     loading: false,
-  }; 
+  };
   onSubmit = async () => {
     this.setState({loading: true});
     await this.props.isSignedIn(this.state, this.props.navigation);
@@ -37,7 +39,6 @@ class Login extends Component {
     if (this.props.authStatus) {
       this.props.navigation.navigate('Main');
     }
-    
   }
   render() {
     const {email} = this.state;
@@ -50,7 +51,12 @@ class Login extends Component {
           navigation={this.props.navigation}
           righSideRoute={'SignUp'}
         />
+
         <View style={styles.container}>
+          <StatusBar
+            backgroundColor={StatusBarColor}
+            barStyle="dark-content"
+          />
           <Text
             // eslint-disable-next-line react-native/no-inline-styles
             style={{
@@ -96,7 +102,9 @@ class Login extends Component {
             secureTextEntry={true}
             onChangeText={text => this.onPasswordChange(text)}
           />
-          {this.state.loading ?   <ActivityIndicator  size="large" color="#e7564c" /> : null}
+          {this.state.loading ? (
+            <ActivityIndicator size="large" color="#e7564c" />
+          ) : null}
           {!this.props.error == '' ? (
             <View style={styles.error}>
               <Icon name="exclamation-circle" size={18} color="#e7564c" />

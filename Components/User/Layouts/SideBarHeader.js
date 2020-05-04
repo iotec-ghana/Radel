@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image,StatusBar} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -28,6 +28,11 @@ export default class SideBarHeader extends Component {
     const img = '../../../assets/deedat.jpg';
     return (
       <View style={styles.container}>
+        <StatusBar
+          barStyle="dark-content"
+           translucent={true}
+          backgroundColor={'transparent'}
+        />
         <Image style={styles.image} source={require(img)} />
         <Text style={styles.nameText}> {this.state.name} </Text>
         <Text style={styles.idText}> {this.state.number} </Text>

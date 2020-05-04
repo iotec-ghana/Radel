@@ -5,9 +5,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 const windowWidth = Dimensions.get('window').width;
+import {StatusBarColor} from '../../constants';
 
 export default class GetStartedActivity extends Component {
   constructor(props) {
@@ -18,6 +20,7 @@ export default class GetStartedActivity extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar barStyle={StatusBarColor} backgroundColor="#6a51ae" />
         <Icon name="check-circle" size={120} color="#000" style={{margin: 2}} />
         <Text style={{fontSize: 40, fontWeight: 'bold'}}>
           You are ready to go

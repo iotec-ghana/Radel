@@ -7,13 +7,14 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {RegisterUser} from '../../Actions/authAction';
 import {connect} from 'react-redux';
 const windowWidth = Dimensions.get('window').width;
 import Toolbar from './Layouts/Toolbar';
-
+import {StatusBarColor} from '../../constants';
 class Register extends Component {
   constructor(props) {
     super(props);
@@ -85,6 +86,10 @@ class Register extends Component {
           righSideRoute={'Login'}
         />
         <View style={styles.container}>
+          <StatusBar
+            backgroundColor={StatusBarColor}
+            barStyle="light-content"
+          />
           <Text
             // eslint-disable-next-line react-native/no-inline-styles
             style={{

@@ -6,7 +6,9 @@ import {
   Dimensions,
   TouchableOpacity,
   StyleSheet,
+  StatusBar,
 } from 'react-native';
+import {StatusBarColor} from '../../constants';
 const windowWidth = Dimensions.get('window').width;
 
 export default class Intro extends Component {
@@ -18,6 +20,7 @@ export default class Intro extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar backgroundColor={StatusBarColor} barStyle="dark-content" />
         <Image
           source={require('../../assets/deedat.jpg')}
           style={{height: 100, width: 100, borderRadius: 100, marginTop: 40}}

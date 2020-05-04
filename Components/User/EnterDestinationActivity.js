@@ -9,10 +9,11 @@ import {
   SafeAreaView,
   TouchableOpacity,
   FlatList,
+  StatusBar,
   Image,
 } from 'react-native';
 
-import {PV_API} from '../../constants';
+import {PV_API, StatusBarColor} from '../../constants';
 import axios from 'axios';
 import {connect} from 'react-redux';
 import {
@@ -26,6 +27,7 @@ const windowHeight = Dimensions.get('window').height;
 import UserDeliveryLocationHistoryList from './Layouts/UserDeliveryLocationHistoryList';
 import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
 import {Toast} from 'native-base';
+import AsyncStorage from '@react-native-community/async-storage';
 
 class EnterDestinationActivity extends Component {
   constructor(props) {
@@ -35,38 +37,55 @@ class EnterDestinationActivity extends Component {
       destination: {},
       disableButton: true,
       originName: props.originName,
+      rphone: null,
     };
   }
 
-  Next = () => {
-    this.props.navigation.navigate('DeliveryDestinationMap');
+  Next = async () => {
+    this.props.navigation.navigate('DeliveryDestinationMap', {
+      receipientPhone: this.state.rphone,
+    });
   };
   componentDidMount = async () => {
     //this.props.getCurrentLocation();
     console.log(this.props.origin);
   };
-
+  rchange(txt) {
+    this.setState({rphone: txt});
+  }
   render() {
     return (
       <View style={styles.main}>
         <Toolbar
-          icon={'chevron-left'}
+          icon={'arrow-left'}
           // right={'Sign Up'}
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}
           // righSideRoute={'SignUp'}
+        />
+        <StatusBar
+          barStyle="dark-content"
+          // translucent={true}
+          backgroundColor={StatusBarColor}
         />
         <TextInput
           style={styles.input}
           placeholder={'Pickup Location'}
           value={this.state.originName}
         />
+        <TextInput
+          style={styles.input}
+          placeholder={'Reciepient phone number'}
+          value={this.state.rphone} 
+          keyboardType={'numeric'}
+          onChangeText={txt => this.rchange(txt)}
+        />
 
         <View style={styles.button}>
           <TouchableOpacity
             style={styles.setButton}
             onPress={() => {
-              this.state.disableButton
+              this.state.disableButton || this.state.rphone === null
                 ? Toast.show({
                     text: 'You must set a delivery destination first',
                     buttonText: 'Okay',
@@ -120,12 +139,11 @@ class EnterDestinationActivity extends Component {
               padding: 10,
               backgroundColor: '#fafafa',
               margin: 10,
-              borderRadius:0
+              borderRadius: 0,
             },
             predefinedPlacesDescription: {
               color: '#1faadb',
               height: 200,
-              
             },
           }}
           //currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
@@ -179,7 +197,7 @@ export default connect(
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor:'#fff'
+    backgroundColor: '#fff',
   },
   container: {
     padding: 3,
@@ -189,7 +207,9 @@ const styles = StyleSheet.create({
     height: 50,
     padding: 10,
     backgroundColor: '#fafafa',
-    margin: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 10,
   },
   button: {
     width: windowWidth,

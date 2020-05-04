@@ -7,8 +7,8 @@ import Icon from 'react-native-vector-icons/Feather';
 export default class Toolbar extends Component {
   render() {
     return (
-      <View>
-        <Header style={styles.header}>
+      <View style={styles.header}>
+        <Header transparent>
           <Left>
             <Button
               transparent
@@ -65,5 +65,6 @@ const styles = StyleSheet.create({
   header: {
     elevation: 0,
     backgroundColor: '#00000000',
+    paddingTop: 0,
   },
 });
