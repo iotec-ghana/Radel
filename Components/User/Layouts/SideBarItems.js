@@ -11,6 +11,9 @@ class SideBarItems extends Component {
   }
   ExecuteSelectedOption = () => {
     switch (this.props.item.id) {
+      case 1:
+        this.props.navigation.navigate('destination');
+        break;
       case 5:
         this.props.isSignedOut(this.props.navigation);
         break;

@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
 import MapView, {
   PROVIDER_GOOGLE,
@@ -24,7 +25,8 @@ import {
   getDestinationCoordinates,
 } from '../../Actions/locationAction';
 import axios from 'axios';
-import {BASE_URL} from '../../constants';
+import {getSelectedRider} from '../../Actions/SelectRiderAction';
+import {BASE_URL, PV_API} from '../../constants';
 const LATITUDE_DELTA = 0.009;
 const LONGITUDE_DELTA = 0.009;
 import SuggestedRidersBottomSheet from './Layouts/SuggestedRidersBottomSheet';
@@ -33,6 +35,8 @@ const {width, height} = Dimensions.get('window');
 const TAB_BAR_HEIGHT = 80;
 import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
 import {getRiders} from '../../Actions/getAllRidersAction';
+import io from 'socket.io-client';
+import {StackActions} from '@react-navigation/native';
 //addy.substr(0, addy.indexOf(','));
 class DeliveryDestinationMap extends Component {
   constructor(props) {
@@ -50,6 +54,8 @@ class DeliveryDestinationMap extends Component {
       loadingPrice: true,
       found: false,
       loadingLayout: false,
+      requestAccepted: false,
+      riderDetails: null,
       originName: this.props.originName.substr(
         0,
         this.props.originName.indexOf(','),
@@ -60,13 +66,55 @@ class DeliveryDestinationMap extends Component {
       ),
     };
     this.mapView = null;
-  }
-  process = async () => {
-    //fetch driver details
-    this.setState({
-      loadingLayout: false,
-      found: true,
+    this.socket = io(PV_API, {
+      secure: true,
+      transports: ['websocket'],
     });
+  }
+  componentDidMount() {
+    console.log(this.props.selected);
+  }
+  requestRide = async () => {
+    //fetch driver details
+
+    const payload = {
+      latitude: this.state.currentloclat,
+      longitude: this.state.currentloclong,
+      userEmail: 'deedat5@gmail.com',
+      destination: this.state.destinationName,
+      pickup: this.state.originName,
+      ...this.props.selected,
+    };
+    // console.log(payload)
+    await this.socket.emit('hailride', payload);
+
+    await this.ListenForRiderDecision();
+    console.log('done');
+  };
+  trackMyRider = () => {
+    //this should be called somehwere else
+    this.socket.on('myRiderLocation-' + this.props.selected.riderEmail, det => {
+      console.log(det);
+    });
+  };
+  ListenForRiderDecision = () => {
+    const userEmail = 'deedat5@gmail.com';
+    this.socket.on('riderChoice-' + userEmail, det => {
+       //console.log(det); 
+      if (det.isAvailable) {
+        this.setState({
+          loadingLayout: false,
+          requestAccepted: det.isAvailable,
+          found: true,
+          riderDetails: det,
+        });
+      } else {
+        // this.props.navigation.dispatch(
+        //   StackActions.replace('DeliveryDestinationMap'),
+        // ); 
+        alert("Rider declined your request")
+      }
+    }); 
   };
   DriverDetailsLayout = () => {
     return (
@@ -138,7 +186,7 @@ class DeliveryDestinationMap extends Component {
     );
   };
   loadingLayout = () => {
-    setTimeout(this.process, 4000);
+    this.requestRide();
     return (
       <View style={{flex: 1, alignItems: 'center'}}>
         <Image
@@ -155,29 +203,33 @@ class DeliveryDestinationMap extends Component {
     );
   };
   renderContent = () => {
-    var modifiedArr = [];
-    var data = {};
-    this.props.riders.forEach(element => {
-      data = {
-        latitude: element.latitude,
-        longitude: element.longitude,
-        riderEmail: element.riderEmail,
-        distanceFromUser: getLatLonDiffInMeters(
-          element.latitude,
-          element.longitude,
-          this.state.currentloclat,
-          this.state.currentloclong,
-        ),
-      };
-      modifiedArr.push(data);
-    });
-    return (
-      <SuggestedRidersBottomSheet
-        price={this.state.price}
-        loading={this.state.loadingPrice}
-        riders={modifiedArr}
-      />
-    );
+    if (this.props.riders) {
+      var modifiedArr = [];
+      var data = {};
+      this.props.riders.forEach(element => {
+        data = {
+          latitude: element.latitude,
+          longitude: element.longitude,
+          riderEmail: element.riderEmail,
+          distanceFromUser: getLatLonDiffInMeters(
+            element.latitude,
+            element.longitude,
+            this.state.currentloclat,
+            this.state.currentloclong,
+          ),
+        };
+        modifiedArr.push(data);
+      });
+      return (
+        <SuggestedRidersBottomSheet
+          price={this.state.price}
+          loading={this.state.loadingPrice}
+          riders={modifiedArr}
+        />
+      );
+    } else {
+      return <Text>There are no riders around you</Text>;
+    }
   };
 
   getCurrentRegion = () => ({
@@ -194,9 +246,6 @@ class DeliveryDestinationMap extends Component {
     longitudeDelta: LONGITUDE_DELTA,
   });
 
-  componentDidMount() {
-    console.log(this.props.riders);
-  }
   calculatePrice = async () => {
     try {
       const dist = {
@@ -240,6 +289,11 @@ class DeliveryDestinationMap extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar
+          barStyle="dark-content"
+          translucent={true}
+          backgroundColor={'transparent'}
+        />
         <MapView
           provider={PROVIDER_GOOGLE}
           loadingEnabled
@@ -346,23 +400,24 @@ const mapStateToProps = state => ({
   destinationName: state.locationData.destinationName,
   originName: state.locationData.originName,
   riders: state.nearby_riders.nearby,
+  selected: state.selected_rider.riderDetails,
   //error: state.locationData.error,
 });
 
 export default connect(
   mapStateToProps,
-  {getCurrentLocation, getDestinationCoordinates, getRiders},
+  {getCurrentLocation, getDestinationCoordinates, getRiders, getSelectedRider},
 )(DeliveryDestinationMap);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
   },
   top: {
     width: width,
     position: 'absolute',
     backgroundColor: '#00000000',
     top: 0,
+    marginTop: 30,
   },
   topItems: {
     flex: 1,

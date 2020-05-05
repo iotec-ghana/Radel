@@ -16,33 +16,23 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import RidersCard from './RidersCard';
-const DATA = [
-  {
-    id: 'bd7acbea-c1b1-46c2u-aed5-3ad53abb28ba',
-    price: 35,
-    time: '1-5 min',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    price: 55,
-    time: '12-15 min',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    price: 75,
-    time: '15-25 min',
-  },
-];
+import {connect} from 'react-redux';
+import {getSelectedRider} from '../../../Actions/SelectRiderAction';
 
-export default class SuggestedRidersBottomSheet extends Component {
+class SuggestedRidersBottomSheet extends Component {
   state = {
-    itemPressed: DATA[0].id,
+    itemPressed: this.props.riders[0].riderEmail,
   };
-  typeSelected(value) {
-    //.alert(value);
+  typeSelected(value, details) {
     this.setState({
       itemPressed: value,
     });
+    this.props.getSelectedRider(details);
+    console.log("selected" + JSON.stringify(details))
+  }
+  componentDidMount() {
+    //console.log(this.props.riders[0]);
+    this.props.getSelectedRider(this.props.riders[0]);
   }
   render() {
     return (
@@ -55,7 +45,7 @@ export default class SuggestedRidersBottomSheet extends Component {
               // <RidersCard data={item} price={this.props.price} arr={DATA} />
               <TouchableOpacity
                 // eslint-disable-next-line react-native/no-inline-styles
-                onPress={() => this.typeSelected(item.riderEmail)}
+                onPress={() => this.typeSelected(item.riderEmail, item)}
                 style={{
                   flex: 1,
                   flexDirection: 'row',
@@ -72,7 +62,7 @@ export default class SuggestedRidersBottomSheet extends Component {
                 <View style={styles.radelGo}>
                   <Text style={styles.radelGoText}>RadelGO</Text>
 
-                  {this.state.riders.indexOf(item) === 0 ? (
+                  {this.props.riders.indexOf(item) === 0 ? (
                     <Text style={styles.bestText}>Best Save</Text>
                   ) : null}
 
@@ -89,15 +79,17 @@ export default class SuggestedRidersBottomSheet extends Component {
                       color="#000"
                       style={{margin: 2}}
                     />
-                    <Text style={styles.time}>{item.time}</Text>
+                    <Text style={styles.time}>
+                      rider is {item.distanceFromUser}Km away
+                    </Text>
                   </View>
                 </View>
 
                 <Image
                   source={require('../../../assets/motor.png')}
                   style={{
-                    height: DATA.indexOf(item) === 0 ? 80 : 50,
-                    width: DATA.indexOf(item) === 0 ? 80 : 50,
+                    height: this.props.riders.indexOf(item) === 0 ? 80 : 50,
+                    width: this.props.riders.indexOf(item) === 0 ? 80 : 50,
                     margin: 5,
                     position: 'absolute',
                     right: 0,
@@ -113,6 +105,10 @@ export default class SuggestedRidersBottomSheet extends Component {
   }
 }
 
+export default connect(
+  null,
+  {getSelectedRider},
+)(SuggestedRidersBottomSheet);
 const styles = StyleSheet.create({
   main: {
     flex: 1,
