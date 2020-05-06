@@ -25,6 +25,7 @@ import Toolbar from './Layouts/Toolbar';
 import haversine from 'haversine';
 import BottomSheet from './Layouts/BottomSheet';
 import BottomDrawer from 'rn-bottom-drawer';
+import {StackActions} from '@react-navigation/native';
 const LATITUDE_DELTA = 0.009;
 const LONGITUDE_DELTA = 0.009;
 const LATITUDE = 0.009;
@@ -33,6 +34,7 @@ import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
 import Sidebar from './Layouts/Sidebar';
 import {Drawer} from 'native-base';
 import {getCurrentLocation} from '../../Actions/locationAction';
+import {isSignedIn} from '../../Actions/authAction';
 import {connect} from 'react-redux';
 import {getRiders} from '../../Actions/getAllRidersAction';
 import {Toast} from 'native-base';
@@ -53,7 +55,13 @@ class MapsActivity extends Component {
       showBS: false,
       originName: props.originName,
       prevLatLng: {},
-      coordinate: new AnimatedRegion({
+      coordinateRiders: new AnimatedRegion({
+        latitude: LATITUDE,
+        longitude: LONGITUDE,
+        latitudeDelta: 0,
+        longitudeDelta: 0,
+      }),
+      coordinateUser: new AnimatedRegion({
         latitude: LATITUDE,
         longitude: LONGITUDE,
         latitudeDelta: 0,
@@ -86,16 +94,16 @@ class MapsActivity extends Component {
       });
       this.setState({riders: [...this.state.riders, det]});
       this.props.getRiders(this.state.riders);
-       console.log(this.state.riders);
+      console.log(this.state.riders);
     });
   };
   animateRiderMovement = () => {
-    const {coordinate} = this.state;
+    const {coordinateRiders: coordinate} = this.state;
     if (Platform.OS === 'android') {
-      if (this.marker) {
+      if (this.markerRider) {
         {
           this.state.riders.map(riders =>
-            this.marker._component.animateMarkerToCoordinate(
+            this.markerRider._component.animateMarkerToCoordinate(
               {latitude: riders.latitude, longitude: riders.longitude},
               500,
             ),
@@ -137,7 +145,17 @@ class MapsActivity extends Component {
   handleBackButton() {
     BackHandler.exitApp();
   }
+  // static getDerivedStateFromProps(props, state) {
+  //   if (!props.authStatus.isAuthenticated) {
+  //     this.props.navigation.goBack();
+  //     //this.props.navigation.dispatch(StackActions.replace('Login'));
+  //   }
+  // }
   componentDidMount = async () => {
+    if (!this.props.authStatus.isAuthenticated) {
+      this.props.navigation.goBack();
+      //this.props.navigation.dispatch(StackActions.replace('Login'));
+    }
     console.log(this.state.riders.length);
     // BackHandler.addEventListener(
     //   'hardwareBackPress',
@@ -159,13 +177,14 @@ class MapsActivity extends Component {
 
         await this.props.getCurrentLocation(data);
         this.setState({showBS: true});
+        // this.RBSheet.open();
         //this.socketIO();
       },
       error => this.setState({error: error.message}),
       {enableHighAccuracy: true, timeout: 200000, maximumAge: 1000},
     );
 
-    const {coordinate} = this.state;
+    const {coordinateRiders: coordinate} = this.state;
 
     this.watchID = Geolocation.watchPosition(
       async position => {
@@ -181,16 +200,16 @@ class MapsActivity extends Component {
         this.props.getCurrentLocation(newCoordinate);
         console.log({newCoordinate});
 
-        // if (Platform.OS === 'android') {
-        //   if (this.marker) {
-        //     this.marker._component.animateMarkerToCoordinate(
-        //       newCoordinate,
-        //       500,
-        //     );
-        //   }
-        // } else {
-        coordinate.timing(newCoordinate).start();
-        // }
+        if (Platform.OS === 'android') {
+          //   if (this.markerUser) {
+          //     this.markerUser._component.animateMarkerToCoordinate(
+          //       newCoordinate,
+          //       500,
+          //     );
+          //   }
+          // } else {
+          coordinate.timing(newCoordinate).start();
+        }
 
         this.setState({
           latitude,
@@ -260,27 +279,21 @@ class MapsActivity extends Component {
               onKmlReady={results => console.log(results + 'kk')}
               region={this.getCurrentRegion()}
               style={{...StyleSheet.absoluteFillObject}}>
-              {/* <Marker.Animated
-            ref={marker => {
-              this.marker = marker;
-            }}
-            coordinate={this.state.coordinate}>
-            <Image
-              source={require('../../assets/map-pin.png')}
-              style={{height: 40, width: 40}}
-            />
-            //will be used to show riders on the mapp
-            {this.state.coordinates.map((coordinate, index) =>
-          <MapView.Marker key={`coordinate_${index}`} coordinate={coordinate} />
-        )}
-        //will be used to show riders on the mapp
+              <Marker.Animated
+                ref={marker => {
+                  this.markerUser = marker;
+                }}
+                coordinate={this.getCurrentRegion()}>
+                {/* <Image
+                  source={require('../../assets/map-pin.png')}
+                  style={{height: 40, width: 40}}
+                /> */}
+              </Marker.Animated>
 
-        
-          </Marker.Animated> */}
               {this.state.riders.map(riders => (
                 <Marker.Animated
                   ref={marker => {
-                    this.marker = marker;
+                    this.markerRider = marker;
                   }}
                   coordinate={{
                     latitude: riders.latitude,
@@ -300,7 +313,6 @@ class MapsActivity extends Component {
                 </Marker.Animated>
               ))}
 
-              <Marker coordinate={this.getCurrentRegion()} />
               {/* will be used in DeliveryDestinationMap */}
               {/* <PolylineDirection
             origin={origin}
@@ -323,7 +335,25 @@ class MapsActivity extends Component {
                 shadow={true}>
                 {this.renderContent()}
               </BottomDrawer>
-            ) : null}
+            ) : // <RBSheet
+            //   ref={ref => {
+            //     this.RBSheet = ref;
+            //   }}
+            //   height={this.state.bottomSheetHeight}
+            //   animationType={'slide'}
+            //   duration={650}
+            //   minClosingHeight={this.state.bottomSheetHeight}
+            //   closeOnPressMask={false}
+            //   closeOnPressBack={false}
+            //   customStyles={{
+            //     container: {},
+            //     wrapper: {
+            //       backgroundColor: 'transparent',
+            //     },
+            //   }}>
+            //   {this.renderContent()}
+            // </RBSheet>
+            null}
           </View>
         </Drawer>
       </View>
@@ -333,10 +363,11 @@ class MapsActivity extends Component {
 const mapStateToProps = state => ({
   origin: state.locationData.OriginCoordinates,
   error: state.locationData.error,
+  authStatus: state.auth,
 });
 export default connect(
   mapStateToProps,
-  {getCurrentLocation, getRiders},
+  {getCurrentLocation, getRiders, isSignedIn},
 )(MapsActivity);
 const styles = StyleSheet.create({
   container: {

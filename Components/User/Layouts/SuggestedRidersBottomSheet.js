@@ -14,7 +14,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import RidersCard from './RidersCard';
 import {connect} from 'react-redux';
 import {getSelectedRider} from '../../../Actions/SelectRiderAction';
@@ -74,13 +74,13 @@ class SuggestedRidersBottomSheet extends Component {
                     )}
 
                     <Icon
-                      name="navigation-2"
+                      name="clock-o"
                       size={14}
                       color="#000"
                       style={{margin: 2}}
                     />
                     <Text style={styles.time}>
-                      rider is {item.distanceFromUser}Km away
+                      rider is {item.distanceFromUser.toFixed(2)}km away
                     </Text>
                   </View>
                 </View>

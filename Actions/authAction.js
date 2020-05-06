@@ -1,4 +1,4 @@
-import {SIGN_IN, SIGN_OUT, REGISTER} from './types';
+import {SIGN_IN, SIGN_OUT, REGISTER, CHECK_LOGIN_STATUS} from './types';
 import axios from 'axios';
 import {BASE_URL} from '../constants';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -16,15 +16,33 @@ export const isSignedIn = (data, navigation) => async dispatch => {
 
     dispatch({
       type: SIGN_IN,
-      payload: response.data.user,
+      payload: authData,
+      error: '',
     });
-    navigation.navigate('Main');
+    //navigation.navigate('Main');
   } catch (e) {
-    console.log(e);
-    dispatch({
-      type: SIGN_IN,
-      payload: 'Your email or password is incorrect. Please try again',
-    });
+    const authData = {
+      isAuthenticated: false,
+    };
+    console.log(e.message);
+    if (
+      e.message === 'Request failed with status code 500' ||
+      e.message === 'Request failed with status code 502' ||
+      e.message === 'Request failed with status code 503' ||
+      e.message === 'Request failed with status code 404'
+    ) {
+      dispatch({
+        type: SIGN_IN,
+        payload: authData,
+        error: 'Internal server error',
+      });
+    } else {
+      dispatch({
+        type: SIGN_IN,
+        payload: authData,
+        error: 'Your email or password is incorrect. Please try again',
+      });
+    }
   }
 };
 
@@ -51,7 +69,18 @@ export const isSignedOut = navigation => async dispatch => {
     navigation.navigate('Intro');
   } catch (e) {}
 };
+export const loginStatus = () => async dispatch => {
+  try {
+    const user = await AsyncStorage.getItem('authdata');
+    const data = JSON.parse(user);
+  
 
+    dispatch({
+      type: CHECK_LOGIN_STATUS,
+      payload: data,
+    });
+  } catch (e) {}
+};
 export const RegisterUser = (payload, navigation) => async dispatch => {
   try {
     const response = await axios.post(BASE_URL + '/register/', payload);
@@ -64,14 +93,32 @@ export const RegisterUser = (payload, navigation) => async dispatch => {
 
     dispatch({
       type: REGISTER,
-      payload: response.data.user,
+      payload: authData,
+      error2: '',
     });
     navigation.navigate('PhoneVerificationActivity');
   } catch (e) {
     console.log(e);
-    dispatch({
-      type: REGISTER,
-      payload: 'email already exist',
-    });
+    const authData = {
+      isAuthenticated: false,
+    };
+    if (
+      e.message === 'Request failed with status code 500' ||
+      e.message === 'Request failed with status code 502' ||
+      e.message === 'Request failed with status code 503' ||
+      e.message === 'Request failed with status code 404'
+    ) {
+      dispatch({
+        type: REGISTER,
+        payload: authData,
+        error2: 'Internal server error',
+      });
+    } else {
+      dispatch({
+        type: REGISTER,
+        payload: authData,
+        error2: 'User already exist',
+      });
+    }
   }
 };

@@ -2,6 +2,8 @@
 import React, {Component} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {getLatLonDiffInMeters} from '../../helpers';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import haversine from 'haversine';
 import {
   View,
   Text,
@@ -26,6 +28,7 @@ import {
 } from '../../Actions/locationAction';
 import axios from 'axios';
 import {getSelectedRider} from '../../Actions/SelectRiderAction';
+import {isSignedIn} from '../../Actions/authAction';
 import {BASE_URL, PV_API} from '../../constants';
 const LATITUDE_DELTA = 0.009;
 const LONGITUDE_DELTA = 0.009;
@@ -72,7 +75,9 @@ class DeliveryDestinationMap extends Component {
     });
   }
   componentDidMount() {
-    console.log(this.props.selected);
+    // this.RBSheet.open();
+
+    console.log(this.props.authStatus);
   }
   requestRide = async () => {
     //fetch driver details
@@ -88,8 +93,8 @@ class DeliveryDestinationMap extends Component {
     // console.log(payload)
     await this.socket.emit('hailride', payload);
 
-    await this.ListenForRiderDecision();
-    console.log('done');
+    this.ListenForRiderDecision();
+    // console.log('done');
   };
   trackMyRider = () => {
     //this should be called somehwere else
@@ -100,7 +105,7 @@ class DeliveryDestinationMap extends Component {
   ListenForRiderDecision = () => {
     const userEmail = 'deedat5@gmail.com';
     this.socket.on('riderChoice-' + userEmail, det => {
-       //console.log(det); 
+      //console.log(det);
       if (det.isAvailable) {
         this.setState({
           loadingLayout: false,
@@ -111,11 +116,12 @@ class DeliveryDestinationMap extends Component {
       } else {
         // this.props.navigation.dispatch(
         //   StackActions.replace('DeliveryDestinationMap'),
-        // ); 
-        alert("Rider declined your request")
+        // );
+        alert('Rider declined your request');
       }
-    }); 
+    });
   };
+
   DriverDetailsLayout = () => {
     return (
       <View style={{flex: 1, alignItems: 'center'}}>
@@ -202,6 +208,9 @@ class DeliveryDestinationMap extends Component {
       </View>
     );
   };
+  calcDistance = (riderlocation, userlocation) => {
+    return haversine(riderlocation, userlocation) || 0;
+  };
   renderContent = () => {
     if (this.props.riders) {
       var modifiedArr = [];
@@ -211,11 +220,12 @@ class DeliveryDestinationMap extends Component {
           latitude: element.latitude,
           longitude: element.longitude,
           riderEmail: element.riderEmail,
-          distanceFromUser: getLatLonDiffInMeters(
-            element.latitude,
-            element.longitude,
-            this.state.currentloclat,
-            this.state.currentloclong,
+          distanceFromUser: this.calcDistance(
+            {latitude: element.latitude, longitude: element.longitude},
+            {
+              latitude: this.state.currentloclat,
+              longitude: this.state.currentloclong,
+            },
           ),
         };
         modifiedArr.push(data);
@@ -355,6 +365,31 @@ class DeliveryDestinationMap extends Component {
             />
           )}
         </MapView>
+        {/* <RBSheet
+          ref={ref => {
+            this.RBSheet = ref;
+          }}
+          height={height/3}
+          animationType={'slide'}
+          duration={650}
+         // minClosingHeight={height/3}
+          closeOnPressMask={false}
+          closeOnPressBack={false}
+          customStyles={{
+            container: {
+              
+            },
+            wrapper: {
+              backgroundColor: 'transparent',
+              marginBottom: 70,
+            },
+          }}>
+          {!this.state.loadingLayout && !this.state.found
+            ? this.renderContent()
+            : this.state.found
+            ? this.DriverDetailsLayout()
+            : this.loadingLayout()}
+        </RBSheet> */}
         <BottomDrawer
           containerHeight={height / 3}
           offset={TAB_BAR_HEIGHT}
@@ -401,12 +436,19 @@ const mapStateToProps = state => ({
   originName: state.locationData.originName,
   riders: state.nearby_riders.nearby,
   selected: state.selected_rider.riderDetails,
+  authStatus: state.auth.user,
   //error: state.locationData.error,
 });
 
 export default connect(
   mapStateToProps,
-  {getCurrentLocation, getDestinationCoordinates, getRiders, getSelectedRider},
+  {
+    getCurrentLocation,
+    getDestinationCoordinates,
+    getRiders,
+    getSelectedRider,
+    isSignedIn,
+  },
 )(DeliveryDestinationMap);
 const styles = StyleSheet.create({
   container: {

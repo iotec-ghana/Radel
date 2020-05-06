@@ -9,14 +9,29 @@ import {
   StatusBar,
 } from 'react-native';
 import {StatusBarColor} from '../../constants';
+import {loginStatus} from '../../Actions/authAction';
+import {connect} from 'react-redux';
+import {StackActions} from '@react-navigation/native';
 const windowWidth = Dimensions.get('window').width;
 
-export default class Intro extends Component {
+class Intro extends Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
-
+  componentDidMount() {
+    this.props.loginStatus();
+    console.log(this.props.authStatus.isAuthenticated);
+    if (this.props.authStatus.isAuthenticated) {
+      this.props.navigation.navigate('Main');
+    }
+  }
+  static getDerivedStateFromProps(props, state) {
+    if (props.authStatus.isAuthenticated) {
+      // props.navigation.navigate('Main');
+      props.navigation.dispatch(StackActions.replace('Main'));
+    }
+  }
   render() {
     return (
       <View style={styles.container}>
@@ -64,6 +79,14 @@ export default class Intro extends Component {
     );
   }
 }
+const mapStateToProps = state => ({
+  authStatus: state.auth,
+  error: state.auth.error,
+});
+export default connect(
+  mapStateToProps,
+  {loginStatus},
+)(Intro);
 const styles = StyleSheet.create({
   container: {
     flex: 1,

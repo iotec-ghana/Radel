@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import React, {Component} from 'react';
 import {
   Text,
@@ -14,20 +15,28 @@ import {
 import Toolbar from './Layouts/Toolbar';
 const windowWidth = Dimensions.get('window').width;
 import {StatusBarColor} from '../../constants';
-
-import {isSignedIn} from '../../Actions/authAction';
+import {StackActions} from '@react-navigation/native';
+import {isSignedIn, loginStatus} from '../../Actions/authAction';
 import {connect} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 class Login extends Component {
   state = {
     email: '',
     password: '',
+    isAuthenticated: false,
     loading: false,
   };
   onSubmit = async () => {
-    this.setState({loading: true});
-    await this.props.isSignedIn(this.state, this.props.navigation);
-    this.setState({loading: false});
+    const {email, password} = this.state;
+    if (email === '') {
+      alert('email field cannot be empty');
+    } else if (password === '') {
+      alert('password field cannot be empty');
+    } else {
+      this.setState({loading: true});
+      await this.props.isSignedIn(this.state, this.props.navigation);
+      this.setState({loading: false});
+    }
   };
   onemailChange = email => {
     this.setState({email: email});
@@ -35,9 +44,12 @@ class Login extends Component {
   onPasswordChange = password => {
     this.setState({password: password});
   };
-  componentDidMount() {
-    if (this.props.authStatus) {
-      this.props.navigation.navigate('Main');
+  componentDidMount = async () => {
+    this.props.loginStatus();
+  };
+  static getDerivedStateFromProps(props, state) {
+    if (props.authStatus.isAuthenticated) {
+      props.navigation.dispatch(StackActions.replace('Main'));
     }
   }
   render() {
@@ -53,10 +65,7 @@ class Login extends Component {
         />
 
         <View style={styles.container}>
-          <StatusBar
-            backgroundColor={StatusBarColor}
-            barStyle="dark-content"
-          />
+          <StatusBar backgroundColor={StatusBarColor} barStyle="dark-content" />
           <Text
             // eslint-disable-next-line react-native/no-inline-styles
             style={{
@@ -121,12 +130,12 @@ class Login extends Component {
             style={{textAlign: 'center', marginTop: 20, fontWeight: 'bold'}}>
             Forgot Password?
           </Text>
-          <Text
+          {/* <Text
             style={{textAlign: 'center', marginTop: 20, fontWeight: 'bold'}}>
             Or
-          </Text>
+          </Text> */}
 
-          <TouchableOpacity style={styles.fb} onPress={this._onPressButton}>
+          {/* <TouchableOpacity style={styles.fb} onPress={this._onPressButton}>
             <Text style={styles.fbText}>Sign Up with Facebook</Text>
           </TouchableOpacity>
 
@@ -140,19 +149,19 @@ class Login extends Component {
             <Text style={styles.normalSignUpButtonText}>
               Sign Up with email and Password
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     );
   }
 }
 const mapStateToProps = state => ({
-  authStatus: state.auth.isAuthenticated,
+  authStatus: state.auth,
   error: state.auth.error,
 });
 export default connect(
   mapStateToProps,
-  {isSignedIn},
+  {isSignedIn, loginStatus},
 )(Login);
 const styles = StyleSheet.create({
   container: {

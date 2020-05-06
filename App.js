@@ -77,7 +77,7 @@ const App: () => React$Node = () => {
 function MainStackScreen() {
   return (
     <MainStack.Navigator
-      initialRouteName="Main"
+      initialRouteName="Intro"
       screenOptions={{headerShown: false}}>
       <MainStack.Screen name="Intro" component={Intro} />
       <MainStack.Screen name="Login" component={Login} />
