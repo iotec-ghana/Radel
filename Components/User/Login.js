@@ -18,7 +18,7 @@ import {StatusBarColor} from '../../constants';
 import {StackActions} from '@react-navigation/native';
 import {isSignedIn, loginStatus} from '../../Actions/authAction';
 import {connect} from 'react-redux';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Feather';
 class Login extends Component {
   state = {
     email: '',
@@ -34,7 +34,7 @@ class Login extends Component {
       alert('password field cannot be empty');
     } else {
       this.setState({loading: true});
-      await this.props.isSignedIn(this.state, this.props.navigation);
+      await this.props.isSignedIn({email: email, password: password});
       this.setState({loading: false});
     }
   };
@@ -45,9 +45,10 @@ class Login extends Component {
     this.setState({password: password});
   };
   componentDidMount = async () => {
-    this.props.loginStatus();
+    //this.props.loginStatus();
   };
   static getDerivedStateFromProps(props, state) {
+    console.log(props.authStatus);
     if (props.authStatus.isAuthenticated) {
       props.navigation.dispatch(StackActions.replace('Main'));
     }
@@ -55,9 +56,9 @@ class Login extends Component {
   render() {
     const {email} = this.state;
     return (
-      <View>
+      <View style={{backgroundColor: '#f7f9fc', flex: 1}}>
         <Toolbar
-          icon={'chevron-left'}
+          icon={'arrow-left'}
           right={'Sign Up'}
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}
@@ -116,14 +117,14 @@ class Login extends Component {
           ) : null}
           {!this.props.error == '' ? (
             <View style={styles.error}>
-              <Icon name="exclamation-circle" size={18} color="#e7564c" />
+              <Icon name="alert-circle" size={18} color="#e7564c" />
               <Text style={styles.errorText}>{this.props.error}</Text>
             </View>
           ) : null}
           <TouchableOpacity
             style={styles.loginButton}
             onPress={() => this.onSubmit()}>
-            <Text style={styles.loginText}>Login</Text>
+            <Text style={styles.loginText}>LOG IN</Text>
           </TouchableOpacity>
 
           <Text
@@ -167,19 +168,24 @@ const styles = StyleSheet.create({
   container: {
     padding: 30,
     width: windowWidth,
+    backgroundColor: '#f7f9fc',
   },
   input: {
     height: 50,
     padding: 10,
-    backgroundColor: '#fafafa',
+
     marginBottom: 15,
+    borderColor: '#8f9883',
+    borderWidth: 1,
+    borderRadius: 4,
   },
   error: {
     flexDirection: 'row',
     marginTop: 7,
     padding: 15,
     borderColor: '#e7564c',
-    borderWidth: 1,
+    borderWidth: 2,
+    borderRadius: 3,
   },
   errorText: {
     marginLeft: 8,
@@ -190,7 +196,7 @@ const styles = StyleSheet.create({
   loginButton: {
     marginTop: 10,
 
-    backgroundColor: '#4f69a2',
+    backgroundColor: '#e7564c',
     paddingVertical: 15,
     borderRadius: 3,
   },

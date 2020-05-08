@@ -10,13 +10,12 @@ import {
   ActivityIndicator,
   StatusBar,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Feather';
 import {RegisterUser} from '../../Actions/authAction';
 import {connect} from 'react-redux';
 const windowWidth = Dimensions.get('window').width;
 import Toolbar from './Layouts/Toolbar';
 import {StatusBarColor} from '../../constants';
-
 
 class Register extends Component {
   constructor(props) {
@@ -99,7 +98,7 @@ class Register extends Component {
     return (
       <View style={styles.container}>
         <Toolbar
-          icon={'chevron-left'}
+          icon={'arrow-left'}
           right={'Log in'}
           rightTextColor={'#e7564c'}
           routeBack={'Home'}
@@ -170,7 +169,7 @@ class Register extends Component {
         ) : null}
         {!this.props.error == '' ? (
           <View style={styles.error}>
-            <Icon name="exclamation-circle" size={18} color="#e7564c" />
+            <Icon name="alert-circle" size={18} color="#e7564c" />
             <Text style={styles.errorText}>{this.props.error}</Text>
           </View>
         ) : null}
@@ -180,7 +179,7 @@ class Register extends Component {
             // this.props.navigation.navigate('PhoneVerificationActivity')
             this.onSubmit()
           }>
-          <Text style={styles.SignUpButtonText}>Register</Text>
+          <Text style={styles.SignUpButtonText}>SIGN UP</Text>
         </TouchableOpacity>
       </View>
     );
@@ -198,11 +197,14 @@ const styles = StyleSheet.create({
   container: {
     width: windowWidth,
     flex: 1,
+    backgroundColor: '#f7f9fc',
   },
   input: {
     height: 50,
     padding: 10,
-    backgroundColor: '#fafafa',
+    borderColor: '#8f9883',
+    borderWidth: 1,
+    borderRadius: 4,
     marginBottom: 15,
     borderRadius: 3,
     marginLeft: 30,
@@ -216,21 +218,27 @@ const styles = StyleSheet.create({
     marginRight: 8,
     borderRadius: 3,
     flex: 1,
+    borderColor: '#8f9883',
+    borderWidth: 1,
+    borderRadius: 4,
   },
   inputl: {
     height: 50,
     padding: 10,
-    backgroundColor: '#fafafa',
+
     marginBottom: 15,
     borderRadius: 3,
     flex: 1,
+    borderColor: '#8f9883',
+    borderWidth: 1,
+    borderRadius: 4,
   },
   error: {
     flexDirection: 'row',
     marginTop: 7,
     padding: 15,
     borderColor: '#e7564c',
-    borderWidth: 1,
+    borderWidth: 2,
     marginLeft: 30,
     marginRight: 30,
   },
@@ -242,7 +250,7 @@ const styles = StyleSheet.create({
   },
   SignUpButton: {
     marginTop: 10,
-    backgroundColor: '#4f69a2',
+    backgroundColor: '#e7564c',
     paddingVertical: 15,
     borderRadius: 3,
     marginLeft: 30,

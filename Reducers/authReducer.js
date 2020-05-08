@@ -5,30 +5,6 @@ import {
   REGISTER,
   CHECK_LOGIN_STATUS,
 } from '../Actions/types';
-import AsyncStorage from '@react-native-community/async-storage';
-
-// const read = async () => {
-//   var userdata = null;
-//   try {
-//     const value = await AsyncStorage.getItem('authdata');
-//     if (value === null) {
-//       const authStatus = {
-//         isAuthenticated: false,
-//         user: null,
-//       };
-//       await AsyncStorage.setItem('authdata', JSON.stringify(authStatus));
-//       userdata = await AsyncStorage.getItem('authdata');
-//     } else {
-//       userdata = await AsyncStorage.getItem('authdata');
-//       //console.log(JSON.parse(data));
-//       return userdata;
-//     }
-//   } catch (e) {
-//     console.log(e);
-//   }
-//   //console.log(userdata)
-//   return userdata;
-// };
 
 const initialState = {
   error2: '',

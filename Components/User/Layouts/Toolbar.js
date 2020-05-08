@@ -49,7 +49,7 @@ export default class Toolbar extends Component {
                   style={{
                     color: this.props.rightTextColor,
                     fontWeight: 'bold',
-                    fontSize: 14,
+                    fontSize: 16,
                   }}>
                   {this.props.right}
                 </Text>

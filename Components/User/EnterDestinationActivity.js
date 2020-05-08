@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
 import {
   View,
@@ -27,7 +28,8 @@ const windowHeight = Dimensions.get('window').height;
 import UserDeliveryLocationHistoryList from './Layouts/UserDeliveryLocationHistoryList';
 import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
 import {Toast} from 'native-base';
-import AsyncStorage from '@react-native-community/async-storage';
+import Icon from 'react-native-vector-icons/Feather';
+
 
 class EnterDestinationActivity extends Component {
   constructor(props) {
@@ -42,9 +44,16 @@ class EnterDestinationActivity extends Component {
   }
 
   Next = async () => {
-    this.props.navigation.navigate('DeliveryDestinationMap', {
-      receipientPhone: this.state.rphone,
-    });
+    if (this.state.rphone.length < 10) {
+      alert('phone number has less than 10 digits');
+    } else {
+      this.props.navigation.navigate('DeliveryDestinationMap', {
+        receipientPhone: this.state.rphone,
+      });
+    }
+  };
+  getPhoneNumber = async () => {
+   
   };
   componentDidMount = async () => {
     //this.props.getCurrentLocation();
@@ -73,13 +82,46 @@ class EnterDestinationActivity extends Component {
           placeholder={'Pickup Location'}
           value={this.state.originName}
         />
-        <TextInput
-          style={styles.input}
-          placeholder={'Reciepient phone number'}
-          value={this.state.rphone} 
-          keyboardType={'numeric'}
-          onChangeText={txt => this.rchange(txt)}
-        />
+        <View
+          style={{
+            flexDirection: 'row',
+            marginLeft: 10,
+            marginRight: 10,
+            marginBottom: 10,
+          }}>
+          <TextInput
+            style={{
+              flex: 1,
+              height: 50,
+              padding: 10,
+
+              backgroundColor: '#fafafa',
+            }}
+            placeholder={'Reciepient phone number'}
+            value={this.state.rphone}
+            keyboardType={'numeric'}
+            onChangeText={txt => this.rchange(txt)}
+          />
+          <TouchableOpacity
+            style={{padding: 10}}
+            onPress={async () => this.getPhoneNumber()}>
+            {/* <Icon
+              name={'user-plus'}
+              size={30}
+              color="#000"
+              style={{margin: 6}}
+            /> */}
+            <Text
+              style={{
+                margin: 6,
+                fontWeight: 'bold',
+                textAlignVertical: 'center',
+                textAlign: 'center',
+              }}>
+              Choose contact
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.button}>
           <TouchableOpacity

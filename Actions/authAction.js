@@ -3,7 +3,7 @@ import axios from 'axios';
 import {BASE_URL} from '../constants';
 import AsyncStorage from '@react-native-community/async-storage';
 
-export const isSignedIn = (data, navigation) => async dispatch => {
+export const isSignedIn = data => async dispatch => {
   try {
     //console.log(data);
     const response = await axios.post(BASE_URL + '/login/', data);
@@ -48,8 +48,6 @@ export const isSignedIn = (data, navigation) => async dispatch => {
 
 export const isSignedOut = navigation => async dispatch => {
   try {
-    const t = await AsyncStorage.getItem('authdata');
-
     // set header authorization token
     // const config = {
     //   headers: {Authorization: `Bearer ${t.token}`},
@@ -73,7 +71,6 @@ export const loginStatus = () => async dispatch => {
   try {
     const user = await AsyncStorage.getItem('authdata');
     const data = JSON.parse(user);
-  
 
     dispatch({
       type: CHECK_LOGIN_STATUS,
@@ -84,19 +81,26 @@ export const loginStatus = () => async dispatch => {
 export const RegisterUser = (payload, navigation) => async dispatch => {
   try {
     const response = await axios.post(BASE_URL + '/register/', payload);
-    const authData = {
-      isAuthenticated: true,
-      user: response.data,
-    };
+    // const authData = {
+    //   isAuthenticated: true,
+    //   user: response.data,
+    // };
 
-    await AsyncStorage.setItem('authdata', JSON.stringify(authData));
+    // await AsyncStorage.setItem('authdata', JSON.stringify(authData));
 
-    dispatch({
-      type: REGISTER,
-      payload: authData,
-      error2: '',
+    // dispatch({
+    //   type: REGISTER,
+    //   payload: authData,
+    //   error2: '',
+    // });
+    // console.log(response.data.phone_number);
+    navigation.navigate('PhoneVerificationActivity', {
+      userid: response.data.id,
+      phone: response.data.phone_number,
+      token: response.data.token,
+      password: payload.password,
+      email: payload.email,
     });
-    navigation.navigate('PhoneVerificationActivity');
   } catch (e) {
     console.log(e);
     const authData = {
@@ -117,7 +121,7 @@ export const RegisterUser = (payload, navigation) => async dispatch => {
       dispatch({
         type: REGISTER,
         payload: authData,
-        error2: 'User already exist',
+        error2: 'Email is  already take',
       });
     }
   }

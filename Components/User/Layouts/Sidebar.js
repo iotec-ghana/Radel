@@ -50,8 +50,8 @@ export default class Sidebar extends Component {
         
         <SideBarHeader
           image={'../../../assets/deedat.jpg'}
-          name={'Deedat Idriss Nuhu Billa'}
-          phone={'0554406539'}
+          
+          authdata={this.props.authdata}
         />
         <SafeAreaView>
           <FlatList

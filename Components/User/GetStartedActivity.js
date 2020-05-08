@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
 import {
   View,
@@ -7,9 +8,10 @@ import {
   Dimensions,
   StatusBar,
 } from 'react-native';
+import {StackActions} from '@react-navigation/native';
+import {StatusBarColor} from '../../constants';
 import Icon from 'react-native-vector-icons/FontAwesome';
 const windowWidth = Dimensions.get('window').width;
-import {StatusBarColor} from '../../constants';
 
 export default class GetStartedActivity extends Component {
   constructor(props) {
@@ -20,21 +22,29 @@ export default class GetStartedActivity extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <StatusBar barStyle={StatusBarColor} backgroundColor="#6a51ae" />
+        <StatusBar backgroundColor={StatusBarColor} barStyle="dark-content" />
         <Icon name="check-circle" size={120} color="#000" style={{margin: 2}} />
         <Text style={{fontSize: 40, fontWeight: 'bold'}}>
           You are ready to go
         </Text>
-        <Text style={{marginTop: 20, fontSize: 16}}>
+        <Text
+          style={{
+            marginTop: 20,
+            fontSize: 18,
+            textAlign: 'center',
+            fontWeight: 'bold',
+          }}>
           {' '}
-          Thanks for taking your time to create account with us. Now this is the
-          part, let's explore the app
+          Thanks for taking your time to create an {'\n'} account with us. Now
+          this is the fun part, {'\n'} let's explore the app
         </Text>
 
         <View style={styles.button}>
           <TouchableOpacity
             style={styles.setButton}
-            onPress={() => this.props.navigation.navigate('Main')}>
+            onPress={() =>
+              this.props.navigation.dispatch(StackActions.replace('Login'))
+            }>
             <Text style={styles.setButtonText}>GET STARTED</Text>
           </TouchableOpacity>
         </View>

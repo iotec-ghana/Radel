@@ -1,120 +1,229 @@
-import React, {useState} from 'react';
+/* eslint-disable react-native/no-inline-styles */
+import React, {Component} from 'react';
+
 import {
   SafeAreaView,
   Text,
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import {isSignedIn} from '../../Actions/authAction';
 import {connect} from 'react-redux';
-import {
-  CodeField,
-  Cursor,
-  useBlurOnFulfill,
-  useClearByFocusCell,
-} from 'react-native-confirmation-code-field';
+
 import {View} from 'native-base';
 import Toolbar from './Layouts/Toolbar';
+import axios from 'axios';
+import {BaseRouter} from '@react-navigation/native';
+import {PV_API, BASE_URL} from '../../constants';
 const windowWidth = Dimensions.get('window').width;
+import InputCode from 'react-native-input-code';
+import {StackActions} from '@react-navigation/native';
+import AsyncStorage from '@react-native-community/async-storage';
 
-const CELL_COUNT = 4;
-validatePhoneNumber = () => {
-  var regexp = /^\+[0-9]?()[0-9](\s|\S)(\d[0-9]{8,16})$/;
-  return regexp.test(this.state.phone);
-};
-const verifyPhone = async => {};
-function PhoneVerificationActivity({navigation}) {
-  verifyPhone();
-  const [value, setValue] = useState('');
-  const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
-  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
-    value,
-    setValue,
-  });
+class PhoneVerificationActivity extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      code: '',
+      input: '',
+      resendTimeout: 60,
+      loadin: false,
+    };
+  }
+  onChangeCode = code => {};
+  onFullFill = async code => {
+    console.log(this.state.code + ' and ' + code);
+    this.setState({input: code});
+    if (this.state.code === code) {
+      this.setState({loading: true});
 
-  return (
-    <View style={styles.main}>
-      <View style={styles.button}>
-        <TouchableOpacity
-          style={styles.setButton}
-          onPress={() => navigation.navigate('GetStartedActivity')}>
-          <Text style={styles.setButtonText}>Verify</Text>
-        </TouchableOpacity>
-      </View>
-      <Toolbar
-        icon={'chevron-left'}
-        routeBack={'Home'}
-        navigation={navigation}
-        righSideRoute={'Login'}
-      />
-      <View style={styles.container}>
-        <Text
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{
-            fontSize: 40,
-            marginTop: 0,
-            textAlign: 'left',
-            fontWeight: 'bold',
-          }}>
-          Verify phone number
-        </Text>
+      await this.UpdateVerificationStatus();
+      this.setState({loading: false});
+      this.props.navigation.dispatch(
+        StackActions.replace('GetStartedActivity'),
+      );
+    } else {
+      alert('The verification code you entered is not valid');
+    }
+  };
 
-        <Text
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{
-            fontSize: 13,
-            marginTop: 0,
-            textAlign: 'left',
-            fontWeight: 'bold',
-          }}>
-          Check your SMS messages. We've sent you the PIN at 054606532
-        </Text>
-        <SafeAreaView style={styles.root}>
-          <CodeField
-            ref={ref}
-            {...props}
-            value={value}
-            onChangeText={setValue}
-            cellCount={CELL_COUNT}
-            rootStyle={styles.codeFiledRoot}
-            keyboardType="number-pad"
-            renderCell={({index, symbol, isFocused}) => (
-              <Text
-                key={index}
-                style={[styles.cell, isFocused && styles.focusCell]}
-                onLayout={getCellOnLayoutHandler(index)}>
-                {symbol || (isFocused ? <Cursor /> : null)}
-              </Text>
-            )}
+  componentDidMount = async () => {
+    //await this.RequestCode();
+  };
+  RequestCode = async () => {
+    try {
+      const response = await axios.post(PV_API + '/verifyPhone', {
+        phone: this.props.route.params.phone,
+      });
+      this.setState({code: response.data.code});
+      console.log(response.data.code);
+    } catch (e) {
+      console.log('err');
+    }
+  };
+
+  UpdateVerificationStatus = async () => {
+    try {
+      const authdata = {
+        email: this.props.route.params.email,
+        password: this.props.route.params.password,
+      };
+
+      const config = {
+        headers: {Authorization: `Bearer ${this.props.route.params.token}`},
+      };
+
+      const response = await axios.put(
+        `${BASE_URL}/verifyUser/${this.props.route.params.userid}`,
+        {},
+        config,
+      );
+      console.log(response.data);
+      //then login
+      // this.props.isSignedIn(authdata);
+    } catch (e) {
+      console.log(e);
+      alert('Oops there was a problem');
+    }
+  };
+
+  render() {
+    return (
+      <View style={styles.main}>
+        <View style={styles.button}>
+          <TouchableOpacity
+            style={styles.setButton}
+            onPress={() => {
+              if (this.state.code === this.state.input) {
+                this.props.navigation.navigate('GetStartedActivity');
+              } else {
+                alert('The verification code you entered is not valid');
+              }
+            }}>
+            <Text style={styles.setButtonText}>Verify</Text>
+          </TouchableOpacity>
+        </View>
+        <Toolbar
+          icon={'arrow-left'}
+          routeBack={'Home'}
+          navigation={this.props.navigation}
+          righSideRoute={'Login'}
+        />
+        <View style={styles.container}>
+          <Text
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{
+              fontSize: 40,
+              marginTop: 0,
+              textAlign: 'left',
+              fontWeight: 'bold',
+            }}>
+            Verify phone {'\n'} number
+          </Text>
+          <Text
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{
+              fontSize: 16,
+              marginTop: 10,
+              textAlign: 'left',
+              fontWeight: 'bold',
+            }}>
+            Check your SMS messages. We've sent you {'\n'}the PIN at
+            {this.props.route.params.phone}
+          </Text>
+          <InputCode
+            style={{marginTop: 20}}
+            ref={ref => (this.inputCode = ref)}
+            length={4}
+            onChangeCode={this.onChangeCode}
+            onFullFill={this.onFullFill}
+            passcode
+            passcodeChar="*"
+            codeContainerStyle={{
+              borderWidth: 0,
+              borderBottomWidth: 2,
+            }}
+            codeContainerCaretStyle={{
+              borderWidth: 0,
+              borderBottomWidth: 2,
+              borderBottomColor: 'red',
+            }}
+            autoFocus
           />
-        </SafeAreaView>
+
+          {/* const pollingID = setInterval(() => {
+                this.checkPaymentStatus(pid.paymentID);
+                if (this.state.hasPaid) {
+                  clearInterval(pollingID);
+                }
+              }, 4000); */}
+
+          <View style={{flexDirection: 'row', marginTop: 40}}>
+            <Text
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{
+                fontSize: 13,
+                textAlign: 'left',
+              }}>
+              Didnt receive SMS?
+            </Text>
+            <Text
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{
+                fontSize: 13,
+                marginLeft: 4,
+                textAlign: 'left',
+                fontWeight: 'bold',
+                color: '#e7564c',
+              }}>
+              Resend Code
+            </Text>
+          </View>
+          {this.state.loading ? (
+            <Image
+              source={require('../../assets/spinner.gif')}
+              style={{
+                height: 200,
+                width: 200,
+                marginTop: 40,
+                backgroundColor: '#fff',
+                alignItems: 'center',
+                justifyContent: 'center',
+                alignContent: 'center',
+              }}
+            />
+          ) : null}
+        </View>
       </View>
-    </View>
-  );
+    );
+  }
 }
 const styles = StyleSheet.create({
   main: {
     flex: 1,
+    backgroundColor: '#fff',
   },
   container: {
     padding: 20,
     width: windowWidth,
   },
-  root: {flex: 1, padding: 0},
+  root: {flex: 1},
 
   codeFiledRoot: {marginTop: 30},
   cell: {
     width: windowWidth / 5,
-    height: 100,
-    lineHeight: 100,
+    height: 50,
+    lineHeight: 50,
     fontSize: 54,
     borderWidth: 2,
     borderColor: '#00000030',
     textAlign: 'center',
+    padding: 10,
   },
   focusCell: {
-    borderColor: '#000',
+    borderColor: '#2bb234',
   },
   button: {
     width: windowWidth,

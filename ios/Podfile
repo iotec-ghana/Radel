@@ -79,6 +79,8 @@ target 'Radel' do
 
   pod 'react-native-geolocation', :path => '../node_modules/@react-native-community/geolocation'
 
+  pod 'RCTSelectContact', :path => '../node_modules/react-native-select-contact'
+
   target 'RadelTests' do
     inherit! :complete
     # Pods for testing

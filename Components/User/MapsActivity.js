@@ -34,16 +34,18 @@ import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
 import Sidebar from './Layouts/Sidebar';
 import {Drawer} from 'native-base';
 import {getCurrentLocation} from '../../Actions/locationAction';
-import {isSignedIn} from '../../Actions/authAction';
+import {isSignedIn, loginStatus} from '../../Actions/authAction';
 import {connect} from 'react-redux';
 import {getRiders} from '../../Actions/getAllRidersAction';
 import {Toast} from 'native-base';
 const TAB_BAR_HEIGHT = 0;
 const {width, height} = Dimensions.get('window');
 import io from 'socket.io-client';
+import Spinner from 'react-native-loading-spinner-overlay';
 class MapsActivity extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       latitude: props.origin.latitude,
       longitude: props.origin.longitude,
@@ -145,26 +147,27 @@ class MapsActivity extends Component {
   handleBackButton() {
     BackHandler.exitApp();
   }
-  // static getDerivedStateFromProps(props, state) {
+  // static async getDerivedStateFromProps(props, state) {
+  //   // await props.loginStatus();
   //   if (!props.authStatus.isAuthenticated) {
-  //     this.props.navigation.goBack();
-  //     //this.props.navigation.dispatch(StackActions.replace('Login'));
+  //     // props.navigation.navigate('Login');
+  //     props.navigation.dispatch(StackActions.replace('Login'));
   //   }
   // }
   componentDidMount = async () => {
+    await this.props.loginStatus();
     if (!this.props.authStatus.isAuthenticated) {
-      this.props.navigation.goBack();
-      //this.props.navigation.dispatch(StackActions.replace('Login'));
+      //this.props.navigation.navigate("Login");
+      this.props.navigation.dispatch(StackActions.replace('Intro'));
     }
-    console.log(this.state.riders.length);
+
     // BackHandler.addEventListener(
     //   'hardwareBackPress',
     //   this.handleBackButton.bind(this),
     // );
 
     // this.requestLocationPermission();
-    this.getAllRiders();
-    this.animateRiderMovement();
+
     Geolocation.getCurrentPosition(
       async position => {
         // console.log(position.coords.latitude);
@@ -177,8 +180,8 @@ class MapsActivity extends Component {
 
         await this.props.getCurrentLocation(data);
         this.setState({showBS: true});
-        // this.RBSheet.open();
-        //this.socketIO();
+        this.getAllRiders();
+        this.animateRiderMovement();
       },
       error => this.setState({error: error.message}),
       {enableHighAccuracy: true, timeout: 200000, maximumAge: 1000},
@@ -197,8 +200,8 @@ class MapsActivity extends Component {
           originName: Oname,
         };
         await this.props.getCurrentLocation(newCoordinate);
-        this.props.getCurrentLocation(newCoordinate);
-        console.log({newCoordinate});
+        // this.props.getCurrentLocation(newCoordinate);
+        // console.log({newCoordinate});
 
         if (Platform.OS === 'android') {
           //   if (this.markerUser) {
@@ -268,60 +271,61 @@ class MapsActivity extends Component {
           ref={ref => {
             this.drawer = ref;
           }}
-          content={<Sidebar navigation={this.props.navigation} />}
-          onClose={() => this.closeDrawer()}>
+          content={
+            <Sidebar
+              navigation={this.props.navigation}
+              authdata={this.props.authStatus}
+            />
+          }>
           <View style={styles.container}>
-            <MapView
-              provider={PROVIDER_GOOGLE}
-              showUserLocation
-              followUserLocation
-              loadingEnabled
-              onKmlReady={results => console.log(results + 'kk')}
-              region={this.getCurrentRegion()}
-              style={{...StyleSheet.absoluteFillObject}}>
-              <Marker.Animated
-                ref={marker => {
-                  this.markerUser = marker;
-                }}
-                coordinate={this.getCurrentRegion()}>
-                {/* <Image
+            {!this.state.showBS ? (
+              <Spinner
+                visible={true}
+                textContent={'Loading...'}
+                textStyle={styles.spinnerTextStyle}
+              />
+            ) : (
+              <MapView
+                provider={PROVIDER_GOOGLE}
+                showUserLocation
+                followUserLocation
+                region={this.getCurrentRegion()}
+                style={{...StyleSheet.absoluteFillObject}}>
+                <Marker.Animated
+                  ref={marker => {
+                    this.markerUser = marker;
+                  }}
+                  coordinate={this.getCurrentRegion()}>
+                  {/* <Image
                   source={require('../../assets/map-pin.png')}
                   style={{height: 40, width: 40}}
                 /> */}
-              </Marker.Animated>
+                </Marker.Animated>
 
-              {this.state.riders.map(riders => (
-                <Marker.Animated
-                  ref={marker => {
-                    this.markerRider = marker;
-                  }}
-                  coordinate={{
-                    latitude: riders.latitude,
-                    longitude: riders.longitude,
-                  }}>
-                  <Image
-                    source={require('../../assets/motor.png')}
-                    style={{height: 40, width: 40}}
-                  />
-
-                  <Marker
+                {this.state.riders.map(riders => (
+                  <Marker.Animated
+                    ref={marker => {
+                      this.markerRider = marker;
+                    }}
                     coordinate={{
                       latitude: riders.latitude,
                       longitude: riders.longitude,
-                    }}
-                  />
-                </Marker.Animated>
-              ))}
+                    }}>
+                    <Image
+                      source={require('../../assets/motor.png')}
+                      style={{height: 40, width: 40}}
+                    />
 
-              {/* will be used in DeliveryDestinationMap */}
-              {/* <PolylineDirection
-            origin={origin}
-            destination={destination}
-            apiKey={'AIzaSyCF1Jur9qHYa6q07JWBMyVjQ2DqOlSJ2qc'}
-            strokeWidth={4}
-            strokeColor="#12bc00"
-          /> */}
-            </MapView>
+                    <Marker
+                      coordinate={{
+                        latitude: riders.latitude,
+                        longitude: riders.longitude,
+                      }}
+                    />
+                  </Marker.Animated>
+                ))}
+              </MapView>
+            )}
             <Toolbar
               icon={'align-left'}
               notbackAction={true}
@@ -367,7 +371,7 @@ const mapStateToProps = state => ({
 });
 export default connect(
   mapStateToProps,
-  {getCurrentLocation, getRiders, isSignedIn},
+  {getCurrentLocation, getRiders, isSignedIn, loginStatus},
 )(MapsActivity);
 const styles = StyleSheet.create({
   container: {

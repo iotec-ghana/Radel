@@ -6,6 +6,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
+    "clean": "watchman watch-del-all && npm cache clean --force && cd android && ./gradlew clean && cd ..",
     "test": "jest",
     "lint": "eslint ."
   },
@@ -24,7 +25,9 @@
     "react-native-confirmation-code-field": "^6.0.0",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-google-places-autocomplete": "^1.4.1",
+    "react-native-input-code": "^1.0.0",
     "react-native-input-credit-card": "^0.5.5",
+    "react-native-loading-spinner-overlay": "^1.1.0",
     "react-native-maps": "^0.27.1",
     "react-native-maps-directions": "^1.8.0",
     "react-native-raw-bottom-sheet": "^2.1.0",
