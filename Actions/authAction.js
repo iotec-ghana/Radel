@@ -121,7 +121,7 @@ export const RegisterUser = (payload, navigation) => async dispatch => {
       dispatch({
         type: REGISTER,
         payload: authData,
-        error2: 'Email is  already take',
+        error2: 'Email is  already taken',
       });
     }
   }

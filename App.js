@@ -33,7 +33,7 @@ const config = {
   animation: 'spring',
   config: {
     stiffness: 500,
-    damping: 100,
+    damping: 500,
     mass: 1,
     overshootClamping: true,
     restDisplacementThreshold: 0.01,
@@ -42,6 +42,7 @@ const config = {
 };
 const MainStack = createStackNavigator();
 const RootStack = createStackNavigator();
+
 const MyStatusBar = ({backgroundColor, ...props}) => (
   <View style={[styles.statusBar, {backgroundColor}]}>
     <StatusBar translucent backgroundColor={backgroundColor} {...props} />
@@ -79,7 +80,16 @@ function MainStackScreen() {
     <MainStack.Navigator
       initialRouteName="Main"
       screenOptions={{headerShown: false}}>
-      <MainStack.Screen name="Intro" component={Intro} />
+      <MainStack.Screen
+        name="Intro"
+        component={Intro}
+        options={{
+          transitionSpec: {
+            open: config,
+            close: config,
+          },
+        }}
+      />
       <MainStack.Screen name="Login" component={Login} />
       <MainStack.Screen name="SignUp" component={Register} />
       <MainStack.Screen name="Main" component={MapsActivity} />

@@ -10,15 +10,22 @@ import {
 } from 'react-native';
 import {StackActions} from '@react-navigation/native';
 import {StatusBarColor} from '../../constants';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Feather';
 const windowWidth = Dimensions.get('window').width;
+import {isSignedIn} from '../../Actions/authAction';
+import {connect} from 'react-redux';
 
-export default class GetStartedActivity extends Component {
+class GetStartedActivity extends Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
-
+  static getDerivedStateFromProps(props, state) {
+    if (props.authStatus) {
+      // props.navigation.navigate('Login');
+      props.navigation.dispatch(StackActions.replace('Main'));
+    }
+  }
   render() {
     return (
       <View style={styles.container}>
@@ -43,7 +50,9 @@ export default class GetStartedActivity extends Component {
           <TouchableOpacity
             style={styles.setButton}
             onPress={() =>
-              this.props.navigation.dispatch(StackActions.replace('Login'))
+              // this.props.navigation.dispatch(StackActions.replace('Login'))
+              //console.log("sdf")
+              this.props.isSignedIn(this.props.route.params.user)
             }>
             <Text style={styles.setButtonText}>GET STARTED</Text>
           </TouchableOpacity>
@@ -76,3 +85,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
+const mapStateToProps = state => ({
+  authStatus: state.auth.isAuthenticated,
+  error: state.auth.error,
+});
+export default connect(
+  mapStateToProps,
+  {isSignedIn},
+)(GetStartedActivity);

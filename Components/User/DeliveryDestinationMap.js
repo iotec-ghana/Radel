@@ -216,18 +216,21 @@ class DeliveryDestinationMap extends Component {
       var modifiedArr = [];
       var data = {};
       this.props.riders.forEach(element => {
-        data = {
-          latitude: element.latitude,
-          longitude: element.longitude,
-          riderEmail: element.riderEmail,
-          distanceFromUser: this.calcDistance(
+        let distance = this.calcDistance(
             {latitude: element.latitude, longitude: element.longitude},
             {
               latitude: this.state.currentloclat,
               longitude: this.state.currentloclong,
             },
           ),
-        };
+          data = {
+            latitude: element.latitude,
+            longitude: element.longitude,
+            riderEmail: element.riderEmail,
+            distanceFromUser: distance,
+            eta: distance / element.speed,
+            id: element.id,
+          };
         modifiedArr.push(data);
       });
       return (
@@ -296,6 +299,7 @@ class DeliveryDestinationMap extends Component {
       </View>
     );
   };
+
   render() {
     return (
       <View style={styles.container}>
@@ -411,7 +415,11 @@ class DeliveryDestinationMap extends Component {
               this.setState(
                 {loadingLayout: true},
                 this.state.found
-                  ? this.props.navigation.navigate('PaymentMethodsActivity')
+                  ? this.props.navigation.navigate('PaymentMethodsActivity', {
+                      receipientPhone: this.props.route.params.receipientPhone,
+                      price: this.state.price,
+                      riderDetails: this.props.selected,
+                    })
                   : null,
               )
             }>

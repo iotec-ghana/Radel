@@ -28,7 +28,7 @@ class SuggestedRidersBottomSheet extends Component {
       itemPressed: value,
     });
     this.props.getSelectedRider(details);
-    console.log("selected" + JSON.stringify(details))
+    console.log('selected' + JSON.stringify(details));
   }
   componentDidMount() {
     //console.log(this.props.riders[0]);
@@ -79,9 +79,7 @@ class SuggestedRidersBottomSheet extends Component {
                       color="#000"
                       style={{margin: 2}}
                     />
-                    <Text style={styles.time}>
-                      rider is {item.distanceFromUser.toFixed(2)}km away
-                    </Text>
+                    <Text style={styles.time}>{item.eta.toFixed(0)} minutes away</Text>
                   </View>
                 </View>
 

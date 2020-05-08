@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
 
@@ -34,7 +35,10 @@ class PhoneVerificationActivity extends Component {
   }
   onChangeCode = code => {};
   onFullFill = async code => {
-    console.log(this.state.code + ' and ' + code);
+    const authdata = {
+      email: this.props.route.params.email,
+      password: this.props.route.params.password,
+    };
     this.setState({input: code});
     if (this.state.code === code) {
       this.setState({loading: true});
@@ -42,7 +46,9 @@ class PhoneVerificationActivity extends Component {
       await this.UpdateVerificationStatus();
       this.setState({loading: false});
       this.props.navigation.dispatch(
-        StackActions.replace('GetStartedActivity'),
+        StackActions.replace('GetStartedActivity', {
+          user: authdata,
+        }),
       );
     } else {
       alert('The verification code you entered is not valid');
@@ -50,7 +56,7 @@ class PhoneVerificationActivity extends Component {
   };
 
   componentDidMount = async () => {
-    //await this.RequestCode();
+     await this.RequestCode();
   };
   RequestCode = async () => {
     try {
@@ -66,11 +72,6 @@ class PhoneVerificationActivity extends Component {
 
   UpdateVerificationStatus = async () => {
     try {
-      const authdata = {
-        email: this.props.route.params.email,
-        password: this.props.route.params.password,
-      };
-
       const config = {
         headers: {Authorization: `Bearer ${this.props.route.params.token}`},
       };
@@ -88,7 +89,7 @@ class PhoneVerificationActivity extends Component {
       alert('Oops there was a problem');
     }
   };
-
+ 
   render() {
     return (
       <View style={styles.main}>
@@ -120,7 +121,7 @@ class PhoneVerificationActivity extends Component {
               textAlign: 'left',
               fontWeight: 'bold',
             }}>
-            Verify phone {'\n'} number
+            Verify phone number
           </Text>
           <Text
             // eslint-disable-next-line react-native/no-inline-styles
@@ -130,7 +131,7 @@ class PhoneVerificationActivity extends Component {
               textAlign: 'left',
               fontWeight: 'bold',
             }}>
-            Check your SMS messages. We've sent you {'\n'}the PIN at
+            Check your SMS messages. We've sent you the PIN at
             {this.props.route.params.phone}
           </Text>
           <InputCode
@@ -144,11 +145,14 @@ class PhoneVerificationActivity extends Component {
             codeContainerStyle={{
               borderWidth: 0,
               borderBottomWidth: 2,
+              padding: 20,
+              borderBottomColor: 'red',
             }}
             codeContainerCaretStyle={{
               borderWidth: 0,
+
               borderBottomWidth: 2,
-              borderBottomColor: 'red',
+              borderBottomColor: 'green',
             }}
             autoFocus
           />
@@ -166,20 +170,25 @@ class PhoneVerificationActivity extends Component {
               style={{
                 fontSize: 13,
                 textAlign: 'left',
+                padding: 2,
               }}>
               Didnt receive SMS?
             </Text>
-            <Text
-              // eslint-disable-next-line react-native/no-inline-styles
-              style={{
-                fontSize: 13,
-                marginLeft: 4,
-                textAlign: 'left',
-                fontWeight: 'bold',
-                color: '#e7564c',
-              }}>
-              Resend Code
-            </Text>
+            <TouchableOpacity
+              onPress={() => this.RequestCode()}
+              style={{margin: 2}}>
+              <Text
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{
+                  fontSize: 13,
+
+                  textAlign: 'left',
+                  fontWeight: 'bold',
+                  color: '#e7564c',
+                }}>
+                Resend Code
+              </Text>
+            </TouchableOpacity>
           </View>
           {this.state.loading ? (
             <Image

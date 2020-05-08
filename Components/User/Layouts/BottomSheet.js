@@ -7,7 +7,8 @@ import {
   Modal,
   KeyboardAvoidingView,
 } from 'react-native';
-
+ 
+ 
 export default class BottomSheet extends Component {
   render() {
     return (

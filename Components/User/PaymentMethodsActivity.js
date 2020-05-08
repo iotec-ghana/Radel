@@ -160,7 +160,10 @@ export default class PaymentMethodsActivity extends Component {
                   <View>
                     <MomoCardOther
                       navigation={this.props.navigation}
+                      route={this.props.route}
                       item={item}
+                      price={this.props.route.params.price}
+                      riderDetails={this.props.route.params.riderDetails}
                     />
                   </View>
                 )}

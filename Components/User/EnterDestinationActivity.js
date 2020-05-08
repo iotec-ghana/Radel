@@ -30,7 +30,6 @@ import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
 import {Toast} from 'native-base';
 import Icon from 'react-native-vector-icons/Feather';
 
-
 class EnterDestinationActivity extends Component {
   constructor(props) {
     super(props);
@@ -52,9 +51,7 @@ class EnterDestinationActivity extends Component {
       });
     }
   };
-  getPhoneNumber = async () => {
-   
-  };
+  getPhoneNumber = async () => {};
   componentDidMount = async () => {
     //this.props.getCurrentLocation();
     console.log(this.props.origin);
@@ -102,16 +99,16 @@ class EnterDestinationActivity extends Component {
             keyboardType={'numeric'}
             onChangeText={txt => this.rchange(txt)}
           />
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{padding: 10}}
-            onPress={async () => this.getPhoneNumber()}>
-            {/* <Icon
+            onPress={async () => this.getPhoneNumber()}> */}
+          {/* <Icon
               name={'user-plus'}
               size={30}
               color="#000"
               style={{margin: 6}}
             /> */}
-            <Text
+          {/* <Text
               style={{
                 margin: 6,
                 fontWeight: 'bold',
@@ -120,7 +117,7 @@ class EnterDestinationActivity extends Component {
               }}>
               Choose contact
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         <View style={styles.button}>

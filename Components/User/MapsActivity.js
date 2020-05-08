@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable no-lone-blocks */
 import React, {Component} from 'react';
 import axios from 'axios';
@@ -26,8 +27,8 @@ import haversine from 'haversine';
 import BottomSheet from './Layouts/BottomSheet';
 import BottomDrawer from 'rn-bottom-drawer';
 import {StackActions} from '@react-navigation/native';
-const LATITUDE_DELTA = 0.009;
-const LONGITUDE_DELTA = 0.009;
+const LATITUDE_DELTA = 0.011;
+const LONGITUDE_DELTA = 0.011;
 const LATITUDE = 0.009;
 const LONGITUDE = 0.009;
 import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
@@ -40,6 +41,9 @@ import {getRiders} from '../../Actions/getAllRidersAction';
 import {Toast} from 'native-base';
 const TAB_BAR_HEIGHT = 0;
 const {width, height} = Dimensions.get('window');
+import Icon from 'react-native-vector-icons/Feather';
+
+import {useAndroidBackHandler} from 'react-navigation-backhandler';
 import io from 'socket.io-client';
 import Spinner from 'react-native-loading-spinner-overlay';
 class MapsActivity extends Component {
@@ -56,6 +60,9 @@ class MapsActivity extends Component {
       locationName: '',
       showBS: false,
       originName: props.originName,
+      bearing: 0,
+      speed: 0,
+      time: 'N/A',
       prevLatLng: {},
       coordinateRiders: new AnimatedRegion({
         latitude: LATITUDE,
@@ -71,6 +78,7 @@ class MapsActivity extends Component {
       }),
     };
     this.drawer = null;
+    this.indx = 0;
   }
   closeDrawer = () => {
     this.drawer._root.close();
@@ -99,6 +107,7 @@ class MapsActivity extends Component {
       console.log(this.state.riders);
     });
   };
+
   animateRiderMovement = () => {
     const {coordinateRiders: coordinate} = this.state;
     if (Platform.OS === 'android') {
@@ -176,8 +185,10 @@ class MapsActivity extends Component {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           originName: Oname,
+          speed: position.coords.speed,
         };
-
+        console.log(position);
+        this.setState({bearing: position.coords.heading});
         await this.props.getCurrentLocation(data);
         this.setState({showBS: true});
         this.getAllRiders();
@@ -202,22 +213,27 @@ class MapsActivity extends Component {
         await this.props.getCurrentLocation(newCoordinate);
         // this.props.getCurrentLocation(newCoordinate);
         // console.log({newCoordinate});
-
+        try {
+          this.map.animateToRegion(this.getCurrentRegion(), 1000 * 2);
         if (Platform.OS === 'android') {
-          //   if (this.markerUser) {
-          //     this.markerUser._component.animateMarkerToCoordinate(
-          //       newCoordinate,
-          //       500,
-          //     );
-          //   }
-          // } else {
+          if (this.markerUser) {
+            this.markerUser._component.animateMarkerToCoordinate(
+              newCoordinate,
+              500,
+            );
+          }
+        } else {
           coordinate.timing(newCoordinate).start();
         }
+        } catch (error) {
+          console.log(error)
+        }
+        
 
         this.setState({
           latitude,
           longitude,
-          routeCoordinates: routeCoordinates.concat([newCoordinate]),
+          bearing: position.coords.heading,
           distanceTravelled:
             distanceTravelled + this.calcDistance(newCoordinate),
           prevLatLng: newCoordinate,
@@ -265,6 +281,7 @@ class MapsActivity extends Component {
   };
 
   render() {
+    
     return (
       <View style={{flex: 1}}>
         <Drawer
@@ -290,22 +307,43 @@ class MapsActivity extends Component {
                 showUserLocation
                 followUserLocation
                 region={this.getCurrentRegion()}
-                style={{...StyleSheet.absoluteFillObject}}>
-                <Marker.Animated
+                style={{...StyleSheet.absoluteFillObject}}
+                ref={ref => {
+                  this.map = ref;
+                }}>
+                <MapView.Marker.Animated
                   ref={marker => {
                     this.markerUser = marker;
                   }}
                   coordinate={this.getCurrentRegion()}>
+                  <Icon
+                    name={'navigation-2'}
+                    size={24}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      resizeMode: 'contain',
+                      transform: [{rotate: `${this.state.bearing}deg`}],
+                      zIndex: 3,
+                    }}
+                  />
                   {/* <Image
                   source={require('../../assets/map-pin.png')}
                   style={{height: 40, width: 40}}
                 /> */}
-                </Marker.Animated>
+                </MapView.Marker.Animated>
 
                 {this.state.riders.map(riders => (
                   <Marker.Animated
                     ref={marker => {
                       this.markerRider = marker;
+                    }}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      resizeMode: 'contain',
+                      transform: [{rotate: `${riders.bearing}deg`}],
+                      zIndex: 3,
                     }}
                     coordinate={{
                       latitude: riders.latitude,

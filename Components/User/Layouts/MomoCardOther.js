@@ -41,6 +41,9 @@ export default class MomoCardOther extends Component {
                       type: 'momo',
                       network: this.props.item.details.network,
                       number: this.props.item.details.number,
+                      receipientPhone: this.props.route.params.receipientPhone,
+                      price: this.props.route.params.price,
+                      riderDetails: this.props.route.params.riderDetails,
                     },
                   ),
               },
@@ -109,6 +112,6 @@ const styles = StyleSheet.create({
   img: {
     height: 50,
     width: 50,
-    borderRadius:50
+    borderRadius: 50,
   },
 });

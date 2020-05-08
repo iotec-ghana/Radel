@@ -6,8 +6,14 @@ import AsyncStorage from '@react-native-community/async-storage';
 import axios from 'axios';
 import {BASE_URL} from '../../constants';
 import {StackActions} from '@react-navigation/native';
+import {isSignedIn} from '../../Actions/authAction';
+import {connect} from 'react-redux';
+import {
+  getCurrentLocation,
+  getDestinationCoordinates,
+} from '../../Actions/locationAction';
 
-export default class WaitingForMomoPaymentActivity extends Component {
+class WaitingForMomoPaymentActivity extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -34,8 +40,7 @@ export default class WaitingForMomoPaymentActivity extends Component {
     console.log('unmounted');
   }
   componentDidMount = async () => {
-    console.log(this.state)
-    console.log('cdm called ');
+    console.log(this.props.route.params.receipientPhone);
     try {
       //await AsyncStorage.removeItem('paymentCheck');
       //check if paymentcheck is set to localstorage
@@ -100,6 +105,7 @@ export default class WaitingForMomoPaymentActivity extends Component {
       if (response.data.status === 'success') {
         this.setState({hasPaid: true});
         //console.log('yess');
+        await this.UploadRideDetails();
         await AsyncStorage.removeItem('paymentCheck');
         this.props.navigation.dispatch(
           StackActions.replace('BookProcessingActivity'),
@@ -113,16 +119,17 @@ export default class WaitingForMomoPaymentActivity extends Component {
   // make initial payment request. this function runs only once
   makePaymentRequest = async () => {
     try {
-      const data = await AsyncStorage.getItem('authdata');
-      const user = JSON.parse(data);
+      const user = this.props.authStatus;
       const payload = {
         email: user.user.email,
         phonenumber: user.user.phone_number,
         firstname: user.user.first_name,
         lastname: user.user.last_name,
-        amount: '35',
+        amount: this.props.route.params.price,
         network: this.state.network,
       };
+      console.log(payload);
+
       const sendPayment = await axios.post(BASE_URL + '/paywithMomo/', payload);
       this.setState({paymentID: sendPayment.data.paymentid});
       //console.log(sendPayment.data.paymentid);
@@ -146,6 +153,44 @@ export default class WaitingForMomoPaymentActivity extends Component {
         </Text>
       </View>
     );
+  };
+  UploadRideDetails = async () => {
+    let startId = Math.floor(1000 + Math.random() * 9000);
+    let endId = Math.floor(1000 + Math.random() * 9000);
+    const {id} = this.props.authStatus.user;
+    try {
+      const getCode = await axios.get(BASE_URL + '/getCode');
+      const code = getCode.data.code.replace(',', '');
+      const deliveryPayload = {
+        userId: id,
+        riderId: this.props.route.params.riderDetails.id,
+        startLocationID: startId,
+        endLocationID: endId,
+        startlocationCoordinates: {
+          ...this.props.origin,
+          startLocationID: startId,
+        },
+        endlocationCoordinates: {
+          ...this.props.destination,
+          endLocationID: endId,
+        },
+        requestTime: Date.now(),
+        startTime: Date.now(),
+        deliveryStatus: 'processing',
+        deliveryTime: '',
+        code: code,
+        paymentId: this.state.paymentID,
+        receipientTel: this.props.route.params.receipientPhone,
+      };
+      console.log(deliveryPayload);
+      const response = await axios.post(
+        BASE_URL + '/bookride/',
+        deliveryPayload,
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.log(error)
+    }
   };
   render() {
     return (
@@ -205,3 +250,12 @@ const styles = StyleSheet.create({
     margin: 5,
   },
 });
+const mapStateToProps = state => ({
+  authStatus: state.auth,
+  origin: state.locationData.OriginCoordinates,
+  destination: state.locationData.DestinationCoordinates,
+});
+export default connect(
+  mapStateToProps,
+  {isSignedIn, getCurrentLocation, getDestinationCoordinates},
+)(WaitingForMomoPaymentActivity);
