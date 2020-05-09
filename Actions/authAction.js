@@ -1,7 +1,7 @@
 import {SIGN_IN, SIGN_OUT, REGISTER, CHECK_LOGIN_STATUS} from './types';
 import axios from 'axios';
 import {BASE_URL} from '../constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import {AsyncStorage} from 'react-native';
 
 export const isSignedIn = data => async dispatch => {
   try {

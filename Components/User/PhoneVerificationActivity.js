@@ -21,7 +21,7 @@ import {PV_API, BASE_URL} from '../../constants';
 const windowWidth = Dimensions.get('window').width;
 import InputCode from 'react-native-input-code';
 import {StackActions} from '@react-navigation/native';
-import AsyncStorage from '@react-native-community/async-storage';
+
 
 class PhoneVerificationActivity extends Component {
   constructor(props) {
@@ -107,7 +107,7 @@ class PhoneVerificationActivity extends Component {
           </TouchableOpacity>
         </View>
         <Toolbar
-          icon={'arrow-left'}
+          icon={'ios-arrow-back'}
           routeBack={'Home'}
           navigation={this.props.navigation}
           righSideRoute={'Login'}

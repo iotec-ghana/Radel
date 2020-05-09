@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Toolbar from './Layouts/Toolbar';
-import AsyncStorage from '@react-native-community/async-storage';
+import {AsyncStorage} from 'react-native';
 import axios from 'axios';
 const {width, height} = Dimensions.get('window');
 import {BASE_URL} from '../../constants';

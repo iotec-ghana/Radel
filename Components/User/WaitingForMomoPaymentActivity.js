@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import {View, Text, StyleSheet, Image} from 'react-native';
 import Toolbar from './Layouts/Toolbar';
-import AsyncStorage from '@react-native-community/async-storage';
+import {AsyncStorage} from 'react-native';
 import axios from 'axios';
 import {BASE_URL} from '../../constants';
 import {StackActions} from '@react-navigation/native';

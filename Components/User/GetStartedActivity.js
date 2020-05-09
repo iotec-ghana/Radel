@@ -10,11 +10,10 @@ import {
 } from 'react-native';
 import {StackActions} from '@react-navigation/native';
 import {StatusBarColor} from '../../constants';
-import Icon from 'react-native-vector-icons/Feather';
 const windowWidth = Dimensions.get('window').width;
 import {isSignedIn} from '../../Actions/authAction';
 import {connect} from 'react-redux';
-
+import { Feather } from '@expo/vector-icons';
 class GetStartedActivity extends Component {
   constructor(props) {
     super(props);
@@ -30,7 +29,7 @@ class GetStartedActivity extends Component {
     return (
       <View style={styles.container}>
         <StatusBar backgroundColor={StatusBarColor} barStyle="dark-content" />
-        <Icon name="check-circle" size={120} color="#000" style={{margin: 2}} />
+        <Feather name="check-circle" size={120} color="#000" style={{margin: 2}} />
         <Text style={{fontSize: 40, fontWeight: 'bold'}}>
           You are ready to go
         </Text>

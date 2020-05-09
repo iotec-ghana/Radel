@@ -63,7 +63,7 @@ class EnterDestinationActivity extends Component {
     return (
       <View style={styles.main}>
         <Toolbar
-          icon={'arrow-left'}
+          icon={'ios-arrow-back'}
           // right={'Sign Up'}
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}

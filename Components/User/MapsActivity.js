@@ -1,7 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable no-lone-blocks */
-import React, {Component} from 'react';
-import axios from 'axios';
+import React, { Component } from "react";
+import axios from "axios";
+import Icon from "react-native-vector-icons/FontAwesome";
 import {
   View,
   Text,
@@ -12,40 +13,41 @@ import {
   TouchableOpacity,
   Platform,
   StatusBar,
+  Animated,
   Image,
-} from 'react-native';
+} from "react-native";
 import MapView, {
   PROVIDER_GOOGLE,
   Marker,
   AnimatedRegion,
   Polyline,
-} from 'react-native-maps';
-import {PV_API} from '../../constants';
-import Geolocation from '@react-native-community/geolocation';
-import Toolbar from './Layouts/Toolbar';
-import haversine from 'haversine';
-import BottomSheet from './Layouts/BottomSheet';
-import BottomDrawer from 'rn-bottom-drawer';
-import {StackActions} from '@react-navigation/native';
-const LATITUDE_DELTA = 0.011;
-const LONGITUDE_DELTA = 0.011;
+} from "react-native-maps";
+import Expo from "expo";
+import { PV_API } from "../../constants";
+import Toolbar from "./Layouts/Toolbar";
+import haversine from "haversine";
+import BottomSheetMain from "./Layouts/MainMapBottomSheet";
+import BottomDrawer from "rn-bottom-drawer";
+import { StackActions } from "@react-navigation/native";
+const LATITUDE_DELTA = 0.015;
+const LONGITUDE_DELTA = 0.015;
 const LATITUDE = 0.009;
 const LONGITUDE = 0.009;
-import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
-import Sidebar from './Layouts/Sidebar';
-import {Drawer} from 'native-base';
-import {getCurrentLocation} from '../../Actions/locationAction';
-import {isSignedIn, loginStatus} from '../../Actions/authAction';
-import {connect} from 'react-redux';
-import {getRiders} from '../../Actions/getAllRidersAction';
-import {Toast} from 'native-base';
-const TAB_BAR_HEIGHT = 0;
-const {width, height} = Dimensions.get('window');
-import Icon from 'react-native-vector-icons/Feather';
+import { GOOGLE_MAPS_APIKEY } from "react-native-dotenv";
+import Sidebar from "./Layouts/Sidebar";
+import { Drawer } from "native-base";
+import { getCurrentLocation } from "../../Actions/locationAction";
+import { isSignedIn, loginStatus } from "../../Actions/authAction";
+import { connect } from "react-redux";
+import { getRiders } from "../../Actions/getAllRidersAction";
+import { Toast } from "native-base";
+const TAB_BAR_HEIGHT = -6;
+const { width, height } = Dimensions.get("window");
+import { Ionicons } from "@expo/vector-icons";
 
-import {useAndroidBackHandler} from 'react-navigation-backhandler';
-import io from 'socket.io-client';
-import Spinner from 'react-native-loading-spinner-overlay';
+import * as Location from "expo-location";
+import io from "socket.io-client";
+import Spinner from "react-native-loading-spinner-overlay";
 class MapsActivity extends Component {
   constructor(props) {
     super(props);
@@ -57,29 +59,39 @@ class MapsActivity extends Component {
       routeCoordinates: [],
       riders: [],
       distanceTravelled: 0,
-      locationName: '',
+      locationName: "",
       showBS: false,
       originName: props.originName,
       bearing: 0,
       speed: 0,
-      time: 'N/A',
+      magnetometer: null,
+      time: "N/A",
       prevLatLng: {},
       coordinateRiders: new AnimatedRegion({
         latitude: LATITUDE,
         longitude: LONGITUDE,
-        latitudeDelta: 0,
-        longitudeDelta: 0,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
       }),
       coordinateUser: new AnimatedRegion({
         latitude: LATITUDE,
         longitude: LONGITUDE,
-        latitudeDelta: 0,
-        longitudeDelta: 0,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
       }),
     };
     this.drawer = null;
     this.indx = 0;
   }
+
+  round(n) {
+    if (!n) {
+      return 0;
+    }
+
+    return Math.floor(n * 100) / 100;
+  }
+
   closeDrawer = () => {
     this.drawer._root.close();
   };
@@ -87,67 +99,130 @@ class MapsActivity extends Component {
     this.drawer._root.open();
   };
   componentWillUnmount() {
-    Geolocation.clearWatch(this.watchID);
-    console.log('unmounted');
+    //this._unsubscribe();
+    //Location.clearWatch(this.watchID);
+    // console.log("unmounted");
   }
+  componentWillMount() {
+    this.animatedValue = new Animated.Value(50);
+  }
+
+  componentDidMount = async () => {
+    await this.props.loginStatus();
+    if (!this.props.authStatus.isAuthenticated) {
+      this.props.navigation.dispatch(StackActions.replace("Intro"));
+    }
+
+    let { status } = await Location.requestPermissionsAsync();
+    if (status !== "granted") {
+      setErrorMsg("Permission to access location was denied");
+    }
+    let pos = await Location.getCurrentPositionAsync({});
+    const Oname = await this.getLocationName(pos);
+    const data = {
+      latitude: pos.coords.latitude,
+      longitude: pos.coords.longitude,
+      originName: Oname,
+      speed: pos.coords.speed,
+    };
+    console.log(pos.coords.heading);
+    //this.subscribe();
+    this.setState({ bearing: pos.coords.heading });
+
+    await this.props.getCurrentLocation(data);
+    Animated.timing(this.animatedValue, {
+      toValue: 1,
+      duration: 600,
+    }).start();
+    this.setState({ showBS: true });
+    this.getAllRiders();
+    this.animateRiderMovement();
+
+    this.watchID = await Location.watchPositionAsync(
+      {
+        enableHighAccuracy: true,
+        distanceInterval: 1,
+        timeInterval: 10000,
+      },
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        const Oname = await this.getLocationName(position);
+        const newCoordinate = {
+          latitude,
+          longitude,
+          originName: Oname,
+        };
+        await this.props.getCurrentLocation(newCoordinate);
+
+        try {
+          this.map.animateToRegion(this.getCurrentRegion(), 1000 * 2);
+          // if (Platform.OS === "android") {
+          //   if (this.markerUser) {
+          //     this.markerUser._component.animateMarkerToCoordinate(
+          //       newCoordinate,
+          //       500
+          //     );
+          //   }
+          // } else {
+          coordinateUser.timing(newCoordinate).start();
+          // }
+        } catch (error) {
+          console.log(error);
+        }
+
+        this.setState({
+          latitude,
+          longitude,
+          bearing: position.coords.heading,
+        });
+      },
+      (error) => console.log(error)
+    );
+  };
   getAllRiders = () => {
     this.socket = io(PV_API, {
       secure: true,
-      transports: ['websocket'],
+      transports: ["websocket"],
     });
 
-    this.socket.on('riderDetails', det => {
+    this.socket.on("riderDetails", (det) => {
       this.setState({
         riders: this.state.riders.filter(
-          rider => rider.riderEmail !== det.riderEmail,
+          (rider) => rider.riderEmail !== det.riderEmail
         ),
       });
-      this.setState({riders: [...this.state.riders, det]});
+      this.setState({ riders: [...this.state.riders, det] });
       this.props.getRiders(this.state.riders);
       console.log(this.state.riders);
     });
   };
 
   animateRiderMovement = () => {
-    const {coordinateRiders: coordinate} = this.state;
-    if (Platform.OS === 'android') {
-      if (this.markerRider) {
-        {
-          this.state.riders.map(riders =>
-            this.markerRider._component.animateMarkerToCoordinate(
-              {latitude: riders.latitude, longitude: riders.longitude},
-              500,
-            ),
-          );
-        }
-      }
-    } else {
-      {
-        this.state.riders.map(riders =>
-          coordinate
-            .timing({latitude: riders.latitude, longitude: riders.longitude})
-            .start(),
-        );
-      }
+    {
+      this.state.riders.map((riders) =>
+        coordinateRiders
+          .timing({ latitude: riders.latitude, longitude: riders.longitude })
+          .start()
+      );
     }
   };
   renderContent = () => {
-    return <BottomSheet navigation={this.props.navigation} />;
+    return <BottomSheetMain navigation={this.props.navigation} />;
   };
   async getLocationName(position) {
     try {
-      const {latitude, longitude} = position.coords;
+      const { latitude, longitude } = position.coords;
       const key = GOOGLE_MAPS_APIKEY;
       const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${key}`;
       const res = await axios.get(url);
       return res.data.results[2].formatted_address;
     } catch (e) {
       console.log(e.message);
-      if (e.message === 'Network Error') {
-        this.setState({showBS: false});
+      if (e.message === "Network Error") {
+        this.setState({ showBS: false });
         Toast.show({
-          text: 'Please check your internet connection',
-          buttonText: 'Okay',
+          text: "Please check your internet connection",
+          buttonText: "Okay",
           duration: 5000,
         });
       }
@@ -156,113 +231,21 @@ class MapsActivity extends Component {
   handleBackButton() {
     BackHandler.exitApp();
   }
-  // static async getDerivedStateFromProps(props, state) {
-  //   // await props.loginStatus();
-  //   if (!props.authStatus.isAuthenticated) {
-  //     // props.navigation.navigate('Login');
-  //     props.navigation.dispatch(StackActions.replace('Login'));
-  //   }
-  // }
-  componentDidMount = async () => {
-    await this.props.loginStatus();
-    if (!this.props.authStatus.isAuthenticated) {
-      //this.props.navigation.navigate("Login");
-      this.props.navigation.dispatch(StackActions.replace('Intro'));
-    }
-
-    // BackHandler.addEventListener(
-    //   'hardwareBackPress',
-    //   this.handleBackButton.bind(this),
-    // );
-
-    // this.requestLocationPermission();
-
-    Geolocation.getCurrentPosition(
-      async position => {
-        // console.log(position.coords.latitude);
-        const Oname = await this.getLocationName(position);
-        const data = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          originName: Oname,
-          speed: position.coords.speed,
-        };
-        console.log(position);
-        this.setState({bearing: position.coords.heading});
-        await this.props.getCurrentLocation(data);
-        this.setState({showBS: true});
-        this.getAllRiders();
-        this.animateRiderMovement();
-      },
-      error => this.setState({error: error.message}),
-      {enableHighAccuracy: true, timeout: 200000, maximumAge: 1000},
-    );
-
-    const {coordinateRiders: coordinate} = this.state;
-
-    this.watchID = Geolocation.watchPosition(
-      async position => {
-        const {routeCoordinates, distanceTravelled} = this.state;
-        const {latitude, longitude} = position.coords;
-        const Oname = await this.getLocationName(position);
-        const newCoordinate = {
-          latitude,
-          longitude,
-          originName: Oname,
-        };
-        await this.props.getCurrentLocation(newCoordinate);
-        // this.props.getCurrentLocation(newCoordinate);
-        // console.log({newCoordinate});
-        try {
-          this.map.animateToRegion(this.getCurrentRegion(), 1000 * 2);
-        if (Platform.OS === 'android') {
-          if (this.markerUser) {
-            this.markerUser._component.animateMarkerToCoordinate(
-              newCoordinate,
-              500,
-            );
-          }
-        } else {
-          coordinate.timing(newCoordinate).start();
-        }
-        } catch (error) {
-          console.log(error)
-        }
-        
-
-        this.setState({
-          latitude,
-          longitude,
-          bearing: position.coords.heading,
-          distanceTravelled:
-            distanceTravelled + this.calcDistance(newCoordinate),
-          prevLatLng: newCoordinate,
-        });
-      },
-      error => console.log(error),
-      {
-        enableHighAccuracy: true,
-        timeout: 20000,
-        maximumAge: 1000,
-        distanceFilter: 10,
-      },
-    );
-  };
 
   requestLocationPermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         {
-          title: 'Location Access Permission',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
+          title: "Location Access Permission",
+          buttonNeutral: "Ask Me Later",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK",
+        }
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
       } else {
-        console.log('permission denied');
+        console.log("permission denied");
       }
     } catch (err) {
       console.warn(err);
@@ -275,17 +258,23 @@ class MapsActivity extends Component {
     longitudeDelta: LONGITUDE_DELTA,
   });
 
-  calcDistance = newLatLng => {
-    const {prevLatLng} = this.state;
+  calcDistance = (newLatLng) => {
+    const { prevLatLng } = this.state;
     return haversine(prevLatLng, newLatLng) || 0;
   };
 
   render() {
-    
+    // const interpolateRotation = this.animatedValue.interpolate({
+    //   inputRange:[0,1],
+    //   outputRange:['0deg',`${this.state.bearing}deg`]
+    // })
+    // const animatedStyle={
+    //   transform:[{rotate:interpolateRotation}]
+    // }
     return (
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <Drawer
-          ref={ref => {
+          ref={(ref) => {
             this.drawer = ref;
           }}
           content={
@@ -293,12 +282,13 @@ class MapsActivity extends Component {
               navigation={this.props.navigation}
               authdata={this.props.authStatus}
             />
-          }>
+          }
+        >
           <View style={styles.container}>
             {!this.state.showBS ? (
               <Spinner
                 visible={true}
-                textContent={'Loading...'}
+                textContent={"Loading..."}
                 textStyle={styles.spinnerTextStyle}
               />
             ) : (
@@ -307,51 +297,60 @@ class MapsActivity extends Component {
                 showUserLocation
                 followUserLocation
                 region={this.getCurrentRegion()}
-                style={{...StyleSheet.absoluteFillObject}}
-                ref={ref => {
+                style={{ ...StyleSheet.absoluteFillObject }}
+                ref={(ref) => {
                   this.map = ref;
-                }}>
+                }}
+              >
                 <MapView.Marker.Animated
-                  ref={marker => {
+                  ref={(marker) => {
                     this.markerUser = marker;
                   }}
-                  coordinate={this.getCurrentRegion()}>
-                  <Icon
-                    name={'navigation-2'}
+                  style={{
+                    transform: [
+                      {
+                        rotate:
+                          this.state.bearing === undefined
+                            ? "0deg"
+                            : `${this.state.bearing}deg`,
+                      },
+                    ],
+                  }}
+                  coordinate={this.getCurrentRegion()}
+                >
+                  {/* <Ionicons
+                    name={"md-checkmark-circle"}
                     size={24}
                     style={{
                       width: 40,
                       height: 40,
-                      resizeMode: 'contain',
-                      transform: [{rotate: `${this.state.bearing}deg`}],
+                      resizeMode: "contain",
+                      // transform: [{ rotate: `${this.state.bearing}deg` }],
                       zIndex: 3,
                     }}
-                  />
-                  {/* <Image
-                  source={require('../../assets/map-pin.png')}
-                  style={{height: 40, width: 40}}
-                /> */}
+                  /> */}
                 </MapView.Marker.Animated>
 
-                {this.state.riders.map(riders => (
+                {this.state.riders.map((riders) => (
                   <Marker.Animated
-                    ref={marker => {
+                    ref={(marker) => {
                       this.markerRider = marker;
                     }}
                     style={{
                       width: 40,
                       height: 40,
-                      resizeMode: 'contain',
-                      transform: [{rotate: `${riders.bearing}deg`}],
+                      resizeMode: "contain",
+                      transform: [{ rotate: `${riders.bearing}deg` }],
                       zIndex: 3,
                     }}
                     coordinate={{
                       latitude: riders.latitude,
                       longitude: riders.longitude,
-                    }}>
+                    }}
+                  >
                     <Image
-                      source={require('../../assets/motor.png')}
-                      style={{height: 40, width: 40}}
+                      source={require("../../assets/motor.png")}
+                      style={{ height: 40, width: 40 }}
                     />
 
                     <Marker
@@ -365,7 +364,7 @@ class MapsActivity extends Component {
               </MapView>
             )}
             <Toolbar
-              icon={'align-left'}
+              icon={"ios-menu"}
               notbackAction={true}
               opendrawer={this.openDrawer}
               navigation={this.props.navigation}
@@ -374,7 +373,8 @@ class MapsActivity extends Component {
               <BottomDrawer
                 containerHeight={this.state.bottomSheetHeight}
                 offset={TAB_BAR_HEIGHT}
-                shadow={true}>
+                shadow={true}
+              >
                 {this.renderContent()}
               </BottomDrawer>
             ) : // <RBSheet
@@ -402,14 +402,14 @@ class MapsActivity extends Component {
     );
   }
 }
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   origin: state.locationData.OriginCoordinates,
   error: state.locationData.error,
   authStatus: state.auth,
 });
 export default connect(
   mapStateToProps,
-  {getCurrentLocation, getRiders, isSignedIn, loginStatus},
+  { getCurrentLocation, getRiders, isSignedIn, loginStatus }
 )(MapsActivity);
 const styles = StyleSheet.create({
   container: {
@@ -421,17 +421,17 @@ const styles = StyleSheet.create({
 
   latlng: {
     width: 200,
-    alignItems: 'stretch',
+    alignItems: "stretch",
   },
   button: {
     width: 80,
     paddingHorizontal: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginHorizontal: 10,
   },
   buttonContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginVertical: 20,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
 });

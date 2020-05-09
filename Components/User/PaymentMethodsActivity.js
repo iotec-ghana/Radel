@@ -13,7 +13,7 @@ import {
 const {width, height} = Dimensions.get('window');
 import Toolbar from './Layouts/Toolbar';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import AsyncStorage from '@react-native-community/async-storage';
+import {AsyncStorage} from 'react-native';
 import axios from 'axios';
 import {BASE_URL} from '../../constants';
 import MomoCard from './Layouts/MomoCardDefault';

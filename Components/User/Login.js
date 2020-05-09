@@ -58,7 +58,7 @@ class Login extends Component {
     return (
       <View style={{backgroundColor: '#f7f9fc', flex: 1}}>
         <Toolbar
-          icon={'arrow-left'}
+          icon={'ios-arrow-back'}
           right={'Sign Up'}
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}

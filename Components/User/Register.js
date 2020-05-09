@@ -98,7 +98,7 @@ class Register extends Component {
     return (
       <View style={styles.container}>
         <Toolbar
-          icon={'arrow-left'}
+          icon={'ios-arrow-back'}
           right={'Log in'}
           rightTextColor={'#e7564c'}
           routeBack={'Home'}

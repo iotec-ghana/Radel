@@ -13,7 +13,7 @@ import Toolbar from './Layouts/Toolbar';
 import {Picker} from 'native-base';
 import axios from 'axios';
 import {BASE_URL} from '../../constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import {AsyncStorage} from 'react-native';
 const {width, height} = Dimensions.get('window');
 export default class AddMomoNumber extends Component {
   constructor(props) {
