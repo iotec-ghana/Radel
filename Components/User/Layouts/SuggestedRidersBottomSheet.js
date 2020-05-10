@@ -21,7 +21,7 @@ import {getSelectedRider} from '../../../Actions/SelectRiderAction';
 
 class SuggestedRidersBottomSheet extends Component {
   state = {
-    itemPressed: this.props.riders[0].riderEmail,
+    itemPressed: this.props.riders[0].riderid,
   };
   typeSelected(value, details) {
     this.setState({
@@ -45,7 +45,7 @@ class SuggestedRidersBottomSheet extends Component {
               // <RidersCard data={item} price={this.props.price} arr={DATA} />
               <TouchableOpacity
                 // eslint-disable-next-line react-native/no-inline-styles
-                onPress={() => this.typeSelected(item.riderEmail, item)}
+                onPress={() => this.typeSelected(item.riderid, item)}
                 style={{
                   flex: 1,
                   flexDirection: 'row',
@@ -53,11 +53,11 @@ class SuggestedRidersBottomSheet extends Component {
                   margin: 2,
                   borderRadius: 5,
                   borderColor:
-                    this.state.itemPressed === item.riderEmail
+                    this.state.itemPressed === item.riderid
                       ? '#e7564c'
                       : 'black',
                   borderWidth:
-                    this.state.itemPressed === item.riderEmail ? 2 : 0,
+                    this.state.itemPressed === item.riderid ? 2 : 0,
                 }}>
                 <View style={styles.radelGo}>
                   <Text style={styles.radelGoText}>RadelGO</Text>
@@ -95,7 +95,7 @@ class SuggestedRidersBottomSheet extends Component {
                 />
               </TouchableOpacity>
             )}
-            keyExtractor={item => item.riderEmail}
+            keyExtractor={item => item.riderid}
           />
         </SafeAreaView>
       </View>

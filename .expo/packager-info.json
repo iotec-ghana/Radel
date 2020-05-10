@@ -1,0 +1,10 @@
+{
+  "devToolsPort": 19002,
+  "expoServerPort": 19000,
+  "packagerPort": 19004,
+  "packagerPid": 44274,
+  "expoServerNgrokUrl": "https://zf-zty.anonymous.radel.exp.direct",
+  "packagerNgrokUrl": "https://packager.zf-zty.anonymous.radel.exp.direct",
+  "ngrokPid": 44355,
+  "webpackServerPort": null
+}

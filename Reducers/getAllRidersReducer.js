@@ -15,7 +15,7 @@ export default function(state = initialState, action) {
     case DELETE_DUPLICATE_RIDER_DETAILS:
       return {
         nearby: state.nearby.filter(
-          rider => rider.riderEmail !== action.payload.riderEmail,
+          rider => rider.riderid !== action.payload.riderid,
         ),
       };
     default:

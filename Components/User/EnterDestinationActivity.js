@@ -63,17 +63,11 @@ class EnterDestinationActivity extends Component {
     return (
       <View style={styles.main}>
         <Toolbar
-          icon={'ios-arrow-back'}
-          // right={'Sign Up'}
+          icon={'ios-close'}
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}
-          // righSideRoute={'SignUp'}
         />
-        <StatusBar
-          barStyle="dark-content"
-          // translucent={true}
-          backgroundColor={StatusBarColor}
-        />
+        <StatusBar barStyle="dark-content" backgroundColor={StatusBarColor} />
         <TextInput
           style={styles.input}
           placeholder={'Pickup Location'}
