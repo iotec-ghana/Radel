@@ -41,10 +41,6 @@ const TAB_BAR_HEIGHT = -6;
 import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
 import {getRiders} from '../../Actions/getAllRidersAction';
 import io from 'socket.io-client';
-const socket = io(PV_API, {
-  secure: true,
-  transports: ['websocket'],
-});
 import {requestRide, listenForRiderDecision} from '../../socketFunctions';
 import {StackActions} from '@react-navigation/native';
 //addy.substr(0, addy.indexOf(','));
@@ -83,71 +79,55 @@ class DeliveryDestinationMap extends Component {
         this.props.destinationName.indexOf(','),
       ),
     };
-
-    this.mapView = null;
     this.socket = io(PV_API, {
       secure: true,
       transports: ['websocket'],
     });
+    this.mapView = null;
   }
   componentDidMount() {
     // this.RBSheet.open();
-
+    const userid = this.props.authStatus.id;
+    this.socket.on('rider-decision-' + userid, riderdecision => {
+      console.log(riderdecision);
+      if (riderdecision.isAvailable) {
+        this.setState({
+          loadingLayout: false,
+          requestAccepted: riderdecision.isAvailable,
+          found: true,
+          riderDetails: riderdecision,
+        });
+        this.socket.emit('customer-movement-' + userid);
+      } else {
+        alert('Rider declined your request');
+      }
+    });  
     console.log(this.props.authStatus);
   }
-  requestRide = async () => {
+  reqRide = async () => {
     //fetch driver details
 
     const payload = {
       latitude: this.state.currentloclat,
       longitude: this.state.currentloclong,
-      userid: 5,
-      destination: this.state.destinationName,
+      userid: this.props.authStatus.id,
+      destination: this.state.destinationName,  
+      DestinationCoordinates: { 
+        latitude: this.state.Destlatitude,
+        longitude: this.state.Destlongitude,
+      }, 
+    
       pickup: this.state.originName,
       ...this.props.selected,
-    };
-    console.log(payload);
+    }; 
+    //console.log(payload); 
     if (!this.state.requestOnce) {
       requestRide(payload);
       this.setState({requestOnce: true});
     }
 
-    this.socket.on('rider-decision', riderdecision => {
-      if (riderdecision.isAvailable) {
-        this.setState({
-          loadingLayout: false,
-          requestAccepted: det.isAvailable, 
-          found: true,
-          riderDetails: riderdecision,
-        }); 
-        console.log(riderdecision)
-      } else {
-        alert('Rider declined your request');
-      }
-    });
-
     // console.log('done');
   };
-
-  // ListenForRiderDecision = () => {
-  //   const userEmail = "deedat5@gmail.com";
-  //   this.socket.on("riderChoice-" + userEmail, (det) => {
-  //     //console.log(det);
-  //     if (det.isAvailable) {
-  //       this.setState({
-  //         loadingLayout: false,
-  //         requestAccepted: det.isAvailable,
-  //         found: true,
-  //         riderDetails: det,
-  //       });
-  //     } else {
-  //       // this.props.navigation.dispatch(
-  //       //   StackActions.replace('DeliveryDestinationMap'),
-  //       // );
-  //       alert("Rider declined your request");
-  //     }
-  //   });
-  // };
 
   DriverDetailsLayout = () => {
     return (
@@ -219,7 +199,7 @@ class DeliveryDestinationMap extends Component {
     );
   };
   loadingLayout = () => {
-    this.requestRide();
+    this.reqRide();
     return (
       <View style={{flex: 1, alignItems: 'center'}}>
         <Image
@@ -309,7 +289,7 @@ class DeliveryDestinationMap extends Component {
       };
       //console.log(dist);
       const res = await axios.post(BASE_URL + '/pricing/', dist);
-      if (this.props.riders) {
+      if (this.props.riders.length > 0) {
         this.setState({
           price: res.data.rounded_price,
           buttonDisabled: false,

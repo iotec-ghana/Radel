@@ -78,9 +78,9 @@ class EnterDestinationActivity extends Component {
             flexDirection: 'row',
             marginLeft: 10,
             marginRight: 10,
-            marginBottom: 10,
+            marginBottom: 10, 
           }}>
-          <TextInput
+          <TextInput 
             style={{
               flex: 1,
               height: 50,

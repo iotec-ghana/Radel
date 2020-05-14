@@ -40,7 +40,7 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "rn-bottom-drawer": "^1.4.3",
-    "socket.io-client": "2.3.0"
+    "socket.io-client": "2.1.1"
   },
   "devDependencies": {
     "babel-preset-expo": "~8.1.0",

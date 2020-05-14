@@ -27,6 +27,7 @@
     "android": {
       "package": "com.iotec.radel",
       "versionCode": 1
-    }
+    },
+    "description": "alpha test 1"
   }
 }

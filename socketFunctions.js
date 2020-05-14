@@ -42,3 +42,10 @@ export function trackRider() {
   });
   return tracking;
 }
+
+export function disconnect(data){
+//  socket.emit("",data)
+  socket.emit("disconnect",data)
+  
+}
+ 
