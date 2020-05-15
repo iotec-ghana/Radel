@@ -43,6 +43,7 @@ import {getRiders} from '../../Actions/getAllRidersAction';
 import io from 'socket.io-client';
 import {requestRide, listenForRiderDecision} from '../../socketFunctions';
 import {StackActions} from '@react-navigation/native';
+import { captureRef } from 'react-native-view-shot';
 //addy.substr(0, addy.indexOf(','));
 
 class DeliveryDestinationMap extends Component {
@@ -56,6 +57,7 @@ class DeliveryDestinationMap extends Component {
       distance: 0,
       duration: 0,
       price: 0,
+      showtopcard:true,
       processing: false,
       buttonDisabled: true,
       loadingPrice: true,
@@ -85,8 +87,19 @@ class DeliveryDestinationMap extends Component {
     });
     this.mapView = null;
   }
-  componentDidMount() {
-    // this.RBSheet.open();
+ async componentDidMount() {
+    // this.RBSheet.open()
+    try {
+      // const result = await captureRef(this.mapView , {
+      //   result: 'tmpfile',
+      //   height: 200,
+      //   width: 150,
+      //   quality: 0,
+      //   format: 'jpg',
+      // });
+      // console.log(result + "dfgddgd")
+    
+    
     const userid = this.props.authStatus.id;
     this.socket.on('rider-decision-' + userid, riderdecision => {
       console.log(riderdecision);
@@ -102,7 +115,10 @@ class DeliveryDestinationMap extends Component {
         alert('Rider declined your request');
       }
     });  
-    console.log(this.props.authStatus);
+   // console.log(this.props.authStatus);
+  } catch (error) {
+      console.log(error)
+  };
   }
   reqRide = async () => {
     //fetch driver details
@@ -113,7 +129,7 @@ class DeliveryDestinationMap extends Component {
       userid: this.props.authStatus.id,
       destination: this.state.destinationName,  
       DestinationCoordinates: { 
-        latitude: this.state.Destlatitude,
+        latitude: this.state.Destlatitude, 
         longitude: this.state.Destlongitude,
       }, 
     
@@ -130,6 +146,9 @@ class DeliveryDestinationMap extends Component {
   };
 
   DriverDetailsLayout = () => {
+    //(this.mapView 
+    
+   
     return (
       <View style={{flex: 1, alignItems: 'center'}}>
         <Text style={{fontWeight: 'bold', fontSize: 16, marginTop: 15}}>
@@ -253,7 +272,7 @@ class DeliveryDestinationMap extends Component {
           style={{
             flex: 1,
             alignContent: 'center',
-            justifyContent: 'center',
+           paddingTop:120,
             alignItems: 'center',
           }}>
           <Text
@@ -288,8 +307,9 @@ class DeliveryDestinationMap extends Component {
         distance: this.state.distance,
       };
       //console.log(dist);
-      const res = await axios.post(BASE_URL + '/pricing/', dist);
       if (this.props.riders.length > 0) {
+      const res = await axios.post(BASE_URL + '/pricing/', dist);
+     
         this.setState({
           price: res.data.rounded_price,
           buttonDisabled: false,
@@ -299,12 +319,13 @@ class DeliveryDestinationMap extends Component {
       // console.log(res.data);
     } catch (e) {
       // console.log(e.message);
-      alert('please check your internet connection');
+      //alert('please check your internet connection');
     }
   };
 
   topCard = () => {
     // console.log(this.state.originName);
+    if(this.state.showtopcard){
     return (
       <View style={styles.top}>
         <View style={styles.topItems}>
@@ -323,6 +344,8 @@ class DeliveryDestinationMap extends Component {
         </View>
       </View>
     );
+          }
+    
   };
   animateRiderMovement = () => {
     {
@@ -334,6 +357,7 @@ class DeliveryDestinationMap extends Component {
     }
   };
   render() {
+    console.log(this.props.destination)
     return (
       <View style={styles.container}>
         <StatusBar
@@ -344,6 +368,7 @@ class DeliveryDestinationMap extends Component {
         <MapView
           provider={PROVIDER_GOOGLE}
           loadingEnabled
+       
           initialRegion={this.getCurrentRegion()}
           ref={c => (this.mapView = c)}
           style={{...StyleSheet.absoluteFillObject}}>
@@ -415,6 +440,7 @@ class DeliveryDestinationMap extends Component {
                   distance: result.distance,
                   duration: result.duration,
                 });
+                console.log(JSON.stringify(result.coordinates) + "ana")
                 this.calculatePrice();
                 // console.log(`Distance: ${result.distance} km`);
                 // console.log(`Duration: ${result.duration} min.`);
@@ -436,11 +462,14 @@ class DeliveryDestinationMap extends Component {
         </MapView>
 
         <BottomDrawer
-          containerHeight={height / 3}
+          containerHeight={height}
           offset={TAB_BAR_HEIGHT}
-          startUp={true}
-          onExpanded={ex => {}}
-          shadow={true}>
+          startUp={false}
+          onCollapsed={collapse=>this.setState({showtopcard:true})}
+          
+          onExpanded={ex => {this.setState({showtopcard:false})}}
+          
+          >
           {!this.state.loadingLayout && !this.state.found
             ? this.renderContent()
             : this.state.found

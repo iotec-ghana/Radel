@@ -47,7 +47,7 @@ import {Ionicons} from '@expo/vector-icons';
 import {
   establishConnectionToSocket,
   getNearbyRiders,
-  disconnect
+  disconnect,
 } from '../../socketFunctions';
 import * as Location from 'expo-location';
 import io from 'socket.io-client';
@@ -57,14 +57,14 @@ const socket = io(PV_API, {
 });
 import Spinner from 'react-native-loading-spinner-overlay';
 class MapsActivity extends Component {
-  constructor(props) { 
+  constructor(props) {
     super(props);
-  
-    this.state = {  
+
+    this.state = {
       latitude: props.origin.latitude,
       longitude: props.origin.longitude,
       bottomSheetHeight: height / 4,
-      routeCoordinates: [], 
+      routeCoordinates: [],
       riders: [],
       distanceTravelled: 0,
       locationName: '',
@@ -89,7 +89,6 @@ class MapsActivity extends Component {
       }),
     };
     this.drawer = null;
-  
   }
 
   round(n) {
@@ -106,34 +105,32 @@ class MapsActivity extends Component {
   openDrawer = () => {
     this.drawer._root.open();
   };
-     
+
   componentWillUnmount() {
-    disconnect({userid:5,user:true}) 
+    disconnect({userid: 5, user: true});
     //this._unsubscribe();
     //Location.clearWatch(this.watchID);
-    // console.log("unmounted");  
-  } 
+    // console.log("unmounted");
+  }
   componentWillMount() {
     this.animatedValue = new Animated.Value(50);
   }
   getAllRiders = () => {
-    const userData = {   
-      userid: this.props.authStatus.user.id, 
-    };    
-    establishConnectionToSocket(userData); 
+    const userData = {
+      userid: this.props.authStatus.user.id,
+    };
+    establishConnectionToSocket(userData);
     socket.on('online-riders', riderData => {
-      this.setState({ 
+      this.setState({
         riders: this.state.riders.filter(
           rider => rider.riderid !== riderData.riderid,
-        ),   
-      }); 
+        ),
+      });
       //console.log()
       this.setState({riders: [...this.state.riders, riderData]});
       this.props.getRiders(this.state.riders);
       console.log(this.state.riders);
     });
- 
-   
   };
 
   componentDidMount = async () => {
@@ -159,14 +156,11 @@ class MapsActivity extends Component {
     this.setState({bearing: pos.coords.heading});
 
     await this.props.getCurrentLocation(data);
-    Animated.timing(this.animatedValue, {
-      toValue: 1,
-      duration: 600,
-    }).start(); 
+
     this.setState({showBS: true});
-    this.getAllRiders(); 
+    this.getAllRiders();
     this.animateRiderMovement();
- 
+
     this.watchID = await Location.watchPositionAsync(
       {
         enableHighAccuracy: true,
@@ -272,6 +266,7 @@ class MapsActivity extends Component {
     // const animatedStyle={
     //   transform:[{rotate:interpolateRotation}]
     // }
+  
     return (
       <View style={{flex: 1}}>
         <Drawer
@@ -300,7 +295,8 @@ class MapsActivity extends Component {
                 style={{...StyleSheet.absoluteFillObject}}
                 ref={ref => {
                   this.map = ref;
-                }}>
+                }}
+                >
                 <MapView.Marker.Animated
                   ref={marker => {
                     this.markerUser = marker;
@@ -362,7 +358,7 @@ class MapsActivity extends Component {
             )}
             <Toolbar
               icon={'ios-menu'}
-              notbackAction={true}  
+              notbackAction={true}
               opendrawer={this.openDrawer}
               navigation={this.props.navigation}
             />

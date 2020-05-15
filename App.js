@@ -27,6 +27,7 @@ import GetStartedActivity from './Components/User/GetStartedActivity';
 import WaitingForMomoPaymentActivity from './Components/User/WaitingForMomoPaymentActivity';
 import SelectPaymentActivity from './Components/User/SelectPaymentActivity';
 import AddMomoNumber from './Components/User/AddMomoNumber';
+import RideHistoryActivity from './Components/User/RideHistoryActivity';
 
 import {Root} from 'native-base';
 const config = {
@@ -123,6 +124,10 @@ function MainStackScreen() {
       <MainStack.Screen
         name="WaitingForMomoPaymentActivity"
         component={WaitingForMomoPaymentActivity}
+      />
+       <MainStack.Screen
+        name="RideHistoryActivity"
+        component={RideHistoryActivity}
       />
     </MainStack.Navigator>
   );
