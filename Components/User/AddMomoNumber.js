@@ -75,7 +75,7 @@ export default class AddMomoNumber extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Toolbar icon={'chevron-left'} navigation={this.props.navigation} />
+        <Toolbar icon={'arrow-left'} navigation={this.props.navigation} />
         <View style={styles.button}>
           <TouchableOpacity
             style={styles.saveButton}

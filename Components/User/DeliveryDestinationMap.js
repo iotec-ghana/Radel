@@ -559,6 +559,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 3,
     margin: 12,
+    
   },
   bookButtonText: {
     color: '#fff',

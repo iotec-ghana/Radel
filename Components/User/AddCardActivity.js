@@ -123,7 +123,7 @@ export default class AddCardActivity extends Component {
           </TouchableOpacity>
         </View>
         <Toolbar
-          icon={'chevron-left'}
+          icon={'arrow-left'}
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}
         />

@@ -3,7 +3,6 @@ import React, {Component} from 'react';
 import {Header, Left, Body, Right, Button, Title} from 'native-base';
 import {StyleSheet, TouchableOpacity, View, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import { Ionicons } from '@expo/vector-icons';
 
 export default class Toolbar extends Component {
   render() {
@@ -18,7 +17,7 @@ export default class Toolbar extends Component {
                   ? this.props.navigation.goBack(null)
                   : this.props.opendrawer();
               }}>
-              <Ionicons
+              <Icon
                 name={this.props.icon}
                 size={30}
                 color="#000"

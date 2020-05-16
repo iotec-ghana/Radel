@@ -17,7 +17,7 @@ import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
 import MapViewDirections from 'react-native-maps-directions';
 import {Feather} from '@expo/vector-icons';
 const {width, height} = Dimensions.get('window');
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Feather';
 //import pin from '../../../assets/map-pin.svg';
 
 export default class UserDeliveryLocationHistoryList extends Component {
@@ -37,7 +37,7 @@ export default class UserDeliveryLocationHistoryList extends Component {
    
     console.log(this.getCurrentRegion());
     return (
-      <TouchableOpacity style={styles.main} activeOpacity={1}>
+      <TouchableOpacity style={styles.main} activeOpacity={0.9}>
         <Text
           style={{
             fontSize: 14,
@@ -54,6 +54,7 @@ export default class UserDeliveryLocationHistoryList extends Component {
           rotateEnabled={false}
           scrollEnabled={false}
           pitchEnabled={false}
+          cacheEnabled={true}
           provider={PROVIDER_GOOGLE}
           loadingEnabled
           style={{height: 160}}
@@ -83,7 +84,7 @@ export default class UserDeliveryLocationHistoryList extends Component {
           <MapViewDirections
             origin={this.props.origin}
             destination={this.props.destination}
-            strokeWidth={3}
+            strokeWidth={4}
             strokeColor="#e7564c"
             optimizeWaypoints={true}
             apikey={GOOGLE_MAPS_APIKEY}
@@ -117,10 +118,10 @@ export default class UserDeliveryLocationHistoryList extends Component {
             }}
           />
         </MapView>
-        <Text style={{fontSize: 18, fontWeight: 'bold', marginBottom: 4}}>
+        {/* <Text style={{fontSize: 18, fontWeight: 'bold', marginBottom: 4}}>
           RadelGo
-        </Text>
-        <View style={{flexDirection: 'row', padding: 0, flex: 1}}>
+        </Text> */}
+        <View style={{flexDirection: 'row', padding: 0, flex: 1,marginVertical:5}}>
           <Icon name="map-pin" size={13} color="#e7564c" style={{margin: 0}} />
           <Text style={{marginLeft: 2, fontWeight: 'bold', fontSize: 13}}>
             West land - Kasoa
@@ -128,7 +129,7 @@ export default class UserDeliveryLocationHistoryList extends Component {
 
           <Text
             style={{
-              fontSize: 15,
+              fontSize: 13,
               fontWeight: 'bold',
               position: 'absolute',
               right: 0,
@@ -147,10 +148,11 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
 
-    borderRadius: 5,
+    borderRadius: 10,
     margin: 10,
     padding: 10,
     backgroundColor: '#f7f9fc',
+    elevation:170
   },
   image: {
     height: 24,

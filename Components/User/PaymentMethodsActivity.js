@@ -93,7 +93,7 @@ export default class PaymentMethodsActivity extends Component {
           </TouchableOpacity>
         </View> */}
         <Toolbar
-          icon={'chevron-left'}
+          icon={'arrow-left'}
           right={'Add Payment Method'}
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}

@@ -58,7 +58,7 @@ class Login extends Component {
     return (
       <View style={{backgroundColor: '#f7f9fc', flex: 1}}>
         <Toolbar
-          icon={'ios-arrow-back'}
+          icon={'arrow-left'}
           right={'Sign Up'}
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}
@@ -195,7 +195,6 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     marginTop: 10,
-
     backgroundColor: '#e7564c',
     paddingVertical: 15,
     borderRadius: 3,

@@ -195,7 +195,7 @@ class WaitingForMomoPaymentActivity extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Toolbar icon={'chevron-left'} navigation={this.props.navigation} />
+        <Toolbar icon={'arrow-left'} navigation={this.props.navigation} />
         <View style={{flex: 1, alignItems: 'center'}}>
           <Image
             source={require('../../assets/spinner.gif')}

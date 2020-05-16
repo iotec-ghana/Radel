@@ -107,7 +107,7 @@ class PhoneVerificationActivity extends Component {
           </TouchableOpacity>
         </View>
         <Toolbar
-          icon={'ios-arrow-back'}
+          icon={'arrow-left'}
           routeBack={'Home'}
           navigation={this.props.navigation}
           righSideRoute={'Login'}

@@ -1,55 +1,48 @@
 import React, {Component} from 'react';
-import {View, Text, SafeAreaView, ScrollView, FlatList} from 'react-native';
-import UserDeliveryLocationHistoryList from './Layouts/UserDeliveryLocationHistoryList';
-const LATITUDE_DELTA = 0.3;
-const LONGITUDE_DELTA = 0.3;
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
+import UpcomingFragment from './UpcomingFragment';
+import CompletedRidesFragment from './CompletedRidesFragment';
+import {View, StatusBar, Text} from 'react-native';
+import Toolbar from './Layouts/Toolbar';
+import {StatusBarColor} from '../../constants';
+
+const Tab = createMaterialTopTabNavigator();
+
 export default class RideHistoryActivity extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      history: [
-        {
-          id: 1,
-          origin: {
-            latitude: 5.6523483,
-            longitude: -0.2135845,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
-          },
-          destination: {latitude: 5.534415500000001, longitude: -0.4252737},
-        },
-        {
-          id: 2,
-          origin: {
-            latitude: 5.6523483,
-            longitude: -0.2135845,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
-          },
-          destination: {latitude: 5.534415500000001, longitude: -0.4252737},
-        },
-      ],
-    };
+    this.state = {};
   }
 
   render() {
     return (
-      <SafeAreaView>
-        <ScrollView>
-          <FlatList
-            data={this.state.history}
-            renderItem={({item}) => (
-              <View>
-                <UserDeliveryLocationHistoryList
-                  origin={item.origin}
-                  destination={item.destination}
-                />
-              </View>
-            )}
-            keyExtractor={item => item.id}
-          />
-        </ScrollView>
-      </SafeAreaView>
+      <View style={{flex: 1, backgroundColor: '#fff'}}>
+        <Toolbar icon={'arrow-left'} navigation={this.props.navigation} />
+        <StatusBar backgroundColor={StatusBarColor} barStyle="dark-content" />
+        <Text
+          style={{
+            fontWeight: 'bold',
+            fontSize: 30,
+            marginHorizontal: 16,
+            marginVertical: 10,
+            color: '#000',
+          }}>
+          My rides
+        </Text>
+        <Tab.Navigator
+          lazy={true}
+          initialRouteName="upcoming"
+          tabBarOptions={{
+            activeTintColor: '#e7564c',
+            inactiveTintColor: '#000',
+            labelStyle: {fontSize: 12, fontWeight: 'bold'},
+            tabStyle: {color: '#e7564c'},
+            style: {color: '#e7564c'},
+          }}>
+          <Tab.Screen name="upcoming" component={UpcomingFragment} />
+          <Tab.Screen name="completed" component={CompletedRidesFragment} />
+        </Tab.Navigator>
+      </View>
     );
   }
 }

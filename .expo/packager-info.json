@@ -1,10 +1,10 @@
 {
-  "devToolsPort": 19003,
+  "devToolsPort": 19002,
   "expoServerPort": 19000,
   "packagerPort": 19001,
-  "packagerPid": 49181,
-  "expoServerNgrokUrl": "https://mh-zuw.deedat5.radel.exp.direct",
-  "packagerNgrokUrl": "https://packager.mh-zuw.deedat5.radel.exp.direct",
-  "ngrokPid": 49266,
+  "packagerPid": 91711,
+  "expoServerNgrokUrl": "https://9s-e7x.deedat5.radel.exp.direct",
+  "packagerNgrokUrl": "https://packager.9s-e7x.deedat5.radel.exp.direct",
+  "ngrokPid": 91811,
   "webpackServerPort": null
 }

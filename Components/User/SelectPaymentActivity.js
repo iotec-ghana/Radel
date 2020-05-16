@@ -33,7 +33,7 @@ export default class SelectPaymentActivity extends Component {
     return (
       <View style={styles.container}>
         <Toolbar
-          icon={'chevron-left'}
+          icon={'arrow-left'}
           navigation={this.props.navigation}
           body={'Select a new payment method'}
           titleColor={'#000'}

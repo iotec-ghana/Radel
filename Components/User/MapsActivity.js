@@ -165,7 +165,7 @@ class MapsActivity extends Component {
       {
         enableHighAccuracy: true,
         distanceInterval: 1,
-        timeInterval: 100,
+        timeInterval: 1,
       },
       async position => {
         const {latitude, longitude} = position.coords;
@@ -177,12 +177,17 @@ class MapsActivity extends Component {
         };
         await this.props.getCurrentLocation(newCoordinate);
 
-        try {
-          // this.map.animateToRegion(this.getCurrentRegion(), 1000 * 2);
-
-          coordinateUser.timing(newCoordinate).start();
-        } catch (error) {
-          console.log(error);
+        const duration = 100;
+        this.map.animateToRegion(this.getCurrentRegion(), 1000 * 2);
+        if (Platform.OS === 'android') {
+          //   if (this.markerUser) {
+          //     this.markerUser._component.animateMarkerToCoordinate(
+          //       newCoordinate,
+          //       duration,
+          //     );
+          //   }
+          // } else {
+          this.state.coordinateUser.timing({newCoordinate, duration}).start();
         }
 
         this.setState({
@@ -266,7 +271,7 @@ class MapsActivity extends Component {
     // const animatedStyle={
     //   transform:[{rotate:interpolateRotation}]
     // }
-  
+    const {latitude, longitude} = this.state;
     return (
       <View style={{flex: 1}}>
         <Drawer
@@ -289,14 +294,14 @@ class MapsActivity extends Component {
             ) : (
               <MapView
                 provider={PROVIDER_GOOGLE}
-                showUserLocation
-                followUserLocation
+                showUserLocation={true}
+                followUserLocation={false}
+                scrollEnabled={true}
                 region={this.getCurrentRegion()}
                 style={{...StyleSheet.absoluteFillObject}}
                 ref={ref => {
                   this.map = ref;
-                }}
-                >
+                }}>
                 <MapView.Marker.Animated
                   ref={marker => {
                     this.markerUser = marker;
@@ -311,7 +316,7 @@ class MapsActivity extends Component {
                       },
                     ],
                   }}
-                  coordinate={this.getCurrentRegion()}>
+                  coordinate={{latitude: latitude, longitude: longitude}}>
                   {/* <Ionicons
                     name={"md-checkmark-circle"}
                     size={24}
@@ -334,7 +339,7 @@ class MapsActivity extends Component {
                       width: 40,
                       height: 40,
                       resizeMode: 'contain',
-                      transform: [{rotate: `${riders.bearing}deg`}],
+                      // transform: [{rotate: `${riders.bearing}deg`}],
                       zIndex: 3,
                     }}
                     coordinate={{
@@ -357,7 +362,7 @@ class MapsActivity extends Component {
               </MapView>
             )}
             <Toolbar
-              icon={'ios-menu'}
+              icon={'menu'}
               notbackAction={true}
               opendrawer={this.openDrawer}
               navigation={this.props.navigation}

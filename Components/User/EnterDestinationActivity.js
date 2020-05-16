@@ -63,7 +63,7 @@ class EnterDestinationActivity extends Component {
     return (
       <View style={styles.main}>
         <Toolbar
-          icon={'ios-close'}
+          icon={'arrow-left'}
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}
         />
@@ -249,6 +249,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     zIndex: 3,
+   
   },
   setButton: {
     margin: 10,
