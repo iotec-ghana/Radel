@@ -14,7 +14,7 @@ export default class SideBarHeader extends Component {
   componentDidMount = async () => {};
 
   render() {
-    const img = '../../../assets/deedat.jpg';
+    const img = '../../../assets/city.jpg';
 
     return (
       <View style={styles.container}>

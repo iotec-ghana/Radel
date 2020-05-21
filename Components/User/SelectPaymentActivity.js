@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Toolbar from './Layouts/Toolbar';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {StatusBarColor} from '../../constants';
 export default class SelectPaymentActivity extends Component {
   constructor(props) {
     super(props);
@@ -22,7 +23,11 @@ export default class SelectPaymentActivity extends Component {
     return (
       <TouchableOpacity
         style={styles.cc}
-        onPress={() => this.props.navigation.navigate('AddMomoNumber')}>
+        onPress={() => {
+          this.props.route.params.payload
+            ? this.props.navigation.navigate('SelectDefaultMomoPaymentActivity',{payload:this.props.route.params.payload})
+            : this.props.navigation.navigate('AddMomoNumber');
+        }}>
         <Icon style={styles.icon} name="mobile" size={24} />
         <Text style={styles.ccText}> Mobile Money</Text>
       </TouchableOpacity>
@@ -38,8 +43,9 @@ export default class SelectPaymentActivity extends Component {
           body={'Select a new payment method'}
           titleColor={'#000'}
         />
+         <StatusBar backgroundColor={StatusBarColor} barStyle="dark-content" />
 
-        {this.ccLayout()}
+        {/* {this.ccLayout()} */}
         {this.mmLayout()}
       </View>
     );

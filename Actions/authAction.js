@@ -80,7 +80,8 @@ export const loginStatus = () => async dispatch => {
 };
 export const RegisterUser = (payload, navigation) => async dispatch => {
   try {
-    const response = await axios.post(BASE_URL + '/register/', payload);
+    const data = {...payload, default_payment: 'momo', details: {}};
+    const response = await axios.post(BASE_URL + '/register/', data);
     // const authData = {
     //   isAuthenticated: true,
     //   user: response.data,

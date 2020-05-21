@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React from 'react';
+import React, {Component} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -28,8 +28,10 @@ import WaitingForMomoPaymentActivity from './Components/User/WaitingForMomoPayme
 import SelectPaymentActivity from './Components/User/SelectPaymentActivity';
 import AddMomoNumber from './Components/User/AddMomoNumber';
 import RideHistoryActivity from './Components/User/RideHistoryActivity';
-
+import SelectDefaultMomoPaymentActivity from './Components/User/SelectDefaultMomoPaymentActivity';
+import * as Font from 'expo-font';
 import {Root} from 'native-base';
+import {render} from 'react-dom';
 const config = {
   animation: 'spring',
   config: {
@@ -51,91 +53,117 @@ const MyStatusBar = ({backgroundColor, ...props}) => (
 );
 const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBar.currentHeight;
 const APPBAR_HEIGHT = Platform.OS === 'ios' ? 44 : 56;
-const App: () => React$Node = () => {
-  console.disableYellowBox = true;
+export default class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+  state = {
+    fontLoaded: false,
+  };
 
-  return (
-    <Root>
-      {/* <StatusBar backgroundColor="#E9665D" barStyle="dark-content" /> */}
-      <Provider store={store}>
-        <NavigationContainer>
-          <RootStack.Navigator mode="modal">
-            <RootStack.Screen
-              name="Main"
-              component={MainStackScreen}
-              options={{headerShown: false}}
-            />
-            <RootStack.Screen
-              name="destination"
-              component={EnterDestinationActivity}
-              options={{headerShown: false}}
-            />
-          </RootStack.Navigator>
-        </NavigationContainer>
-      </Provider>
-    </Root>
-  );
-};
-function MainStackScreen() {
-  return (
-    <MainStack.Navigator
-      initialRouteName="Main"
-      screenOptions={{headerShown: false}}>
-      <MainStack.Screen
-        name="Intro"
-        component={Intro}
-        options={{
-          transitionSpec: {
-            open: config,
-            close: config,
-          },
-        }}
-      />
-      <MainStack.Screen name="Login" component={Login} />
-      <MainStack.Screen name="SignUp" component={Register} />
-      <MainStack.Screen name="Main" component={MapsActivity} />
-      <MainStack.Screen
-        name="DeliveryDestinationMap"
-        component={DeliveryDestinationMap}
-      />
-      <MainStack.Screen
-        name="BookProcessingActivity"
-        component={BookProcessingActivity}
-      />
-      <MainStack.Screen name="AddCardActivity" component={AddCardActivity} />
-      <MainStack.Screen
-        name="PaymentMethodsActivity"
-        component={PaymentMethodsActivity}
-      />
-      <MainStack.Screen
-        name="SelectPaymentActivity"
-        component={SelectPaymentActivity}
-      />
-      <MainStack.Screen name="AddMomoNumber" component={AddMomoNumber} />
-      <MainStack.Screen
-        name="PhoneVerificationActivity"
-        component={PhoneVerificationActivity}
-      />
+  async componentDidMount() {
+    this.loadAssetsAsync();
+  }
 
-      <MainStack.Screen
-        name="GetStartedActivity"
-        component={GetStartedActivity}
-      />
-      <MainStack.Screen
-        name="WaitingForMomoPaymentActivity"
-        component={WaitingForMomoPaymentActivity}
-      />
-       <MainStack.Screen
-        name="RideHistoryActivity"
-        component={RideHistoryActivity}
-      />
-    </MainStack.Navigator>
-  );
+  loadAssetsAsync = async () => {
+    await Font.loadAsync({
+      Roboto_medium: require('./assets/fonts/Roboto-Medium.ttf'),
+    });
+    this.setState({fontLoaded: true});
+  };
+  MainStackScreen() {
+    return (
+      <MainStack.Navigator
+        initialRouteName="Main"
+        screenOptions={{headerShown: false}}>
+        <MainStack.Screen
+          name="Intro"
+          component={Intro}
+          options={{
+            transitionSpec: {
+              open: config,
+              close: config,
+            },
+          }}
+        />
+        <MainStack.Screen name="Login" component={Login} />
+        <MainStack.Screen name="SignUp" component={Register} />
+        <MainStack.Screen
+          name="SelectDefaultMomoPaymentActivity"
+          component={SelectDefaultMomoPaymentActivity}
+        />
+        <MainStack.Screen name="Main" component={MapsActivity} />
+        <MainStack.Screen
+          name="DeliveryDestinationMap"
+          component={DeliveryDestinationMap}
+        />
+        <MainStack.Screen
+          name="BookProcessingActivity"
+          component={BookProcessingActivity}
+        />
+        <MainStack.Screen name="AddCardActivity" component={AddCardActivity} />
+        <MainStack.Screen
+          name="PaymentMethodsActivity"
+          component={PaymentMethodsActivity}
+        />
+        <MainStack.Screen
+          name="SelectPaymentActivity"
+          component={SelectPaymentActivity}
+        />
+        <MainStack.Screen name="AddMomoNumber" component={AddMomoNumber} />
+        <MainStack.Screen
+          name="PhoneVerificationActivity"
+          component={PhoneVerificationActivity}
+        />
+
+        <MainStack.Screen
+          name="GetStartedActivity"
+          component={GetStartedActivity}
+        />
+        <MainStack.Screen
+          name="WaitingForMomoPaymentActivity"
+          component={WaitingForMomoPaymentActivity}
+        />
+        <MainStack.Screen
+          name="RideHistoryActivity"
+          component={RideHistoryActivity}
+        />
+      </MainStack.Navigator>
+    );
+  }
+  render() {
+    console.disableYellowBox = true;
+    if (!this.state.fontLoaded) {
+      return <Text>loading font</Text>;
+    } else {
+      return (
+        <Root>
+          {/* <StatusBar backgroundColor="#E9665D" barStyle="dark-content" /> */}
+          <Provider store={store}>
+            <NavigationContainer>
+              <RootStack.Navigator mode="modal">
+                <RootStack.Screen
+                  name="Main"
+                  component={this.MainStackScreen}
+                  options={{headerShown: false}}
+                />
+                <RootStack.Screen 
+                  name="destination"
+                  component={EnterDestinationActivity}
+                  options={{headerShown: false}}
+                />
+              </RootStack.Navigator>
+            </NavigationContainer>
+          </Provider>
+        </Root>
+      );
+    }
+  }
 }
+
 const styles = StyleSheet.create({
   statusBar: {
     height: STATUSBAR_HEIGHT,
   },
 });
-
-export default App;

@@ -56,7 +56,7 @@ class PhoneVerificationActivity extends Component {
   };
 
   componentDidMount = async () => {
-     await this.RequestCode();
+   //  this.RequestCode();
   };
   RequestCode = async () => {
     try {
@@ -97,11 +97,17 @@ class PhoneVerificationActivity extends Component {
           <TouchableOpacity
             style={styles.setButton}
             onPress={() => {
-              if (this.state.code === this.state.input) {
-                this.props.navigation.navigate('GetStartedActivity');
-              } else {
-                alert('The verification code you entered is not valid');
-              }
+            //  if (this.state.code === this.state.input) {
+              const authdata = {
+                email: this.props.route.params.email,
+                password: this.props.route.params.password,
+              };
+                this.props.navigation.navigate('GetStartedActivity',{
+                  user: authdata,
+                });
+              // } else {
+              //   alert('The verification code you entered is not valid');
+              // }
             }}>
             <Text style={styles.setButtonText}>Verify</Text>
           </TouchableOpacity>
@@ -145,7 +151,7 @@ class PhoneVerificationActivity extends Component {
             codeContainerStyle={{
               borderWidth: 0,
               borderBottomWidth: 2,
-              padding: 20,
+             
               borderBottomColor: 'red',
             }}
             codeContainerCaretStyle={{
