@@ -102,7 +102,7 @@ class DeliveryDestinationMap extends Component {
     
     const userid = this.props.authStatus.id;
     this.socket.on('rider-decision-' + userid, riderdecision => {
-      console.log(riderdecision);
+    
       if (riderdecision.isAvailable) {
         this.setState({
           loadingLayout: false,
@@ -440,7 +440,7 @@ class DeliveryDestinationMap extends Component {
                   distance: result.distance,
                   duration: result.duration,
                 });
-                console.log(JSON.stringify(result.coordinates) + "ana")
+                
                 this.calculatePrice();
                 // console.log(`Distance: ${result.distance} km`);
                 // console.log(`Duration: ${result.duration} min.`);

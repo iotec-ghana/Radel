@@ -55,6 +55,7 @@ const socket = io(PV_API, {
   secure: true,
   transports: ['websocket'],
 });
+
 import Spinner from 'react-native-loading-spinner-overlay';
 class MapsActivity extends Component {
   constructor(props) {
@@ -65,7 +66,9 @@ class MapsActivity extends Component {
       longitude: props.origin.longitude,
       bottomSheetHeight: height / 4,
       routeCoordinates: [],
-      riders: [],
+      riders: [
+        
+      ],
       distanceTravelled: 0,
       locationName: '',
       showBS: false,
@@ -120,6 +123,14 @@ class MapsActivity extends Component {
       userid: this.props.authStatus.user.id,
     };
     establishConnectionToSocket(userData);
+    this.props.getRiders([{
+      riderid: 1,
+      latitude: this.props.origin.latitude,
+      longitude: this.props.origin.longitude,
+      originName: 'mankesim',
+      speed: 9,
+      bearing: 88,
+    },]);
     socket.on('online-riders', riderData => {
       this.setState({
         riders: this.state.riders.filter(
@@ -151,9 +162,7 @@ class MapsActivity extends Component {
       originName: Oname,
       speed: pos.coords.speed,
     };
-    console.log(data);
-    //this.subscribe();
-    this.setState({bearing: pos.coords.heading});
+    
 
     await this.props.getCurrentLocation(data);
 
