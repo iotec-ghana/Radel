@@ -25,16 +25,16 @@ export default class UserDeliveryLocationHistoryList extends Component {
     super(props);
     this.state = {
       markers: [
-        {coord: this.props.origin, icon: 'map-marker'},
-        {coord: this.props.destination, icon: 'stop-circle'},
+        {coord: this.props.data.origin_cordinates, icon: 'map-marker'},
+        {coord: this.props.data.destination_cordinates, icon: 'stop-circle'},
       ],
     };
   }
   getCurrentRegion = () => ({
-    ...this.props.origin,
+    ...this.props.data.origin_cordinates,
   });
   render() {
-   
+   var date = new Date(this.props.data.requesttime)
     console.log(this.getCurrentRegion());
     return (
       <TouchableOpacity style={styles.main} activeOpacity={0.9}>
@@ -45,7 +45,7 @@ export default class UserDeliveryLocationHistoryList extends Component {
             padding: 4,
             opacity: 0.6,
           }}>
-          Today, 10:30AM
+          {date.toString()}
         </Text>
         <MapView
           zoomEnabled={false}
@@ -58,7 +58,7 @@ export default class UserDeliveryLocationHistoryList extends Component {
           provider={PROVIDER_GOOGLE}
           loadingEnabled
           style={{height: 160}}
-          region={this.props.origin}
+          region={this.props.data.origin_cordinates}
           ref={c => (this.mapView = c)}>
             {this.state.markers.map(coords=>{
               
@@ -82,8 +82,8 @@ export default class UserDeliveryLocationHistoryList extends Component {
           </MapView.Marker> */}
 
           <MapViewDirections
-            origin={this.props.origin}
-            destination={this.props.destination}
+            origin={this.props.data.origin_cordinates}
+            destination={this.props.data.destination_cordinates}
             strokeWidth={4}
             strokeColor="#e7564c"
             optimizeWaypoints={true}
@@ -124,7 +124,7 @@ export default class UserDeliveryLocationHistoryList extends Component {
         <View style={{flexDirection: 'row', padding: 0, flex: 1,marginVertical:5}}>
           <Icon name="map-pin" size={13} color="#e7564c" style={{margin: 0}} />
           <Text style={{marginLeft: 2, fontWeight: 'bold', fontSize: 13}}>
-            West land - Kasoa
+            {this.props.data.origin_name} - {this.props.data.dest_name}
           </Text>
 
           <Text

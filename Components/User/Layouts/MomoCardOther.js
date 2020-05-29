@@ -42,6 +42,7 @@ export default class MomoCardOther extends Component {
                       network: this.props.item.details.network,
                       number: this.props.item.details.number,
                       receipientPhone: this.props.route.params.receipientPhone,
+                      locationNames:this.props.route.params.locationNames,
                       price: this.props.route.params.price,
                       riderDetails: this.props.route.params.riderDetails,
                     },

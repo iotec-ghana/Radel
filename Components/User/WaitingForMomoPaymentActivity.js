@@ -155,6 +155,7 @@ class WaitingForMomoPaymentActivity extends Component {
     );
   };
   UploadRideDetails = async () => {
+    const {receipientPhone,locationName}=this.props.route.params
     let startId = Math.floor(1000 + Math.random() * 9000);
     let endId = Math.floor(1000 + Math.random() * 9000);
     const {id} = this.props.authStatus.user;
@@ -180,7 +181,9 @@ class WaitingForMomoPaymentActivity extends Component {
         deliveryTime: '',
         code: code,
         paymentId: this.state.paymentID,
-        receipientTel: this.props.route.params.receipientPhone,
+        receipientTel: receipientPhone,
+        dest_name: locationName.destination,
+        origin_name: locationName.origin
       };
       console.log(deliveryPayload);
       const response = await axios.post(

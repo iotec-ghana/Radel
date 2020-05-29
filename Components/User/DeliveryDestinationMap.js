@@ -489,6 +489,10 @@ class DeliveryDestinationMap extends Component {
                       receipientPhone: this.props.route.params.receipientPhone,
                       price: this.state.price,
                       riderDetails: this.props.selected,
+                      locationNames:{
+                        origin:this.state.originName,
+                        destination:this.state.destinationName
+                      }
                     })
                   : null,
               )

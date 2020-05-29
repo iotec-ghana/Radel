@@ -32,8 +32,7 @@ export default class UserMarker extends Component {
             backgroundColor: '#e7564c',
             height: 50,
             width: 50,
-            borderRadius: 25,
-            
+            borderRadius: 125,
             opacity: this.state.animatedValue,
           }}
         />
@@ -43,8 +42,8 @@ export default class UserMarker extends Component {
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#e7564c',
-            height: 15,
-            width: 15,
+            height: 18,
+            width: 18,
             borderRadius: 25,
             position: 'absolute',
             borderColor: '#fff',

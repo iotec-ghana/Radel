@@ -23,7 +23,7 @@ export default class BottomSheet extends Component {
               flexDirection: 'row',
               backgroundColor: '#fafafa',
               borderRadius: 5,
-              elevation: 10,
+              elevation: 0,
             }}>
             <TextInput
               style={styles.input}
