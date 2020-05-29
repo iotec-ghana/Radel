@@ -34,6 +34,7 @@ const LONGITUDE_DELTA = 0.015;
 const LATITUDE = 0.009;
 const LONGITUDE = 0.009;
 import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
+import UserMarker from './Layouts/UserMarker';
 import Sidebar from './Layouts/Sidebar';
 import {Drawer} from 'native-base';
 import {getCurrentLocation} from '../../Actions/locationAction';
@@ -317,17 +318,7 @@ class MapsActivity extends Component {
                     ],
                   }}
                   coordinate={{latitude: latitude, longitude: longitude}}>
-                  {/* <Ionicons
-                    name={"md-checkmark-circle"}
-                    size={24}
-                    style={{
-                      width: 40,
-                      height: 40,
-                      resizeMode: "contain",
-                      // transform: [{ rotate: `${this.state.bearing}deg` }],
-                      zIndex: 3,
-                    }}
-                  /> */}
+                  <UserMarker/>
                 </MapView.Marker.Animated>
 
                 {this.state.riders.map(riders => (

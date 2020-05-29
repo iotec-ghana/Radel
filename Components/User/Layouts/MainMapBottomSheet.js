@@ -7,8 +7,8 @@ import {
   Modal,
   KeyboardAvoidingView,
 } from 'react-native';
- 
- 
+import Icon from 'react-native-vector-icons/Feather';
+
 export default class BottomSheet extends Component {
   render() {
     return (
@@ -18,11 +18,26 @@ export default class BottomSheet extends Component {
           <Text style={styles.book}>
             Book on demand or pre-schedule a delivery
           </Text>
-          <TextInput
-            style={styles.input}
-            placeholder={'Enter delivery destination'}
-            onFocus={() => this.props.navigation.navigate('destination')}
-          />
+          <View
+            style={{
+              flexDirection: 'row',
+              backgroundColor: '#fafafa',
+              borderRadius: 5,
+              elevation: 10,
+            }}>
+            <TextInput
+              style={styles.input}
+              placeholder={'Enter delivery destination'}
+              onFocus={() => this.props.navigation.navigate('destination')}
+              underlineColorAndroid="transparent"
+            />
+            <Icon
+              name="search"
+              style={styles.searchIcon}
+              color="#e7564c"
+              size={24}
+            />
+          </View>
         </View>
       </View>
     );
@@ -33,8 +48,11 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     flexDirection: 'column',
-
     borderRadius: 20,
+
+  },
+  searchIcon: {
+    padding: 10,
   },
   container: {
     flex: 13,
@@ -59,6 +77,7 @@ const styles = StyleSheet.create({
     height: 50,
     padding: 10,
     backgroundColor: '#fafafa',
-    marginBottom: 10,
+    flex: 1,
+    borderRadius:5
   },
 });

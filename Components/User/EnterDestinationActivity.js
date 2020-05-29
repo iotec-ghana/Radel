@@ -96,8 +96,9 @@ class EnterDestinationActivity extends Component {
             style={{
               flex: 1,
               height: 50,
+              borderRadius:5,
               padding: 10,
-
+              elevation:10,
               backgroundColor: '#fafafa',
             }}
             placeholder={'Reciepient phone number'}
@@ -178,6 +179,8 @@ class EnterDestinationActivity extends Component {
               backgroundColor: 'rgba(0,0,0,0)',
               borderTopWidth: 0,
               borderBottomWidth: 0,
+              
+              
             },
             textInput: {
               height: 50,
@@ -185,10 +188,13 @@ class EnterDestinationActivity extends Component {
               backgroundColor: '#fafafa',
               margin: 10,
               borderRadius: 0,
+              elevation:10,borderRadius:5
+              
             },
             predefinedPlacesDescription: {
               color: '#1faadb',
               height: 200,
+             
             },
           }}
           //currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
@@ -255,6 +261,8 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     marginBottom: 10,
+    elevation:10,
+    borderRadius:5
   },
   button: {
     width: windowWidth,

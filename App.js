@@ -29,6 +29,7 @@ import SelectPaymentActivity from './Components/User/SelectPaymentActivity';
 import AddMomoNumber from './Components/User/AddMomoNumber';
 import RideHistoryActivity from './Components/User/RideHistoryActivity';
 import MyPaymentsActivity from './Components/User/MyPaymentsActivity';
+import UserMarker from './Components/User/Layouts/UserMarker';
 import * as Font from 'expo-font';
 import {Root} from 'native-base';
 import {render} from 'react-dom';
@@ -89,6 +90,7 @@ export default class App extends Component {
         />
         <MainStack.Screen name="Login" component={Login} />
         <MainStack.Screen name="SignUp" component={Register} />
+        <MainStack.Screen name="UserMarker" component={UserMarker}/>
        
         <MainStack.Screen name="Main" component={MapsActivity} />
         <MainStack.Screen

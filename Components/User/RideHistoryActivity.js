@@ -37,7 +37,8 @@ export default class RideHistoryActivity extends Component {
             inactiveTintColor: '#000',
             labelStyle: {fontSize: 12, fontWeight: 'bold'},
             tabStyle: {color: '#e7564c'},
-            style: {color: '#e7564c'},
+            style: {color: '#e7564c',},
+            
           }}>
           <Tab.Screen name="upcoming" component={UpcomingFragment} />
           <Tab.Screen name="completed" component={CompletedRidesFragment} />
