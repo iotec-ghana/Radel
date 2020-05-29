@@ -105,7 +105,7 @@ class Register extends Component {
           navigation={this.props.navigation}
           righSideRoute={'Login'}
         />
-        <StatusBar backgroundColor={StatusBarColor} barStyle="dark-content" />
+        <StatusBar backgroundColor={StatusBarColor} barStyle="light-content" />
         <Text
           // eslint-disable-next-line react-native/no-inline-styles
           style={{

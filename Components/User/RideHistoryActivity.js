@@ -18,7 +18,7 @@ export default class RideHistoryActivity extends Component {
     return (
       <View style={{flex: 1, backgroundColor: '#fff'}}>
         <Toolbar icon={'arrow-left'} navigation={this.props.navigation} />
-        <StatusBar backgroundColor={StatusBarColor} barStyle="dark-content" />
+        <StatusBar backgroundColor={StatusBarColor} barStyle="light-content" />
         <Text
           style={{
             fontWeight: 'bold',

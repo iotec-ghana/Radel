@@ -13,7 +13,7 @@ import {
   StatusBar,
   Image,
 } from 'react-native';
-
+import * as Contacts from 'expo-contacts';
 import {PV_API, StatusBarColor} from '../../constants';
 import axios from 'axios';
 import {connect} from 'react-redux';
@@ -51,7 +51,19 @@ class EnterDestinationActivity extends Component {
       });
     }
   };
-  getPhoneNumber = async () => {};
+  getPhoneNumber = async () => {
+    const { status } = await Contacts.requestPermissionsAsync();
+    if (status === 'granted') {
+      const { data } = await Contacts.getContactsAsync({
+        fields: [Contacts.Fields.Emails],
+      });
+
+      if (data.length > 0) {
+        const contact = data[0];
+        console.log(contact);
+      }
+    }
+  };
   componentDidMount = async () => {
     //this.props.getCurrentLocation();
     console.log(this.props.origin);
@@ -67,7 +79,7 @@ class EnterDestinationActivity extends Component {
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}
         />
-        <StatusBar barStyle="dark-content" backgroundColor={StatusBarColor} />
+        <StatusBar barStyle="light-content" backgroundColor={StatusBarColor} />
         <TextInput
           style={styles.input}
           placeholder={'Pickup Location'}

@@ -28,7 +28,7 @@ import WaitingForMomoPaymentActivity from './Components/User/WaitingForMomoPayme
 import SelectPaymentActivity from './Components/User/SelectPaymentActivity';
 import AddMomoNumber from './Components/User/AddMomoNumber';
 import RideHistoryActivity from './Components/User/RideHistoryActivity';
-import SelectDefaultMomoPaymentActivity from './Components/User/SelectDefaultMomoPaymentActivity';
+import MyPaymentsActivity from './Components/User/MyPaymentsActivity';
 import * as Font from 'expo-font';
 import {Root} from 'native-base';
 import {render} from 'react-dom';
@@ -89,10 +89,7 @@ export default class App extends Component {
         />
         <MainStack.Screen name="Login" component={Login} />
         <MainStack.Screen name="SignUp" component={Register} />
-        <MainStack.Screen
-          name="SelectDefaultMomoPaymentActivity"
-          component={SelectDefaultMomoPaymentActivity}
-        />
+       
         <MainStack.Screen name="Main" component={MapsActivity} />
         <MainStack.Screen
           name="DeliveryDestinationMap"
@@ -107,6 +104,7 @@ export default class App extends Component {
           name="PaymentMethodsActivity"
           component={PaymentMethodsActivity}
         />
+         <MainStack.Screen name="MyPaymentsActivity" component={MyPaymentsActivity} />
         <MainStack.Screen
           name="SelectPaymentActivity"
           component={SelectPaymentActivity}
@@ -139,7 +137,7 @@ export default class App extends Component {
     } else {
       return (
         <Root>
-          {/* <StatusBar backgroundColor="#E9665D" barStyle="dark-content" /> */}
+          {/* <StatusBar backgroundColor="#E9665D" barStyle="light-content" /> */}
           <Provider store={store}>
             <NavigationContainer>
               <RootStack.Navigator mode="modal">

@@ -9,21 +9,35 @@ export default class MomoCard extends Component {
   }
 
   render() {
+    if(this.props.item){
     return (
+    
       <TouchableOpacity style={styles.container}>
-        <Image
-          source={require('../../../assets/momo.png')}
-          style={styles.img}
-        />
+         {this.props.item.details.network === 'mtn' ? (
+          <Image
+            source={require('../../../assets/mtn.png')}
+            style={styles.img}
+          />
+        ) : this.props.item.details.network === 'airtel' ? (
+          <Image
+            source={require('../../../assets/airtel.jpg')}
+            style={styles.img}
+          />
+        ) : (
+          <Image
+            source={require('../../../assets/vodafone.png')}
+            style={styles.img}
+          />
+        )}
         <View style={styles.misc}>
-          <Text style={{fontWeight: 'bold', fontSize: 18, marginBottom: 4}}>
+          <Text style={{fontWeight: 'bold', fontSize: 18, marginBottom: 0}}>
             Mobile Money Payment
           </Text>
           <Text style={{fontWeight: 'bold', fontSize: 12, opacity: 0.5}}>
             Default Method
           </Text>
           <Text style={{fontWeight: 'bold', fontSize: 12, opacity: 0.5}}>
-            {this.props.network}: {this.props.number}
+            {this.props.item.details.network.toUpperCase()}: {this.props.item.details.number}
           </Text>
         </View>
 
@@ -32,6 +46,9 @@ export default class MomoCard extends Component {
         </View>
       </TouchableOpacity>
     );
+        }else{
+          return null
+        }
   }
 }
 const styles = StyleSheet.create({
@@ -53,6 +70,7 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     marginRight: 10,
+    borderRadius:50,
   },
 
   misc: {

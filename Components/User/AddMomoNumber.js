@@ -8,11 +8,12 @@ import {
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
 import Toolbar from './Layouts/Toolbar';
 import {Picker} from 'native-base';
 import axios from 'axios';
-import {BASE_URL} from '../../constants';
+import {BASE_URL,StatusBarColor} from '../../constants';
 import {AsyncStorage} from 'react-native';
 const {width, height} = Dimensions.get('window');
 export default class AddMomoNumber extends Component {
@@ -76,6 +77,7 @@ export default class AddMomoNumber extends Component {
     return (
       <View style={styles.container}>
         <Toolbar icon={'arrow-left'} navigation={this.props.navigation} />
+        <StatusBar backgroundColor={StatusBarColor} barStyle="light-content" />
         <View style={styles.button}>
           <TouchableOpacity
             style={styles.saveButton}

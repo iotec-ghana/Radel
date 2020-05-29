@@ -66,7 +66,7 @@ class Login extends Component {
         />
 
         <View style={styles.container}>
-          <StatusBar backgroundColor={StatusBarColor} barStyle="dark-content" />
+          <StatusBar backgroundColor={StatusBarColor} barStyle="light-content" />
           <Text
             // eslint-disable-next-line react-native/no-inline-styles
             style={{

@@ -123,14 +123,6 @@ class MapsActivity extends Component {
       userid: this.props.authStatus.user.id,
     };
     establishConnectionToSocket(userData);
-    this.props.getRiders([{
-      riderid: 1,
-      latitude: this.props.origin.latitude,
-      longitude: this.props.origin.longitude,
-      originName: 'mankesim',
-      speed: 9,
-      bearing: 88,
-    },]);
     socket.on('online-riders', riderData => {
       this.setState({
         riders: this.state.riders.filter(
@@ -304,7 +296,6 @@ class MapsActivity extends Component {
               <MapView
                 provider={PROVIDER_GOOGLE}
                 showUserLocation={true}
-                followUserLocation={false}
                 scrollEnabled={true}
                 region={this.getCurrentRegion()}
                 style={{...StyleSheet.absoluteFillObject}}

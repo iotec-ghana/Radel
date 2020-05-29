@@ -361,7 +361,7 @@ class DeliveryDestinationMap extends Component {
     return (
       <View style={styles.container}>
         <StatusBar
-          barStyle="dark-content"
+          barStyle="light-content"
           translucent={true}
           backgroundColor={'transparent'}
         />

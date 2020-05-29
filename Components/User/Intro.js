@@ -28,7 +28,7 @@ class Intro extends Component {
         <StatusBar
           translucent={true}
           backgroundColor={'transparent'}
-          barStyle="dark-content"
+          barStyle="light-content"
         />
         <Image
           source={require('../../assets/city.jpg')}

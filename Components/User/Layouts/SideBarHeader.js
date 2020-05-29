@@ -26,9 +26,8 @@ export default class SideBarHeader extends Component {
         <Image style={styles.image} source={require(img)} />
         {this.props.authdata.isAuthenticated ? (
           <Text style={styles.nameText}>
-            {' '}
             {this.props.authdata.user.first_name}{' '}
-            {this.props.authdata.user.last_name}{' '}
+            {this.props.authdata.user.last_name}
           </Text>
         ) : null}
 
@@ -39,12 +38,8 @@ export default class SideBarHeader extends Component {
         ) : null}
         {this.props.authdata.isAuthenticated ? (
           <Text style={styles.idText}>
-            {' '}
             {!this.props.authdata.user.isVerified ? (
-              <Text style={styles.idText}>
-                {' '}
-                Please tap here to verify your account{' '}
-              </Text>
+              <Text style={styles.idText}>Acount not verified </Text>
             ) : null}{' '}
           </Text>
         ) : null}

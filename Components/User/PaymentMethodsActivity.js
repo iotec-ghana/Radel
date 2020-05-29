@@ -59,6 +59,7 @@ export default class PaymentMethodsActivity extends Component {
       };
       const response = await axios.get(BASE_URL + '/paymentMethods/', config);
       const payments = response.data;
+      console.log(payments)
 
       payments.forEach(element => {
         if (element.paymentType === 'momo') {
@@ -74,24 +75,17 @@ export default class PaymentMethodsActivity extends Component {
       });
 
       console.log(JSON.stringify(this.state.momo));
-    } catch (e) {}
+    } catch (e) {
+      console.log(e.message)
+      this.setState({
+        loading: false,
+      });
+    }
   };
   render() {
     return (
       <View style={styles.container}>
-        {/* <View style={styles.button}>
-          <TouchableOpacity
-            style={styles.setButton}
-            onPress={() =>
-              this.props.navigation.navigate('WaitingForMomoPaymentActivity', {
-                type: 'momo',
-                network: 'MTN',
-                number: '0546055647',
-              })
-            }>
-            <Text style={styles.ConfirmButton}>CONFIRM</Text>
-          </TouchableOpacity>
-        </View> */}
+       
         <Toolbar
           icon={'arrow-left'}
           right={'Add Payment Method'}

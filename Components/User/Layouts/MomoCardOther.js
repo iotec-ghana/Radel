@@ -22,7 +22,7 @@ export default class MomoCardOther extends Component {
     return (
       <TouchableOpacity
         style={styles.container}
-        onPress={() =>
+        onPress={() => {this.props.price?
           Alert.alert(
             'Confirm',
             `proceed to pay with ${this.props.item.details.number}?`,
@@ -50,13 +50,13 @@ export default class MomoCardOther extends Component {
             ],
             {cancelable: false},
           )
-        }>
+       :null} }>
         {this.props.item.details.network === 'mtn' ? (
           <Image
             source={require('../../../assets/mtn.png')}
             style={styles.img}
           />
-        ) : this.props.item.network === 'airtel' ? (
+        ) : this.props.item.details.network === 'airtel' ? (
           <Image
             source={require('../../../assets/airtel.jpg')}
             style={styles.img}

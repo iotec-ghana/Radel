@@ -28,7 +28,7 @@ class GetStartedActivity extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <StatusBar backgroundColor={StatusBarColor} barStyle="dark-content" />
+        <StatusBar backgroundColor={StatusBarColor} barStyle="light-content" />
         <AntDesign name="check" size={120} color="#000" style={{margin: 2}} />
         <Text style={{fontSize: 40, fontWeight: 'bold'}}>
           You are ready to go
