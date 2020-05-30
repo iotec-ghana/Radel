@@ -25,12 +25,13 @@ export default class RideHistoryActivity extends Component {
             fontSize: 30,
             marginHorizontal: 16,
             marginVertical: 10,
-            color: '#000',
-          }}>
+            color: '#000', 
+          }}> 
           My rides
         </Text>
         <Tab.Navigator
           lazy={true}
+          
           initialRouteName="upcoming"
           tabBarOptions={{
             activeTintColor: '#e7564c',
@@ -38,9 +39,12 @@ export default class RideHistoryActivity extends Component {
             labelStyle: {fontSize: 12, fontWeight: 'bold'},
             tabStyle: {color: '#e7564c'},
             style: {color: '#e7564c',},
+            indicatorStyle:{color:"black"},
+            
+           
             
           }}>
-          <Tab.Screen name="upcoming" component={UpcomingFragment} />
+          <Tab.Screen  name="upcoming"  component={UpcomingFragment} />
           <Tab.Screen name="completed" component={CompletedRidesFragment} />
         </Tab.Navigator>
       </View>

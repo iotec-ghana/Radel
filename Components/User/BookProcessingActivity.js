@@ -67,7 +67,7 @@ class BookProcessingActivity extends Component {
   }
   DriverDetailsLayout = () => {
     return (
-      <View style={{flex: 1, alignItems: 'center'}}>
+      <View style={{flex: 1, alignItems: 'center',}}>
         <Text style={{fontWeight: 'bold', fontSize: 16, marginTop: 15}}>
           WE HAVE FOUND YOU A RIDER
         </Text>
@@ -294,6 +294,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     backgroundColor: '#00000000',
     top: 0,
+    marginTop: 30,
   },
   topItems: {
     flex: 1,

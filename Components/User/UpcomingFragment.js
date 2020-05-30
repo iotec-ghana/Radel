@@ -42,8 +42,8 @@ export default class UpcomingFragment extends Component {
           });
         }
       });
-
-      // console.log(this.state.history);
+      this.setState({loading: false});
+      //console.log(this.state.history);
     } catch (error) {
       console.log(error.message);
       this.setState({loading: false});
@@ -52,7 +52,9 @@ export default class UpcomingFragment extends Component {
   empty() {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text style={{fontSize:18,fontWeight:"bold"}}>You have no completed rides</Text>
+        <Text style={{fontSize: 18, fontWeight: 'bold'}}>
+          You have no completed rides
+        </Text>
       </View>
     );
   }
@@ -65,7 +67,10 @@ export default class UpcomingFragment extends Component {
           data={this.state.history}
           renderItem={({item}) => (
             <View>
-              <UserDeliveryLocationHistoryList data={item} />
+              <UserDeliveryLocationHistoryList
+                data={item}
+                navigation={this.props.navigation}
+              />
             </View>
           )}
           keyExtractor={item => item.deliveryid}

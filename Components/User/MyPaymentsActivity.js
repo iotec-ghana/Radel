@@ -33,6 +33,7 @@ export default class MyPaymentsActivity extends Component {
       default: null,
     };
   }
+
   changeDefaultPayment = async id => {
     try {
       this.setState({loading: true});
@@ -64,10 +65,10 @@ export default class MyPaymentsActivity extends Component {
 
       payments.forEach(element => {
         if (element.paymentType === 'momo') {
-          this.setState({momo: this.state.momo.concat(element)});
           if (element.isDefault) {
             this.setState({default: element});
-            console.log(element);
+          } else {
+            this.setState({momo: this.state.momo.concat(element)});
           }
         }
         if (element.paymentType === 'card') {
@@ -79,7 +80,7 @@ export default class MyPaymentsActivity extends Component {
         loading: false,
       });
 
-      console.log(JSON.stringify(this.state.momo));
+      console.log(payments);
     } catch (e) {
       console.log(e.message);
       this.setState({loading: false});
@@ -175,20 +176,25 @@ export default class MyPaymentsActivity extends Component {
     return <ActivityIndicator size="large" color="#e7564c" />;
   };
   render() {
-    const {payments,loading} = this.state;
+    const {payments, loading} = this.state;
 
     return (
       <View style={styles.container}>
         <Toolbar
           icon={'arrow-left'}
           right={'Add Payment Method'}
+          JustAddingPayment={true}
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}
           righSideRoute={'SelectPaymentActivity'}
         />
         <StatusBar backgroundColor={StatusBarColor} barStyle="light-content" />
-        {loading?this.loadinglayout():payments.length>0?this.paymentlist():this.empty()}
-      </View> 
+        {loading
+          ? this.loadinglayout()
+          : payments.length > 0
+          ? this.paymentlist()
+          : this.empty()}
+      </View>
     );
   }
 }

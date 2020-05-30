@@ -42,9 +42,13 @@ export default class Toolbar extends Component {
             {this.props.right ? (
               <Button
                 transparent
-                onPress={() =>
-                  this.props.navigation.navigate(this.props.righSideRoute)
-                }>
+                onPress={() => {
+                  this.props.JustAddingPayment
+                    ? this.props.navigation.navigate(this.props.righSideRoute, {
+                        JustAddingPayment: this.props.JustAddingPayment,
+                      })
+                    : this.props.navigation.navigate(this.props.righSideRoute);
+                }}>
                 <Text
                   style={{
                     color: this.props.rightTextColor,

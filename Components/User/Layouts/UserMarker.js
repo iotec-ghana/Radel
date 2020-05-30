@@ -18,7 +18,7 @@ export default class UserMarker extends Component {
           duration: 2000,
           easing: Easing.inOut(Easing.ease),
         }),
-      ]),
+      ]), 
     ).start();
     // this.setState({animatedValue:new Animated.Value(0)})
   }

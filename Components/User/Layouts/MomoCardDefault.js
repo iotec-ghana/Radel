@@ -13,12 +13,12 @@ export default class MomoCard extends Component {
     return (
     
       <TouchableOpacity style={styles.container}>
-         {this.props.item.details.network === 'mtn' ? (
+         {this.props.item.details.network === 'MTN' ? (
           <Image
             source={require('../../../assets/mtn.png')}
             style={styles.img}
           />
-        ) : this.props.item.details.network === 'airtel' ? (
+        ) : this.props.item.details.network === 'AirtelTigo' ? (
           <Image
             source={require('../../../assets/airtel.jpg')}
             style={styles.img}

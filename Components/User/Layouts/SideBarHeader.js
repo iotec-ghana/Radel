@@ -23,7 +23,20 @@ export default class SideBarHeader extends Component {
           translucent={true}
           backgroundColor={'transparent'}
         />
-        <Image style={styles.image} source={require(img)} />
+        <View style={{flexDirection: 'row'}}>
+          <Image style={styles.image} source={require(img)} />
+          {this.props.authdata.isAuthenticated ? (
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                color: '#fff',
+                margin: 20,
+              }}>
+              {this.props.authdata.user.email}
+            </Text>
+          ) : null}
+        </View>
         {this.props.authdata.isAuthenticated ? (
           <Text style={styles.nameText}>
             {this.props.authdata.user.first_name}{' '}

@@ -34,10 +34,15 @@ export default class UserDeliveryLocationHistoryList extends Component {
     ...this.props.data.origin_cordinates,
   });
   render() {
-   var date = new Date(this.props.data.requesttime)
+    var date = new Date(this.props.data.requesttime);
     console.log(this.getCurrentRegion());
     return (
-      <TouchableOpacity style={styles.main} activeOpacity={0.9}>
+      <TouchableOpacity
+        style={styles.main}
+        activeOpacity={0.9}
+        onPress={() => {
+          this.props.navigation.navigate('BookProcessingActivity');
+        }}>
         <Text
           style={{
             fontSize: 14,
@@ -60,18 +65,17 @@ export default class UserDeliveryLocationHistoryList extends Component {
           style={{height: 160}}
           region={this.props.data.origin_cordinates}
           ref={c => (this.mapView = c)}>
-            {this.state.markers.map(coords=>{
-              
-              <MapView.Marker coordinate={coords.coord}>
+          {this.state.markers.map(coords => {
+            <MapView.Marker coordinate={coords.coord}>
               <Icon
                 name={`${coords.icon}`}
                 size={24}
                 color="#000"
                 style={{margin: 2}}
               />
-            </MapView.Marker>
-            })}
-          
+            </MapView.Marker>;
+          })}
+
           {/* <MapView.Marker coordinate={this.props.destination}>
             <Icon
               name="stop-circle"
@@ -121,7 +125,13 @@ export default class UserDeliveryLocationHistoryList extends Component {
         {/* <Text style={{fontSize: 18, fontWeight: 'bold', marginBottom: 4}}>
           RadelGo
         </Text> */}
-        <View style={{flexDirection: 'row', padding: 0, flex: 1,marginVertical:5}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            padding: 0,
+            flex: 1,
+            marginVertical: 5,
+          }}>
           <Icon name="map-pin" size={13} color="#e7564c" style={{margin: 0}} />
           <Text style={{marginLeft: 2, fontWeight: 'bold', fontSize: 13}}>
             {this.props.data.origin_name} - {this.props.data.dest_name}
@@ -152,7 +162,7 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 10,
     backgroundColor: '#f7f9fc',
-    elevation:170
+    elevation: 170,
   },
   image: {
     height: 24,

@@ -13,7 +13,7 @@ import {
 import Toolbar from './Layouts/Toolbar';
 import {Picker} from 'native-base';
 import axios from 'axios';
-import {BASE_URL,StatusBarColor} from '../../constants';
+import {BASE_URL, StatusBarColor} from '../../constants';
 import {AsyncStorage} from 'react-native';
 const {width, height} = Dimensions.get('window');
 export default class AddMomoNumber extends Component {
@@ -47,6 +47,13 @@ export default class AddMomoNumber extends Component {
           headers: {Authorization: `Bearer ${token.user.token}`},
         };
         this.setState({loading: true});
+
+        const checkpaymentlist = await axios.get(
+          BASE_URL + '/paymentMethods/',
+          config,
+        );
+        const list = checkpaymentlist.data;
+        // console.log(list)
         const {network, phone} = this.state;
         const payload = {
           type: 'momo',
@@ -60,8 +67,18 @@ export default class AddMomoNumber extends Component {
           payload,
           config,
         );
-        console.log(response.data);
-        this.props.navigation.navigate('PaymentMethodsActivity');
+        // console.log(response.data);
+        if (list.length == 0) {
+          const set = await axios.get(
+            `${BASE_URL}/setDefaultPayment/${response.data.id}`,
+            config,
+          );
+        }
+        if (this.props.route.params.JustAddingPayment !== undefined) {
+          this.props.navigation.navigate('MyPaymentsActivity');
+        } else {
+          this.props.navigation.navigate('PaymentMethodsActivity');
+        }
       } else {
         alert('please select a network');
       }
@@ -145,7 +162,7 @@ export default class AddMomoNumber extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:"#fff"
+    backgroundColor: '#fff',
   },
   body: {
     padding: 20,

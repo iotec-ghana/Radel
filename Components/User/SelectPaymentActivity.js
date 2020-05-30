@@ -30,7 +30,14 @@ export default class SelectPaymentActivity extends Component {
       <TouchableOpacity
         style={styles.cc}
         onPress={() => {
-          this.props.navigation.navigate('AddMomoNumber');
+          {
+            //done to redirect user to mypaymentsactivity
+            this.props.route.params.JustAddingPayment !== undefined
+              ? this.props.navigation.navigate('AddMomoNumber', {
+                  JustAddingPayment: this.props.route.params.JustAddingPayment,
+                })
+              : this.props.navigation.navigate('AddMomoNumber');
+          }
         }}>
         <Icon style={styles.icon} name="mobile" size={24} />
         <Text style={styles.ccText}> Mobile Money</Text>
