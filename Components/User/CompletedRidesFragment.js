@@ -22,12 +22,20 @@ export default class CompletedRidesFragment extends Component {
     };
   }
   loadinglayout = () => {
-    return <ActivityIndicator size="large" color="#e7564c" />;
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#e7564c"
+        style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
+      />
+    );
   };
   empty() {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text style={{fontSize:18,fontWeight:"bold"}}>You have no completed rides</Text>
+        <Text style={{fontSize: 18, fontWeight: 'bold'}}>
+          You have no completed rides
+        </Text>
       </View>
     );
   }
@@ -83,6 +91,5 @@ export default class CompletedRidesFragment extends Component {
     } else {
       return this.empty();
     }
-    
   }
 }

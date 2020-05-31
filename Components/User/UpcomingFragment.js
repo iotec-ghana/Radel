@@ -22,7 +22,13 @@ export default class UpcomingFragment extends Component {
     };
   }
   loadinglayout = () => {
-    return <ActivityIndicator size="large" color="#e7564c" />;
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#e7564c"
+        style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
+      />
+    );
   };
   componentDidMount = async () => {
     try {

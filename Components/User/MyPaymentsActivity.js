@@ -6,6 +6,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Alert,
+  RefreshControl,
   SafeAreaView,
   ActivityIndicator,
   FlatList,
@@ -31,6 +32,7 @@ export default class MyPaymentsActivity extends Component {
       cards: [],
       momo: [],
       default: null,
+      refreshing: false,
     };
   }
 
@@ -51,8 +53,13 @@ export default class MyPaymentsActivity extends Component {
     } catch (error) {}
   };
   componentDidMount = async () => {
+    this.loadPayments();
+  };
+
+  loadPayments = async () => {
     try {
       this.setState({loading: true});
+      this.setState({payments:[],momo:[]})
       const user = await AsyncStorage.getItem('authdata');
       const token = JSON.parse(user);
 
@@ -61,6 +68,7 @@ export default class MyPaymentsActivity extends Component {
       };
       const response = await axios.get(BASE_URL + '/paymentMethods/', config);
       const payments = response.data;
+    
       this.setState({payments: [...payments]});
 
       payments.forEach(element => {
@@ -86,7 +94,7 @@ export default class MyPaymentsActivity extends Component {
       this.setState({loading: false});
     }
   };
-  componentWillMount = async () => {};
+
   empty = () => {
     return (
       <View style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -104,6 +112,10 @@ export default class MyPaymentsActivity extends Component {
         </Text>
       </View>
     );
+  };
+  onRefresh = () => {
+    // this.setState({refreshing: true});
+    this.loadPayments();
   };
   paymentlist = () => {
     return (
@@ -138,42 +150,41 @@ export default class MyPaymentsActivity extends Component {
           item={this.state.default}
         />
 
-        <SafeAreaView>
-          <ScrollView>
-            <Text
-              // eslint-disable-next-line react-native/no-inline-styles
-              style={{
-                fontSize: 12,
-                textAlign: 'left',
-                marginLeft: 20,
-                marginTop: 10,
-                marginRight: 20,
-                fontWeight: 'bold',
-                opacity: 0.5,
-              }}>
-              Choose a desired payment method. We offer payment methods suitable
-              for everyone
-            </Text>
-            <FlatList
-              data={this.state.momo}
-              renderItem={({item}) => (
-                <View>
-                  <MomoCardOther
-                    navigation={this.props.navigation}
-                    item={item}
-                  />
-                </View>
-              )}
-              keyExtractor={item => item.id}
-            />
-          </ScrollView>
-        </SafeAreaView>
+        <Text
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{
+            fontSize: 12,
+            textAlign: 'left',
+            marginLeft: 20,
+            marginTop: 10,
+            marginRight: 20,
+            fontWeight: 'bold',
+            opacity: 0.5,
+          }}>
+          Choose a desired payment method. We offer payment methods suitable for
+          everyone
+        </Text>
+        <FlatList
+          data={this.state.momo}
+          renderItem={({item}) => (
+            <View>
+              <MomoCardOther navigation={this.props.navigation} item={item} />
+            </View>
+          )}
+          keyExtractor={item => item.id}
+        />
       </View>
     );
   };
 
   loadinglayout = () => {
-    return <ActivityIndicator size="large" color="#e7564c" />;
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#e7564c"
+        style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
+      />
+    );
   };
   render() {
     const {payments, loading} = this.state;
@@ -189,11 +200,21 @@ export default class MyPaymentsActivity extends Component {
           righSideRoute={'SelectPaymentActivity'}
         />
         <StatusBar backgroundColor={StatusBarColor} barStyle="light-content" />
-        {loading
-          ? this.loadinglayout()
-          : payments.length > 0
-          ? this.paymentlist()
-          : this.empty()}
+        <SafeAreaView>
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={this.onRefresh}
+              />
+            }>
+            {loading
+              ? this.loadinglayout()
+              : payments.length > 0
+              ? this.paymentlist()
+              : this.empty()}
+          </ScrollView>
+        </SafeAreaView>
       </View>
     );
   }
