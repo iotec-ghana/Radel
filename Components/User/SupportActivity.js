@@ -12,7 +12,7 @@ export default class SupportActivity extends Component {
     return (
       <View>
         <Toolbar icon={'arrow-left'} navigation={this.props.navigation} />
-        <Text style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text style={{fontSize:30}}>
           {' '}
           Contact us on : 0554891929{' '}
         </Text>

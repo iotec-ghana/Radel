@@ -49,7 +49,7 @@ export default class UserMarker extends Component {
             borderColor: '#fff',
             borderWidth: 2,
           }}>
-          {/* <View
+          <View
             style={{
               position:"absolute",
               width: 0,
@@ -67,7 +67,7 @@ export default class UserMarker extends Component {
                
               
             }}
-          /> */}
+          />
         </View>
       </View>
     );

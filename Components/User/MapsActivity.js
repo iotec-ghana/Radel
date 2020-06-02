@@ -67,9 +67,7 @@ class MapsActivity extends Component {
       longitude: props.origin.longitude,
       bottomSheetHeight: height / 4,
       routeCoordinates: [],
-      riders: [
-        
-      ],
+      riders: [],
       distanceTravelled: 0,
       locationName: '',
       showBS: false,
@@ -155,7 +153,6 @@ class MapsActivity extends Component {
       originName: Oname,
       speed: pos.coords.speed,
     };
-    
 
     await this.props.getCurrentLocation(data);
 
@@ -318,7 +315,7 @@ class MapsActivity extends Component {
                     ],
                   }}
                   coordinate={{latitude: latitude, longitude: longitude}}>
-                  <UserMarker/>
+                  <UserMarker />
                 </MapView.Marker.Animated>
 
                 {this.state.riders.map(riders => (
@@ -360,6 +357,10 @@ class MapsActivity extends Component {
             />
             {this.state.showBS ? (
               <BottomDrawer
+                // onCollapsed={collapse => this.setState({showtopcard: true})}
+                // onExpanded={ex => {
+                //   this.setState({showtopcard: false});
+                // }}
                 containerHeight={this.state.bottomSheetHeight}
                 offset={TAB_BAR_HEIGHT}
                 shadow={true}>

@@ -17,6 +17,9 @@ class SideBarItems extends Component {
       case 2:
         this.props.navigation.navigate('MyPaymentsActivity');
         break;
+        case 4:
+          this.props.navigation.navigate('SupportActivity');
+          break;
       case 5:
         this.props.isSignedOut(this.props.navigation);
         break;

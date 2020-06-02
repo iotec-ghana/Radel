@@ -53,22 +53,21 @@ export default class MyPaymentsActivity extends Component {
     } catch (error) {}
   };
   componentDidMount = async () => {
+  
     this.loadPayments();
   };
 
   loadPayments = async () => {
     try {
       this.setState({loading: true});
-      this.setState({payments:[],momo:[]})
+      this.setState({payments: [], momo: []});
       const user = await AsyncStorage.getItem('authdata');
       const token = JSON.parse(user);
-
       const config = {
         headers: {Authorization: `Bearer ${token.user.token}`},
       };
       const response = await axios.get(BASE_URL + '/paymentMethods/', config);
       const payments = response.data;
-    
       this.setState({payments: [...payments]});
 
       payments.forEach(element => {
@@ -83,19 +82,16 @@ export default class MyPaymentsActivity extends Component {
           this.setState({cards: this.state.cards.concat(element)});
         }
       });
-
       this.setState({
         loading: false,
       });
-
-      console.log(payments);
     } catch (e) {
       console.log(e.message);
       this.setState({loading: false});
     }
   };
 
-  empty = () => {
+  noItemsLayout = () => {
     return (
       <View style={{justifyContent: 'center', alignItems: 'center'}}>
         <Image source={require('../../assets/empty1.png')} style={styles.img} />
@@ -113,11 +109,12 @@ export default class MyPaymentsActivity extends Component {
       </View>
     );
   };
-  onRefresh = () => {
-    // this.setState({refreshing: true});
-    this.loadPayments();
+  onRefresh = async () => {
+    this.setState({refreshing: true});
+    await this.loadPayments();
+    this.setState({refreshing: false});
   };
-  paymentlist = () => {
+  paymentlistLayout = () => {
     return (
       <View>
         <Text
@@ -182,7 +179,7 @@ export default class MyPaymentsActivity extends Component {
       <ActivityIndicator
         size="large"
         color="#e7564c"
-        style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
+        
       />
     );
   };
@@ -200,7 +197,7 @@ export default class MyPaymentsActivity extends Component {
           righSideRoute={'SelectPaymentActivity'}
         />
         <StatusBar backgroundColor={StatusBarColor} barStyle="light-content" />
-        <SafeAreaView>
+        <SafeAreaView style={{flex: 1}}>
           <ScrollView
             refreshControl={
               <RefreshControl
@@ -211,8 +208,8 @@ export default class MyPaymentsActivity extends Component {
             {loading
               ? this.loadinglayout()
               : payments.length > 0
-              ? this.paymentlist()
-              : this.empty()}
+              ? this.paymentlistLayout()
+              : this.noItemsLayout()}
           </ScrollView>
         </SafeAreaView>
       </View>
@@ -223,31 +220,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-
-  addpaymet: {
-    position: 'absolute',
-    right: 0,
-    margin: 2,
-    color: '#e7564c',
-    fontWeight: 'bold',
-  },
-
-  button: {
-    width: width,
-    position: 'absolute', //Here is the trick
-    bottom: 0, //Here is the trick
-  },
-  setButton: {
-    margin: 10,
-    backgroundColor: '#e7564c',
-    paddingVertical: 15,
-    borderRadius: 2,
-  },
-  ConfirmButton: {
-    color: '#fff',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 18,
   },
 });
