@@ -2,7 +2,7 @@
 /* eslint-disable no-lone-blocks */
 import React, {Component} from 'react';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 import {
   View,
   Text,
@@ -49,14 +49,10 @@ import {
   establishConnectionToSocket,
   getNearbyRiders,
   disconnect,
+  socket,
 } from '../../socketFunctions';
 import * as Location from 'expo-location';
 import io from 'socket.io-client';
-const socket = io(PV_API, {
-  secure: true,
-  transports: ['websocket'],
-});
-
 import Spinner from 'react-native-loading-spinner-overlay';
 class MapsActivity extends Component {
   constructor(props) {
@@ -76,6 +72,7 @@ class MapsActivity extends Component {
       speed: 0,
       magnetometer: null,
       time: 'N/A',
+      onRegionChange: true,
       prevLatLng: {},
       coordinateRiders: new AnimatedRegion({
         latitude: LATITUDE,
@@ -117,6 +114,16 @@ class MapsActivity extends Component {
   componentWillMount() {
     this.animatedValue = new Animated.Value(50);
   }
+  removeDisconnectedRiderFromMap = () => {
+    socket.on('remove-rider-from map', data => {
+      this.setState({
+        riders: this.state.riders.filter(
+          rider => rider.riderid !== data.riderid,
+        ),
+      });
+      this.props.getRiders(this.state.riders);
+    });
+  };
   getAllRiders = () => {
     const userData = {
       userid: this.props.authStatus.user.id,
@@ -158,6 +165,7 @@ class MapsActivity extends Component {
 
     this.setState({showBS: true});
     this.getAllRiders();
+    this.removeDisconnectedRiderFromMap();
     this.animateRiderMovement();
 
     this.watchID = await Location.watchPositionAsync(
@@ -176,8 +184,8 @@ class MapsActivity extends Component {
         };
         await this.props.getCurrentLocation(newCoordinate);
 
-        const duration = 100;
-        this.map.animateToRegion(this.getCurrentRegion(), 1000 * 2);
+        const duration = 10;
+        //this.map.animateToRegion(this.getCurrentRegion(), 1000 * 2);
         if (Platform.OS === 'android') {
           //   if (this.markerUser) {
           //     this.markerUser._component.animateMarkerToCoordinate(
@@ -256,7 +264,11 @@ class MapsActivity extends Component {
     latitudeDelta: LATITUDE_DELTA,
     longitudeDelta: LONGITUDE_DELTA,
   });
-
+  reCenter() {
+    this.map.animateToRegion(this.getCurrentRegion(), 1000);
+    // this.map.animateToViewingAngle(20,1000)
+    this.setState({onRegionChange: false});
+  }
   calcDistance = newLatLng => {
     const {prevLatLng} = this.state;
     return haversine(prevLatLng, newLatLng) || 0;
@@ -271,7 +283,7 @@ class MapsActivity extends Component {
     //   transform:[{rotate:interpolateRotation}]
     // }
     const {latitude, longitude} = this.state;
-    return (
+    return ( 
       <View style={{flex: 1}}>
         <Drawer
           ref={ref => {
@@ -284,77 +296,108 @@ class MapsActivity extends Component {
             />
           }>
           <View style={styles.container}>
-            {!this.state.showBS ? (
-              <Spinner
-                visible={true}
-                textContent={'Loading...'}
-                textStyle={styles.spinnerTextStyle}
-              />
-            ) : (
-              <MapView
-                provider={PROVIDER_GOOGLE}
-                showUserLocation={true}
-                scrollEnabled={true}
-                region={this.getCurrentRegion()}
-                style={{...StyleSheet.absoluteFillObject}}
-                ref={ref => {
-                  this.map = ref;
-                }}>
-                <MapView.Marker.Animated
+            <MapView
+              provider={PROVIDER_GOOGLE}
+              showUserLocation={true}
+              showsMyLocationButton={true}
+              scrollEnabled={true}
+              loadingEnabled
+              onRegionChangeComplete={changed => {
+                const currentregion = this.getCurrentRegion();
+
+                if (
+                  currentregion.latitude.toFixed(3) ==
+                    changed.latitude.toFixed(3) &&
+                  currentregion.longitude.toFixed(3) ==
+                    changed.longitude.toFixed(3)
+                ) {
+                  this.setState({onRegionChange: false});
+                } else {
+                  this.setState({onRegionChange: true});
+                }
+              }}
+              initialRegion={this.getCurrentRegion()}
+              style={{...StyleSheet.absoluteFillObject}}
+              ref={ref => {
+                this.map = ref;
+              }}>
+              <MapView.Marker.Animated
+                ref={marker => {
+                  this.markerUser = marker;
+                }}
+                style={{
+                  transform: [
+                    {
+                      rotate:
+                        this.state.bearing === undefined
+                          ? '0deg'
+                          : `${this.state.bearing}deg`,
+                    },
+                  ],
+                }}
+                coordinate={{latitude: latitude, longitude: longitude}}>
+                <UserMarker />
+              </MapView.Marker.Animated>
+
+              {this.state.riders.map(riders => (
+                <Marker.Animated
                   ref={marker => {
-                    this.markerUser = marker;
+                    this.markerRider = marker;
                   }}
                   style={{
-                    transform: [
-                      {
-                        rotate:
-                          this.state.bearing === undefined
-                            ? '0deg'
-                            : `${this.state.bearing}deg`,
-                      },
-                    ],
+                    width: 40,
+                    height: 40,
+                    resizeMode: 'contain',
+                    // transform: [{rotate: `${riders.bearing}deg`}],
+                    zIndex: 3,
                   }}
-                  coordinate={{latitude: latitude, longitude: longitude}}>
-                  <UserMarker />
-                </MapView.Marker.Animated>
+                  coordinate={{
+                    latitude: riders.latitude,
+                    longitude: riders.longitude,
+                  }}>
+                  <Image
+                    source={require('../../assets/motor.png')}
+                    style={{height: 40, width: 40}}
+                  />
 
-                {this.state.riders.map(riders => (
-                  <Marker.Animated
-                    ref={marker => {
-                      this.markerRider = marker;
-                    }}
-                    style={{
-                      width: 40,
-                      height: 40,
-                      resizeMode: 'contain',
-                      // transform: [{rotate: `${riders.bearing}deg`}],
-                      zIndex: 3,
-                    }}
+                  <Marker
                     coordinate={{
                       latitude: riders.latitude,
                       longitude: riders.longitude,
-                    }}>
-                    <Image
-                      source={require('../../assets/motor.png')}
-                      style={{height: 40, width: 40}}
-                    />
+                    }}
+                  />
+                </Marker.Animated>
+              ))}
+            </MapView>
 
-                    <Marker
-                      coordinate={{
-                        latitude: riders.latitude,
-                        longitude: riders.longitude,
-                      }}
-                    />
-                  </Marker.Animated>
-                ))}
-              </MapView>
-            )}
             <Toolbar
               icon={'menu'}
               notbackAction={true}
               opendrawer={this.openDrawer}
               navigation={this.props.navigation}
             />
+            {this.state.onRegionChange ? (
+              <TouchableOpacity
+                onPress={() => {
+                  this.reCenter();
+                }}
+                style={{
+                  position: 'absolute',
+                  bottom: 260,
+                  right: 15,
+                  padding: 7,
+                  backgroundColor: '#fff',
+                  borderRadius: 40,
+                  elevation: 4,
+                }}>
+                <Icon
+                  name="crosshairs"
+                  size={24}
+                  color="#000"
+                  style={{margin: 2}}
+                />
+              </TouchableOpacity>
+            ) : null}
             {this.state.showBS ? (
               <BottomDrawer
                 // onCollapsed={collapse => this.setState({showtopcard: true})}

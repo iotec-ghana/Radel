@@ -1,5 +1,4 @@
 import {GET_CURRENT_LOCATION, GET_DESTINATION_LOCATION} from '../Actions/types';
-
 const initialState = {
   OriginCoordinates: {
     latitude: 0.009,
@@ -16,7 +15,6 @@ const initialState = {
 export default function(state = initialState, action) {
   switch (action.type) {
     case GET_CURRENT_LOCATION:
-      //console.log(action.payload);
       return {
         ...state,
         OriginCoordinates: {

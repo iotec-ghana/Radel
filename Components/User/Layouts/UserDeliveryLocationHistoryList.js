@@ -60,6 +60,7 @@ export default class UserDeliveryLocationHistoryList extends Component {
           scrollEnabled={false}
           pitchEnabled={false}
           cacheEnabled={true}
+          liteMode={true}
           provider={PROVIDER_GOOGLE}
           loadingEnabled
           style={{height: 160}}

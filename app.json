@@ -19,7 +19,7 @@
       "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": [
-      "**/*"
+      "./assets/*"
     ],
     "ios": {
       "supportsTablet": true
@@ -28,6 +28,6 @@
       "package": "com.iotec.radel",
       "versionCode": 1
     },
-    "description": "alpha test 1"
+    "description": "alphatest1"
   }
 }

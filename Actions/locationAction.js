@@ -1,6 +1,7 @@
 import {GET_CURRENT_LOCATION, GET_DESTINATION_LOCATION} from './types';
 
-export const getCurrentLocation = data => {
+export  const  getCurrentLocation = data => {
+//  console.log(JSON.stringify(data))
   return {
     type: GET_CURRENT_LOCATION,
     payload: data,

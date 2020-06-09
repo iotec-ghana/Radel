@@ -32,7 +32,9 @@ class SuggestedRidersBottomSheet extends Component {
   }
   componentDidMount() {
     //console.log(this.props.riders[0]);
-    this.props.getSelectedRider(this.props.riders[0]);
+    if (this.props.riders !== undefined) {
+      this.props.getSelectedRider(this.props.riders[0]);
+    }
   }
   render() {
     return (
@@ -56,8 +58,7 @@ class SuggestedRidersBottomSheet extends Component {
                     this.state.itemPressed === item.riderid
                       ? '#e7564c'
                       : 'black',
-                  borderWidth:
-                    this.state.itemPressed === item.riderid ? 2 : 0,
+                  borderWidth: this.state.itemPressed === item.riderid ? 2 : 0,
                 }}>
                 <View style={styles.radelGo}>
                   <Text style={styles.radelGoText}>RadelGO</Text>
@@ -79,7 +80,9 @@ class SuggestedRidersBottomSheet extends Component {
                       color="#000"
                       style={{margin: 2}}
                     />
-                    <Text style={styles.time}>{item.eta.toFixed(0)} minutes away</Text>
+                    <Text style={styles.time}>
+                      {item.eta.toFixed(0)} minutes away
+                    </Text>
                   </View>
                 </View>
 

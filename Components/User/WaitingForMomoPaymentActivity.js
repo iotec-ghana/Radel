@@ -42,7 +42,7 @@ class WaitingForMomoPaymentActivity extends Component {
   componentDidMount = async () => {
     console.log(this.props.route.params.receipientPhone);
     try {
-      //await AsyncStorage.removeItem('paymentCheck');
+      await AsyncStorage.removeItem('paymentCheck');
       //check if paymentcheck is set to localstorage
       if ((await AsyncStorage.getItem('paymentCheck')) === null) {
         console.log('localstorage is empty');
@@ -128,7 +128,7 @@ class WaitingForMomoPaymentActivity extends Component {
         amount: this.props.route.params.price,
         network: this.state.network,
       };
-      console.log(payload);
+      console.log(JSON.stringify(payload));
 
       const sendPayment = await axios.post(BASE_URL + '/paywithMomo/', payload);
       this.setState({paymentID: sendPayment.data.paymentid});

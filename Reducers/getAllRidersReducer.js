@@ -2,7 +2,7 @@ import {
   GET_NEARBY_RIDERS,
   DELETE_DUPLICATE_RIDER_DETAILS,
 } from '../Actions/types';
-const initialState = {};
+const initialState = {nearby:[]};
 export default function(state = initialState, action) {
   switch (action.type) {
     case GET_NEARBY_RIDERS:

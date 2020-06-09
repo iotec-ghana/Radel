@@ -15,7 +15,9 @@
     "@react-navigation/stack": "^5.2.10",
     "axios": "^0.19.2",
     "expo": "^37.0.8",
+    "expo-background-fetch": "^8.1.0",
     "expo-constants": "~9.0.0",
+    "expo-contacts": "~8.1.0",
     "expo-font": "~8.1.1",
     "expo-location": "~8.1.0",
     "haversine": "^1.1.1",
@@ -42,8 +44,8 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "rn-bottom-drawer": "^1.4.3",
-    "socket.io-client": "2.1.1",
-    "expo-contacts": "~8.1.0"
+    "socket.io-client": "^2.1.1",
+    "expo-task-manager": "~8.1.0"
   },
   "devDependencies": {
     "babel-preset-expo": "~8.1.0",

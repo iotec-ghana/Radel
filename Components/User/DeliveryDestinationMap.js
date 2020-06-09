@@ -12,6 +12,7 @@ import {
   Image,
   ActivityIndicator,
   StatusBar,
+  Linking,
 } from 'react-native';
 import MapView, {
   PROVIDER_GOOGLE,
@@ -41,9 +42,9 @@ const TAB_BAR_HEIGHT = -6;
 import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
 import {getRiders} from '../../Actions/getAllRidersAction';
 import io from 'socket.io-client';
-import {requestRide, listenForRiderDecision} from '../../socketFunctions';
+import {requestRide, socket} from '../../socketFunctions';
 import {StackActions} from '@react-navigation/native';
-import { captureRef } from 'react-native-view-shot';
+import {captureRef} from 'react-native-view-shot';
 //addy.substr(0, addy.indexOf(','));
 
 class DeliveryDestinationMap extends Component {
@@ -57,7 +58,7 @@ class DeliveryDestinationMap extends Component {
       distance: 0,
       duration: 0,
       price: 0,
-      showtopcard:true,
+      showtopcard: true,
       processing: false,
       buttonDisabled: true,
       loadingPrice: true,
@@ -81,13 +82,11 @@ class DeliveryDestinationMap extends Component {
         this.props.destinationName.indexOf(','),
       ),
     };
-    this.socket = io(PV_API, {
-      secure: true,
-      transports: ['websocket'],
-    });
+
     this.mapView = null;
   }
- async componentDidMount() {
+
+  async componentDidMount() {
     // this.RBSheet.open()
     try {
       // const result = await captureRef(this.mapView , {
@@ -98,27 +97,25 @@ class DeliveryDestinationMap extends Component {
       //   format: 'jpg',
       // });
       // console.log(result + "dfgddgd")
-    
-    
-    const userid = this.props.authStatus.id;
-    this.socket.on('rider-decision-' + userid, riderdecision => {
-    
-      if (riderdecision.isAvailable) {
-        this.setState({
-          loadingLayout: false,
-          requestAccepted: riderdecision.isAvailable,
-          found: true,
-          riderDetails: riderdecision,
-        });
-        this.socket.emit('customer-movement-' + userid);
-      } else {
-        alert('Rider declined your request');
-      }
-    });  
-   // console.log(this.props.authStatus);
-  } catch (error) {
-      console.log(error)
-  };
+
+      const userid = this.props.authStatus.id;
+      socket.on('rider-decision-' + userid, riderdecision => {
+        if (riderdecision.isAvailable) {
+          this.setState({
+            loadingLayout: false,
+            requestAccepted: riderdecision.isAvailable,
+            found: true,
+            riderDetails: riderdecision,
+          });
+          socket.emit('customer-movement-' + userid);
+        } else {
+          //  alert('Rider declined your request');
+        }
+      });
+      // console.log(this.props.authStatus);
+    } catch (error) {
+      console.log(error);
+    }
   }
   reqRide = async () => {
     //fetch driver details
@@ -127,16 +124,17 @@ class DeliveryDestinationMap extends Component {
       latitude: this.state.currentloclat,
       longitude: this.state.currentloclong,
       userid: this.props.authStatus.id,
-      destination: this.state.destinationName,  
-      DestinationCoordinates: { 
-        latitude: this.state.Destlatitude, 
+      destination: this.state.destinationName,
+      DestinationCoordinates: {
+        latitude: this.state.Destlatitude,
         longitude: this.state.Destlongitude,
-      }, 
-    
+      },
+
       pickup: this.state.originName,
-      ...this.props.selected,
-    }; 
-    //console.log(payload); 
+      riderid: this.props.selected.riderid,
+    };
+    //console.log(payloa d);
+    console.log(this.props.selected);
     if (!this.state.requestOnce) {
       requestRide(payload);
       this.setState({requestOnce: true});
@@ -145,16 +143,34 @@ class DeliveryDestinationMap extends Component {
     // console.log('done');
   };
 
+  dialCall = number => {
+    let phoneNumber = '';
+    if (Platform.OS === 'android') {
+      phoneNumber = `tel:${number}`;
+    } else {
+      phoneNumber = `telprompt:${number}`;
+    }
+
+    Linking.openURL(phoneNumber);
+  };
+
   DriverDetailsLayout = () => {
-    //(this.mapView 
-    
-   
-    return (
-      <View style={{flex: 1, alignItems: 'center'}}>
-        <Text style={{fontWeight: 'bold', fontSize: 16, marginTop: 15}}>
-          WE HAVE FOUND YOU A RIDER
-        </Text>
-        {/* <Text
+    //(this.mapView
+    //alert(this.state.riderDetails)
+    if (this.state.riderDetails !== undefined) {
+      const {
+        first_name,
+        last_name,
+        email,
+        phone_number,
+      } = this.state.riderDetails;
+
+      return (
+        <View style={{flex: 1, alignItems: 'center'}}>
+          <Text style={{fontWeight: 'bold', fontSize: 16, marginTop: 15}}>
+            WE HAVE FOUND YOU A RIDER
+          </Text>
+          {/* <Text
           style={{
             fontWeight: 'bold',
             color: '#e7564c',
@@ -163,59 +179,62 @@ class DeliveryDestinationMap extends Component {
           }}>
           Rider will pickup your items in {'02:45'}
         </Text> */}
-        <View
-          style={{
-            flexDirection: 'row',
-            marginTop: 15,
-            alignItems: 'center',
-          }}>
           <View
             style={{
-              padding: 20,
-              backgroundColor: '#fafafa',
-              borderRadius: 40,
-              marginRight: 30,
+              flexDirection: 'row',
+              marginTop: 15,
+              alignItems: 'center',
             }}>
-            <Icon name="phone" size={24} color="#000" style={{margin: 2}} />
+            <TouchableOpacity
+              onPress={() => this.dialCall(phone_number)}
+              style={{
+                padding: 20,
+                backgroundColor: '#fafafa',
+                borderRadius: 40,
+                marginRight: 30,
+              }}>
+              <Icon name="phone" size={24} color="#000" style={{margin: 2}} />
+            </TouchableOpacity>
+
+            <View style={{}}>
+              <Image
+                source={require('../../assets/deedat.jpg')}
+                style={{height: 100, width: 100, borderRadius: 100}}
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => this.dialCall(phone_number)}
+              style={{
+                padding: 20,
+                backgroundColor: '#fafafa',
+                borderRadius: 40,
+                marginLeft: 30,
+              }}>
+              <Icon name="phone" size={24} color="#000" style={{}} />
+            </TouchableOpacity>
           </View>
 
-          <View style={{}}>
-            <Image
-              source={require('../../assets/deedat.jpg')}
-              style={{height: 100, width: 100, borderRadius: 100}}
-            />
-          </View>
-          <View
+          <Text
             style={{
-              padding: 20,
-              backgroundColor: '#fafafa',
-              borderRadius: 40,
-              marginLeft: 30,
+              fontWeight: 'bold',
+              color: '#000',
+              fontSize: 16,
+              marginTop: 10,
             }}>
-            <Icon name="phone" size={24} color="#000" style={{}} />
-          </View>
+            {first_name} {last_name}
+          </Text>
+          <Text
+            style={{
+              fontWeight: 'bold',
+              color: '#000',
+              fontSize: 16,
+              marginTop: 20,
+            }}>
+            {'GR-34-18'} - {'Honda'}
+          </Text>
         </View>
-
-        <Text
-          style={{
-            fontWeight: 'bold',
-            color: '#000',
-            fontSize: 16,
-            marginTop: 10,
-          }}>
-          Deedat Billa
-        </Text>
-        <Text
-          style={{
-            fontWeight: 'bold',
-            color: '#000',
-            fontSize: 16,
-            marginTop: 20,
-          }}>
-          {'GR-34-18'} - {'Honda'}
-        </Text>
-      </View>
-    );
+      );
+    }
   };
   loadingLayout = () => {
     this.reqRide();
@@ -238,7 +257,7 @@ class DeliveryDestinationMap extends Component {
     return haversine(riderlocation, userlocation) || 0;
   };
   renderContent = () => {
-    if (this.props.riders) {
+    if (this.props.riders.length > 0) {
       var modifiedArr = [];
       var data = {};
       this.props.riders.forEach(element => {
@@ -272,7 +291,7 @@ class DeliveryDestinationMap extends Component {
           style={{
             flex: 1,
             alignContent: 'center',
-           paddingTop:120,
+            paddingTop: 120,
             alignItems: 'center',
           }}>
           <Text
@@ -308,8 +327,8 @@ class DeliveryDestinationMap extends Component {
       };
       //console.log(dist);
       if (this.props.riders.length > 0) {
-      const res = await axios.post(BASE_URL + '/pricing/', dist);
-     
+        const res = await axios.post(BASE_URL + '/pricing/', dist);
+
         this.setState({
           price: res.data.rounded_price,
           buttonDisabled: false,
@@ -325,27 +344,31 @@ class DeliveryDestinationMap extends Component {
 
   topCard = () => {
     // console.log(this.state.originName);
-    if(this.state.showtopcard){
-    return (
-      <View style={styles.top}>
-        <View style={styles.topItems}>
-          <Text style={{marginRight: 8}}>{this.state.originName}</Text>
-          <Icon name="arrow-right" size={12} color="#000" style={{margin: 2}} />
-          <Text style={{marginLeft: 8}}>{this.state.destinationName}</Text>
-          <Text
-            style={{
-              position: 'absolute',
-              right: 0,
-              margin: 10,
-              fontWeight: 'bold',
-            }}>
-            {this.state.distance}Km
-          </Text>
+    if (this.state.showtopcard) {
+      return (
+        <View style={styles.top}>
+          <View style={styles.topItems}>
+            <Text style={{marginRight: 8}}>{this.state.originName}</Text>
+            <Icon
+              name="arrow-right"
+              size={12}
+              color="#000"
+              style={{margin: 2}}
+            />
+            <Text style={{marginLeft: 8}}>{this.state.destinationName}</Text>
+            <Text
+              style={{
+                position: 'absolute',
+                right: 0,
+                margin: 10,
+                fontWeight: 'bold',
+              }}>
+              {this.state.distance}Km
+            </Text>
+          </View>
         </View>
-      </View>
-    );
-          }
-    
+      );
+    }
   };
   animateRiderMovement = () => {
     {
@@ -357,7 +380,7 @@ class DeliveryDestinationMap extends Component {
     }
   };
   render() {
-    console.log(this.props.destination)
+    // console.log(this.props.destination);
     return (
       <View style={styles.container}>
         <StatusBar
@@ -368,7 +391,6 @@ class DeliveryDestinationMap extends Component {
         <MapView
           provider={PROVIDER_GOOGLE}
           loadingEnabled
-       
           initialRegion={this.getCurrentRegion()}
           ref={c => (this.mapView = c)}
           style={{...StyleSheet.absoluteFillObject}}>
@@ -394,17 +416,21 @@ class DeliveryDestinationMap extends Component {
                     style={{height: 40, width: 40}}
                   />
 
-                  <Marker
+                  {/* <Marker
+                    tracksViewChanges={false}
                     coordinate={{
                       latitude: riders.latitude,
                       longitude: riders.longitude,
                     }}
-                  />
+                  /> */}
                 </Marker.Animated>
               ))
             : null}
 
-          <MapView.Marker coordinate={this.getCurrentRegion()}>
+          <MapView.Marker
+          tracksViewChanges={false}
+          
+          coordinate={this.getCurrentRegion()}>
             <Icon
               name="map-marker"
               size={24}
@@ -412,7 +438,9 @@ class DeliveryDestinationMap extends Component {
               style={{margin: 2}}
             />
           </MapView.Marker>
-          <MapView.Marker coordinate={this.getDestinationRegion()}>
+          <MapView.Marker
+            tracksViewChanges={false}
+             coordinate={this.getDestinationRegion()}>
             <Icon
               name="stop-circle"
               size={24}
@@ -425,8 +453,10 @@ class DeliveryDestinationMap extends Component {
               origin={this.props.origin}
               destination={this.props.destination}
               strokeWidth={3}
+              mode={'DRIVING'}
               strokeColor="#e7564c"
-              optimizeWaypoints={true}
+              optimizeWaypoints={false}
+              resetOnChange={false}
               apikey={GOOGLE_MAPS_APIKEY}
               onStart={params => {
                 // console.log(
@@ -440,7 +470,7 @@ class DeliveryDestinationMap extends Component {
                   distance: result.distance,
                   duration: result.duration,
                 });
-                
+
                 this.calculatePrice();
                 // console.log(`Distance: ${result.distance} km`);
                 // console.log(`Duration: ${result.duration} min.`);
@@ -465,11 +495,10 @@ class DeliveryDestinationMap extends Component {
           containerHeight={height}
           offset={TAB_BAR_HEIGHT}
           startUp={false}
-          onCollapsed={collapse=>this.setState({showtopcard:true})}
-          
-          onExpanded={ex => {this.setState({showtopcard:false})}}
-          
-          >
+          onCollapsed={collapse => this.setState({showtopcard: true})}
+          onExpanded={ex => {
+            this.setState({showtopcard: false});
+          }}>
           {!this.state.loadingLayout && !this.state.found
             ? this.renderContent()
             : this.state.found
@@ -489,10 +518,10 @@ class DeliveryDestinationMap extends Component {
                       receipientPhone: this.props.route.params.receipientPhone,
                       price: this.state.price,
                       riderDetails: this.props.selected,
-                      locationNames:{
-                        origin:this.state.originName,
-                        destination:this.state.destinationName
-                      }
+                      locationNames: {
+                        origin: this.state.originName,
+                        destination: this.state.destinationName,
+                      },
                     })
                   : null,
               )
@@ -563,7 +592,6 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 3,
     margin: 12,
-    
   },
   bookButtonText: {
     color: '#fff',
