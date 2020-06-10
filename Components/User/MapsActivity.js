@@ -138,7 +138,7 @@ class MapsActivity extends Component {
       //console.log()
       this.setState({riders: [...this.state.riders, riderData]});
       this.props.getRiders(this.state.riders);
-      console.log(this.state.riders);
+      console.log(JSON.stringify(this.state.riders[0]));
     });
   };
 
@@ -184,18 +184,18 @@ class MapsActivity extends Component {
         };
         await this.props.getCurrentLocation(newCoordinate);
 
-        const duration = 10;
-        //this.map.animateToRegion(this.getCurrentRegion(), 1000 * 2);
-        if (Platform.OS === 'android') {
-          //   if (this.markerUser) {
-          //     this.markerUser._component.animateMarkerToCoordinate(
-          //       newCoordinate,
-          //       duration,
-          //     );
-          //   }
-          // } else {
-          this.state.coordinateUser.timing({newCoordinate, duration}).start();
-        }
+        const duration = 100;
+        //this.map.animateToRegion(this.getCurrentRegion(), 1000);
+        //if (Platform.OS === 'android') {
+        //   if (this.markerUser) {
+        //     this.markerUser._component.animateMarkerToCoordinate(
+        //       newCoordinate,
+        //       duration,
+        //     );
+        //   }
+        // } else {
+        this.state.coordinateUser.timing({newCoordinate, duration}).start();
+        // }
 
         this.setState({
           latitude,
@@ -208,10 +208,15 @@ class MapsActivity extends Component {
   };
 
   animateRiderMovement = () => {
+    const duration = 100;
     {
       this.state.riders.map(riders =>
-        coordinateRiders
-          .timing({latitude: riders.latitude, longitude: riders.longitude})
+        this.state.coordinateRiders
+          .timing({
+            latitude: riders.latitude,
+            longitude: riders.longitude,
+            duration,
+          })
           .start(),
       );
     }
@@ -282,8 +287,8 @@ class MapsActivity extends Component {
     // const animatedStyle={
     //   transform:[{rotate:interpolateRotation}]
     // }
-    const {latitude, longitude} = this.state;
-    return ( 
+    const {latitude, longitude, riders} = this.state;
+    return (
       <View style={{flex: 1}}>
         <Drawer
           ref={ref => {
@@ -302,6 +307,7 @@ class MapsActivity extends Component {
               showsMyLocationButton={true}
               scrollEnabled={true}
               loadingEnabled
+              minZoomLevel={20}
               onRegionChangeComplete={changed => {
                 const currentregion = this.getCurrentRegion();
 
@@ -322,6 +328,7 @@ class MapsActivity extends Component {
                 this.map = ref;
               }}>
               <MapView.Marker.Animated
+                tracksViewChanges={false}
                 ref={marker => {
                   this.markerUser = marker;
                 }}
@@ -339,33 +346,20 @@ class MapsActivity extends Component {
                 <UserMarker />
               </MapView.Marker.Animated>
 
-              {this.state.riders.map(riders => (
+              {riders.map(riders => (
                 <Marker.Animated
+                  tracksViewChanges={false}
                   ref={marker => {
                     this.markerRider = marker;
-                  }}
-                  style={{
-                    width: 40,
-                    height: 40,
-                    resizeMode: 'contain',
-                    // transform: [{rotate: `${riders.bearing}deg`}],
-                    zIndex: 3,
                   }}
                   coordinate={{
                     latitude: riders.latitude,
                     longitude: riders.longitude,
                   }}>
-                  <Image
+                  {/* <Image
                     source={require('../../assets/motor.png')}
                     style={{height: 40, width: 40}}
-                  />
-
-                  <Marker
-                    coordinate={{
-                      latitude: riders.latitude,
-                      longitude: riders.longitude,
-                    }}
-                  />
+                  /> */}
                 </Marker.Animated>
               ))}
             </MapView>
@@ -383,12 +377,12 @@ class MapsActivity extends Component {
                 }}
                 style={{
                   position: 'absolute',
-                  bottom: 260,
+                  bottom: height / 4 + 40,
                   right: 15,
-                  padding: 7,
+                  padding: 13,
                   backgroundColor: '#fff',
-                  borderRadius: 40,
-                  elevation: 4,
+                  borderRadius: 140,
+                  elevation: 74,
                 }}>
                 <Icon
                   name="crosshairs"

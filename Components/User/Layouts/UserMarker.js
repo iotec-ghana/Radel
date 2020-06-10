@@ -25,7 +25,7 @@ export default class UserMarker extends Component {
   render() {
     return (
       <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-        <Animated.View
+        {/* <Animated.View
           style={{
             justifyContent: 'center',
             alignItems: 'center',
@@ -35,17 +35,17 @@ export default class UserMarker extends Component {
             borderRadius: 125,
             opacity: this.state.animatedValue,
           }}
-        />
+        /> */}
 
         <View
           style={{
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: '#e7564c',
-            height: 18,
-            width: 18,
+            height: 15,
+            width: 15,
             borderRadius: 25,
-            position: 'absolute',
+          //  position: 'absolute',
             borderColor: '#fff',
             borderWidth: 2,
           }}>

@@ -406,15 +406,15 @@ class DeliveryDestinationMap extends Component {
                     resizeMode: 'contain',
                     transform: [{rotate: `${riders.bearing}deg`}],
                     zIndex: 3,
-                  }}
+                  }} 
                   coordinate={{
                     latitude: riders.latitude,
                     longitude: riders.longitude,
                   }}>
-                  <Image
+                  {/* <Image
                     source={require('../../assets/motor.png')}
                     style={{height: 40, width: 40}}
-                  />
+                  /> */}
 
                   {/* <Marker
                     tracksViewChanges={false}
@@ -429,6 +429,7 @@ class DeliveryDestinationMap extends Component {
 
           <MapView.Marker
           tracksViewChanges={false}
+          
           
           coordinate={this.getCurrentRegion()}>
             <Icon

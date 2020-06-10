@@ -6,20 +6,25 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
+    "test": "jest",
     "clean": "watchman watch-del-all && npm cache clean --force && cd android && ./gradlew clean && cd .."
   },
   "dependencies": {
+    "@babel/preset-typescript": "^7.10.1",
     "@react-native-community/masked-view": "^0.1.6",
     "@react-navigation/material-top-tabs": "^5.2.4",
     "@react-navigation/native": "^5.2.5",
     "@react-navigation/stack": "^5.2.10",
     "axios": "^0.19.2",
+    "babel-jest": "^26.0.1",
     "expo": "^37.0.8",
     "expo-background-fetch": "^8.1.0",
     "expo-constants": "~9.0.0",
     "expo-contacts": "~8.1.0",
+    "expo-firebase-analytics": "^2.1.1",
     "expo-font": "~8.1.1",
     "expo-location": "~8.1.0",
+    "expo-task-manager": "~8.1.0",
     "haversine": "^1.1.1",
     "native-base": "^2.13.12",
     "react": "^16.9.0",
@@ -44,16 +49,22 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "rn-bottom-drawer": "^1.4.3",
-    "socket.io-client": "^2.1.1",
-    "expo-task-manager": "~8.1.0"
+    "socket.io-client": "^2.1.1"
   },
   "devDependencies": {
-    "babel-preset-expo": "~8.1.0",
-    "@babel/core": "^7.8.6",
-    "react-native-dotenv": "^0.2.0",
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
     "@react-native-community/eslint-config": "^0.0.5",
-    "jest": "~25.2.6",
+    "babel-preset-expo": "~8.1.0",
+    "jest-expo": "^37.0.0",
+    "react-native-dotenv": "^0.2.0",
     "react-test-renderer": "~16.9.0"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!(jest-)?react-native|react-clone-referenced-element|@react-native-community|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|@sentry/.*)"
+    ]
   },
   "private": true
 }

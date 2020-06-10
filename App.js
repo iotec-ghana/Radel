@@ -6,6 +6,7 @@ import store from './store';
 import * as Font from 'expo-font';
 import {Root} from 'native-base';
 import RootComponent from './Components/RootComponent';
+import * as Analytics from 'expo-firebase-analytics';
 class App extends Component {
   constructor(props) {
     super(props);
@@ -16,7 +17,13 @@ class App extends Component {
   };
 
   async componentDidMount() {
-    //this.loadAssetsAsync();
+    this.loadAssetsAsync();
+    await Analytics.logEvent('ButtonTapped', {
+      name: 'settings',
+      screen: 'profile',
+      purpose: 'Opens the internal settings',
+    });
+    await Analytics.setAnalyticsCollectionEnabled(true);
   }
   loadAssetsAsync = async () => {
     await Font.loadAsync({
@@ -27,9 +34,9 @@ class App extends Component {
 
   render() {
     console.disableYellowBox = true;
-    // if (!this.state.fontLoaded) {
-    //   return <Text>loading font</Text>;
-    // } else {
+    if (!this.state.fontLoaded) {
+      return <Text>loading font</Text>;
+    } else {
       return (
         <Root>
           <Provider store={store}>
@@ -37,7 +44,7 @@ class App extends Component {
           </Provider>
         </Root>
       );
-    }
+    }}
   }
 
 
