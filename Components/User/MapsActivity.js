@@ -135,7 +135,7 @@ class MapsActivity extends Component {
           rider => rider.riderid !== riderData.riderid,
         ),
       });
-      //console.log()
+      //console.log() 
       this.setState({riders: [...this.state.riders, riderData]});
       this.props.getRiders(this.state.riders);
       console.log(JSON.stringify(this.state.riders[0]));
@@ -167,7 +167,7 @@ class MapsActivity extends Component {
     this.getAllRiders();
     this.removeDisconnectedRiderFromMap();
     this.animateRiderMovement();
-
+   
     this.watchID = await Location.watchPositionAsync(
       {
         enableHighAccuracy: true,
@@ -176,14 +176,14 @@ class MapsActivity extends Component {
       },
       async position => {
         const {latitude, longitude} = position.coords;
-        const Oname = await this.getLocationName(position);
+        //const Oname = await this.getLocationName(position);
         const newCoordinate = {
           latitude,
-          longitude,
-          originName: Oname,
+          longitude, 
+         originName: Oname,   
         };
         await this.props.getCurrentLocation(newCoordinate);
-
+    
         const duration = 100;
         //this.map.animateToRegion(this.getCurrentRegion(), 1000);
         //if (Platform.OS === 'android') {
@@ -307,7 +307,7 @@ class MapsActivity extends Component {
               showsMyLocationButton={true}
               scrollEnabled={true}
               loadingEnabled
-              minZoomLevel={20}
+            
               onRegionChangeComplete={changed => {
                 const currentregion = this.getCurrentRegion();
 
@@ -356,10 +356,10 @@ class MapsActivity extends Component {
                     latitude: riders.latitude,
                     longitude: riders.longitude,
                   }}>
-                  {/* <Image
+                  <Image
                     source={require('../../assets/motor.png')}
                     style={{height: 40, width: 40}}
-                  /> */}
+                  />
                 </Marker.Animated>
               ))}
             </MapView>

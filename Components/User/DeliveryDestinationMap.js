@@ -31,8 +31,8 @@ import axios from 'axios';
 import {getSelectedRider} from '../../Actions/SelectRiderAction';
 import {isSignedIn} from '../../Actions/authAction';
 import {BASE_URL, PV_API} from '../../constants';
-const LATITUDE_DELTA = 0.015;
-const LONGITUDE_DELTA = 0.015;
+const LATITUDE_DELTA = 0.9;
+const LONGITUDE_DELTA = 0.9;
 const LATITUDE = 0.009;
 const LONGITUDE = 0.009;
 import SuggestedRidersBottomSheet from './Layouts/SuggestedRidersBottomSheet';
@@ -124,23 +124,50 @@ class DeliveryDestinationMap extends Component {
       latitude: this.state.currentloclat,
       longitude: this.state.currentloclong,
       userid: this.props.authStatus.id,
+      name:
+        this.props.authStatus.first_name +
+        ' ' +
+        this.props.authStatus.last_name,
       destination: this.state.destinationName,
       DestinationCoordinates: {
         latitude: this.state.Destlatitude,
         longitude: this.state.Destlongitude,
       },
-
       pickup: this.state.originName,
       riderid: this.props.selected.riderid,
     };
     //console.log(payloa d);
-    console.log(this.props.selected);
+
     if (!this.state.requestOnce) {
+      await this.sendPushNotificationToRider();
       requestRide(payload);
       this.setState({requestOnce: true});
     }
 
     // console.log('done');
+  };
+
+  sendPushNotificationToRider = async () => {
+    console.log(this.props.selected.NotificationToken);
+    const message = {
+      to: this.props.selected.NotificationToken,
+      sound: 'default',
+      title: 'New ride request',
+      body: `from ${this.props.authStatus.first_name +
+        ' ' +
+        this.props.authStatus.last_name}`,
+      data: {data: 'anything  here'},
+      _displayInForeground: true,
+    };
+    const response = await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(message),
+    });
   };
 
   dialCall = number => {
@@ -275,6 +302,7 @@ class DeliveryDestinationMap extends Component {
             distanceFromUser: distance,
             eta: distance / element.speed,
             id: element.id,
+            NotificationToken: element.NotificationToken,
           };
         modifiedArr.push(data);
       });
@@ -371,9 +399,10 @@ class DeliveryDestinationMap extends Component {
     }
   };
   animateRiderMovement = () => {
+    const duration = 100;
     {
       this.state.riders.map(riders =>
-        coordinateRiders
+        this.state.coordinateRiders
           .timing({latitude: riders.latitude, longitude: riders.longitude})
           .start(),
       );
@@ -400,13 +429,13 @@ class DeliveryDestinationMap extends Component {
                   ref={marker => {
                     this.markerRider = marker;
                   }}
-                  style={{
-                    width: 40,
-                    height: 40,
-                    resizeMode: 'contain',
-                    transform: [{rotate: `${riders.bearing}deg`}],
-                    zIndex: 3,
-                  }} 
+                  // style={{
+                  //   width: 40,
+                  //   height: 40,
+                  //   resizeMode: 'contain',
+                  //   transform: [{rotate: `${riders.bearing}deg`}],
+                  //   zIndex: 3,
+                  // }}
                   coordinate={{
                     latitude: riders.latitude,
                     longitude: riders.longitude,
@@ -428,10 +457,8 @@ class DeliveryDestinationMap extends Component {
             : null}
 
           <MapView.Marker
-          tracksViewChanges={false}
-          
-          
-          coordinate={this.getCurrentRegion()}>
+            tracksViewChanges={false}
+            coordinate={this.getCurrentRegion()}>
             <Icon
               name="map-marker"
               size={24}
@@ -441,7 +468,7 @@ class DeliveryDestinationMap extends Component {
           </MapView.Marker>
           <MapView.Marker
             tracksViewChanges={false}
-             coordinate={this.getDestinationRegion()}>
+            coordinate={this.getDestinationRegion()}>
             <Icon
               name="stop-circle"
               size={24}
@@ -451,9 +478,9 @@ class DeliveryDestinationMap extends Component {
           </MapView.Marker>
           {this.state.currentloclat && (
             <MapViewDirections
-              origin={this.props.origin}
+              origin={{...this.props.origin}}
               destination={this.props.destination}
-              strokeWidth={3}
+              strokeWidth={5}
               mode={'DRIVING'}
               strokeColor="#e7564c"
               optimizeWaypoints={false}
@@ -476,14 +503,28 @@ class DeliveryDestinationMap extends Component {
                 // console.log(`Distance: ${result.distance} km`);
                 // console.log(`Duration: ${result.duration} min.`);
 
-                this.mapView.fitToCoordinates(result.coordinates, {
-                  edgePadding: {
-                    right: width / 50,
-                    bottom: height / 50,
-                    left: width / 50,
-                    top: height / 50,
+                // this.mapView.fitToCoordinates(result.coordinates, {
+                //   edgePadding: {
+                //     right: width / 50,
+                //     bottom: height / 50,
+                //     left: width / 50,
+                //     top: height / 50,
+                //   },
+                // });
+                this.mapView.animateCamera(
+                  {
+                    center: {
+                      ...this.props.origin,
+                      LATITUDE_DELTA: 0.9,
+                      LONGITUDE_DELTA: 0.9,
+                    },
+                    pitch: 29,
+                    heading: 50,
+                    altitude: 200,
+                    zoom: 12,
                   },
-                });
+                  1000,
+                );
               }}
               onError={errorMessage => {
                 console.log('GOT AN ERROR');
