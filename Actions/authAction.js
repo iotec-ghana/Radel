@@ -11,7 +11,9 @@ export const isSignedIn = data => async dispatch => {
       isAuthenticated: true,
       user: response.data,
     };
-  
+    if ((await AsyncStorage.getItem('authdata')) !== null) {
+      await AsyncStorage.removeItem('authdata');
+    }
     await AsyncStorage.setItem('authdata', JSON.stringify(authData));
 
     dispatch({
