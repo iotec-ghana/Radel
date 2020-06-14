@@ -11,7 +11,7 @@ export const isSignedIn = data => async dispatch => {
       isAuthenticated: true,
       user: response.data,
     };
-
+  
     await AsyncStorage.setItem('authdata', JSON.stringify(authData));
 
     dispatch({

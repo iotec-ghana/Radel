@@ -3,7 +3,6 @@ import React, {Component} from 'react';
 import {Header, Left, Body, Right, Button, Title} from 'native-base';
 import {StyleSheet, TouchableOpacity, View, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-
 export default class Toolbar extends Component {
   render() {
     return (

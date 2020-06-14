@@ -13,7 +13,7 @@ import {StatusBarColor} from '../../constants';
 const windowWidth = Dimensions.get('window').width;
 import {isSignedIn} from '../../Actions/authAction';
 import {connect} from 'react-redux';
-import { AntDesign } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/Feather';
 class GetStartedActivity extends Component {
   constructor(props) {
     super(props);
@@ -29,7 +29,7 @@ class GetStartedActivity extends Component {
     return (
       <View style={styles.container}>
         <StatusBar backgroundColor={StatusBarColor} barStyle="light-content" />
-        <AntDesign name="check" size={120} color="#000" style={{margin: 2}} />
+        <Icon name="shield" size={120} color="#000" style={{margin: 2}} />
         <Text style={{fontSize: 40, fontWeight: 'bold'}}>
           You are ready to go
         </Text>
@@ -39,10 +39,10 @@ class GetStartedActivity extends Component {
             fontSize: 18,
             textAlign: 'center',
             fontWeight: 'bold',
+            padding:3,
           }}>
-          {' '}
-          Thanks for taking your time to create an {'\n'} account with us. Now
-          this is the fun part, {'\n'} let's explore the app
+          Thanks for taking your time to create an account with us. Now this is
+          the fun part, let's explore the app
         </Text>
 
         <View style={styles.button}>
