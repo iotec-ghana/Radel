@@ -50,7 +50,7 @@ export default class Sidebar extends Component {
         
         <SideBarHeader
           image={'../../../assets/deedat.jpg'}
-          
+          navigation={this.props.navigation}
           authdata={this.props.authdata}
         />
         <SafeAreaView>

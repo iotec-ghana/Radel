@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {View, Text, StyleSheet, Image, StatusBar} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  StatusBar,
+  TouchableOpacity,
+} from 'react-native';
 import {AsyncStorage} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -24,18 +31,10 @@ export default class SideBarHeader extends Component {
           backgroundColor={'transparent'}
         />
         <View style={{flexDirection: 'row'}}>
-          <Image style={styles.image} source={require(img)} />
-          {this.props.authdata.isAuthenticated ? (
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: 'bold',
-                color: '#fff',
-                margin: 20,
-              }}>
-              {this.props.authdata.user.email}
-            </Text>
-          ) : null}
+          <TouchableOpacity
+            onPress={() => this.props.navigation.navigate('ProfileActivity')}>
+            <Image style={styles.image} source={require(img)} />
+          </TouchableOpacity>
         </View>
         {this.props.authdata.isAuthenticated ? (
           <Text style={styles.nameText}>

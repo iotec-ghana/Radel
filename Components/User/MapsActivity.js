@@ -379,9 +379,9 @@ class MapsActivity extends Component {
                   position: 'absolute',
                   bottom: height / 4 + 40,
                   right: 15,
-                  padding: 13,
+                  padding: 10,
                   backgroundColor: '#fff',
-                  borderRadius: 140,
+                  borderRadius: 70,
                   elevation: 74,
                 }}>
                 <Icon

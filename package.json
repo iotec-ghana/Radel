@@ -49,7 +49,8 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "rn-bottom-drawer": "^1.4.3",
-    "socket.io-client": "^2.1.1"
+    "socket.io-client": "^2.1.1",
+    "expo-image-picker": "~8.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",

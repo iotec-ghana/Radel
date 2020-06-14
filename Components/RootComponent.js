@@ -23,6 +23,7 @@ import {connect} from 'react-redux';
 import {getCurrentLocation} from '../Actions/locationAction';
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
+import ProfileActivity from './User/ProfileActivity';
 const taskName = 'user-background-location';
 const MainStack = createStackNavigator();
 const RootStack = createStackNavigator();
@@ -94,6 +95,7 @@ class RootComponent extends Component {
           name="MyPaymentsActivity"
           component={MyPaymentsActivity}
         />
+        <MainStack.Screen name="ProfileActivity" component={ProfileActivity} />
         <MainStack.Screen
           name="SelectPaymentActivity"
           component={SelectPaymentActivity}
@@ -161,7 +163,6 @@ TaskManager.defineTask(taskName, async ({data, error}) => {
     // const user = await AsyncStorage.getItem('authdata');
     // const data = JSON.parse(user);
     const {locations} = data;
-   getCurrentLocation(locations[0].coords)
-   
+    getCurrentLocation(locations[0].coords);
   }
 });
