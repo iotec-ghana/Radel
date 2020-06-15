@@ -113,7 +113,7 @@ class MapsActivity extends Component {
    
     // console.log("unmounted");
   }
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.animatedValue = new Animated.Value(50);
   }
   removeDisconnectedRiderFromMap = () => {
