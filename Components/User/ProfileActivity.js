@@ -37,7 +37,8 @@ class ProfileActivity extends Component {
       oldpassword: '',
       newpassword: '',
       imageUri: null,
-      passwordVisible: true,
+      passwordVisible1: false,
+      passwordVisible2: false,
     };
   }
   onFirstnameChange = fname => {
@@ -84,8 +85,15 @@ class ProfileActivity extends Component {
   onNewPasswordChange = pass => {
     this.setState({newpassword: pass});
   };
-  onPasswordVisibilityToggle() {
-    this.setState({passwordVisible: !this.state.passwordVisible});
+  onPasswordVisibilityToggle1() {
+    this.setState({
+      passwordVisible1: !this.state.passwordVisible1,
+    });
+  }
+  onPasswordVisibilityToggle2() {
+    this.setState({
+      passwordVisible2: !this.state.passwordVisible2,
+    });
   }
   async componentDidMount() {
     console.log(this.props.authStatus);
@@ -109,7 +117,8 @@ class ProfileActivity extends Component {
       lname,
       email,
       phone,
-      passwordVisible,
+      passwordVisible1,
+      passwordVisible2,
     } = this.state;
     return (
       <View style={styles.container}>
@@ -187,12 +196,12 @@ class ProfileActivity extends Component {
           <TextInput
             style={styles.inputPassword}
             placeholder="Old password"
-            secureTextEntry={passwordVisible}
+            secureTextEntry={!passwordVisible1}
             editable={editable}
             onChangeText={text => this.onOldPasswordChange(text)}
           />
-          <TouchableOpacity onPress={() => this.onPasswordVisibilityToggle()}>
-            {passwordVisible ? (
+          <TouchableOpacity onPress={() => this.onPasswordVisibilityToggle1()}>
+            {passwordVisible1 ? (
               <Icon
                 name="eye-off"
                 style={styles.eyeIcon}
@@ -223,12 +232,12 @@ class ProfileActivity extends Component {
           <TextInput
             style={styles.inputPassword}
             placeholder="New password"
-            secureTextEntry={passwordVisible}
+            secureTextEntry={!passwordVisible2}
             editable={editable}
             onChangeText={text => this.onNewPasswordChange(text)}
           />
-          <TouchableOpacity onPress={() => this.onPasswordVisibilityToggle()}>
-            {passwordVisible ? (
+          <TouchableOpacity onPress={() => this.onPasswordVisibilityToggle2()}>
+            {passwordVisible2 ? (
               <Icon
                 name="eye-off"
                 style={styles.eyeIcon}
@@ -288,7 +297,7 @@ const styles = StyleSheet.create({
   container: {
     width: windowWidth,
     flex: 1,
-    //backgroundColor: '#f7f9fc',
+    backgroundColor: '#f7f9fc',
   },
   eyeIcon: {
     padding: 10,
@@ -336,11 +345,12 @@ const styles = StyleSheet.create({
     borderColor: '#8f9883',
     borderWidth: 1,
     borderRadius: 4,
+    backgroundColor: '#fafafa',
   },
   inputl: {
     height: 50,
     padding: 10,
-
+    backgroundColor: '#fafafa',
     marginBottom: 15,
     borderRadius: 3,
     flex: 1,
@@ -366,7 +376,7 @@ const styles = StyleSheet.create({
   UpdateButton: {
     backgroundColor: '#e7564c',
     paddingVertical: 20,
-    borderRadius: 3,
+    //borderRadius: 3,
   },
   UpdateButtonText: {
     color: '#fff',

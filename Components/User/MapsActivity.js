@@ -29,8 +29,8 @@ import haversine from 'haversine';
 import BottomSheetMain from './Layouts/MainMapBottomSheet';
 import BottomDrawer from 'rn-bottom-drawer';
 import {StackActions} from '@react-navigation/native';
-const LATITUDE_DELTA = 0.009;
-const LONGITUDE_DELTA = 0.009;
+const LATITUDE_DELTA = 0.013;
+const LONGITUDE_DELTA = 0.013;
 const LATITUDE = 0.009;
 const LONGITUDE = 0.009;
 import {GOOGLE_MAPS_APIKEY} from 'react-native-dotenv';
@@ -108,7 +108,9 @@ class MapsActivity extends Component {
   componentWillUnmount() {
     disconnect({userid: 5, user: true});
     //this._unsubscribe();
-    //Location.clearWatch(this.watchID);
+
+   // Location.clearWatch(this.watchID);
+   
     // console.log("unmounted");
   }
   componentWillMount() {
@@ -135,7 +137,7 @@ class MapsActivity extends Component {
           rider => rider.riderid !== riderData.riderid,
         ),
       });
-      //console.log() 
+      //console.log()
       this.setState({riders: [...this.state.riders, riderData]});
       this.props.getRiders(this.state.riders);
       console.log(JSON.stringify(this.state.riders[0]));
@@ -162,12 +164,12 @@ class MapsActivity extends Component {
     };
 
     await this.props.getCurrentLocation(data);
-
+    this.map.animateToRegion(this.getCurrentRegion(), 2000);
     this.setState({showBS: true});
     this.getAllRiders();
     this.removeDisconnectedRiderFromMap();
     this.animateRiderMovement();
-   
+
     this.watchID = await Location.watchPositionAsync(
       {
         enableHighAccuracy: true,
@@ -179,23 +181,13 @@ class MapsActivity extends Component {
         //const Oname = await this.getLocationName(position);
         const newCoordinate = {
           latitude,
-          longitude, 
-         originName: Oname,   
+          longitude,
+          originName: Oname,
         };
         await this.props.getCurrentLocation(newCoordinate);
-    
+
         const duration = 100;
-        //this.map.animateToRegion(this.getCurrentRegion(), 1000);
-        //if (Platform.OS === 'android') {
-        //   if (this.markerUser) {
-        //     this.markerUser._component.animateMarkerToCoordinate(
-        //       newCoordinate,
-        //       duration,
-        //     );
-        //   }
-        // } else {
         this.state.coordinateUser.timing({newCoordinate, duration}).start();
-        // }
 
         this.setState({
           latitude,
@@ -307,7 +299,6 @@ class MapsActivity extends Component {
               showsMyLocationButton={true}
               scrollEnabled={true}
               loadingEnabled
-            
               onRegionChangeComplete={changed => {
                 const currentregion = this.getCurrentRegion();
 
@@ -382,14 +373,9 @@ class MapsActivity extends Component {
                   padding: 10,
                   backgroundColor: '#fff',
                   borderRadius: 70,
-                  elevation: 74,
+                  elevation: 94,
                 }}>
-                <Icon
-                  name="crosshairs"
-                  size={24}
-                  color="#000"
-                  style={{margin: 2}}
-                />
+               <Text style={{fontSize:15,fontWeight:"bold"}}>Re-center</Text>
               </TouchableOpacity>
             ) : null}
             {this.state.showBS ? (
@@ -403,24 +389,7 @@ class MapsActivity extends Component {
                 shadow={true}>
                 {this.renderContent()}
               </BottomDrawer>
-            ) : // <RBSheet
-            //   ref={ref => {
-            //     this.RBSheet = ref;
-            //   }}
-            //   height={this.state.bottomSheetHeight}
-            //   animationType={'slide'}
-            //   duration={650}
-            //   minClosingHeight={this.state.bottomSheetHeight}
-            //   closeOnPressMask={false}
-            //   closeOnPressBack={false}
-            //   customStyles={{
-            //     container: {},
-            //     wrapper: {
-            //       backgroundColor: 'transparent',
-            //     },
-            //   }}>
-            //   {this.renderContent()}
-            // </RBSheet>
+            ) : 
             null}
           </View>
         </Drawer>

@@ -87,17 +87,8 @@ class DeliveryDestinationMap extends Component {
   }
 
   async componentDidMount() {
-    // this.RBSheet.open()
     try {
-      // const result = await captureRef(this.mapView , {
-      //   result: 'tmpfile',
-      //   height: 200,
-      //   width: 150,
-      //   quality: 0,
-      //   format: 'jpg',
-      // });
-      // console.log(result + "dfgddgd")
-
+      this.calculatePrice();
       const userid = this.props.authStatus.id;
       socket.on('rider-decision-' + userid, riderdecision => {
         if (riderdecision.isAvailable) {
@@ -280,15 +271,15 @@ class DeliveryDestinationMap extends Component {
       </View>
     );
   };
-  calcDistance = (riderlocation, userlocation) => {
+  calcDistanceBetweenUserAndRider = (riderlocation, userlocation) => {
     return haversine(riderlocation, userlocation) || 0;
   };
+
   renderContent = () => {
     if (this.props.riders.length > 0) {
       var modifiedArr = [];
-      var data = {};
       this.props.riders.forEach(element => {
-        let distance = this.calcDistance(
+        let distance = this.calcDistanceBetweenUserAndRider(
             {latitude: element.latitude, longitude: element.longitude},
             {
               latitude: this.state.currentloclat,
@@ -362,6 +353,7 @@ class DeliveryDestinationMap extends Component {
           buttonDisabled: false,
           loadingPrice: false,
         });
+        console.log('running');
       }
       // console.log(res.data);
     } catch (e) {
@@ -413,7 +405,7 @@ class DeliveryDestinationMap extends Component {
     return (
       <View style={styles.container}>
         <StatusBar
-          barStyle="light-content"
+          barStyle="dark-content"
           translucent={true}
           backgroundColor={'transparent'}
         />
@@ -440,18 +432,11 @@ class DeliveryDestinationMap extends Component {
                     latitude: riders.latitude,
                     longitude: riders.longitude,
                   }}>
-                  {/* <Image
+                  <Image
+                    //tracksViewChanges={false}
                     source={require('../../assets/motor.png')}
                     style={{height: 40, width: 40}}
-                  /> */}
-
-                  {/* <Marker
-                    tracksViewChanges={false}
-                    coordinate={{
-                      latitude: riders.latitude,
-                      longitude: riders.longitude,
-                    }}
-                  /> */}
+                  />
                 </Marker.Animated>
               ))
             : null}
@@ -480,7 +465,7 @@ class DeliveryDestinationMap extends Component {
             <MapViewDirections
               origin={{...this.props.origin}}
               destination={this.props.destination}
-              strokeWidth={5}
+              strokeWidth={3}
               mode={'DRIVING'}
               strokeColor="#e7564c"
               optimizeWaypoints={false}
@@ -499,32 +484,31 @@ class DeliveryDestinationMap extends Component {
                   duration: result.duration,
                 });
 
-                this.calculatePrice();
+                
                 // console.log(`Distance: ${result.distance} km`);
                 // console.log(`Duration: ${result.duration} min.`);
 
-                // this.mapView.fitToCoordinates(result.coordinates, {
-                //   edgePadding: {
-                //     right: width / 50,
-                //     bottom: height / 50,
-                //     left: width / 50,
-                //     top: height / 50,
-                //   },
-                // });
-                this.mapView.animateCamera(
-                  {
-                    center: {
-                      ...this.props.origin,
-                      LATITUDE_DELTA: 0.9,
-                      LONGITUDE_DELTA: 0.9,
-                    },
-                    pitch: 29,
-                    heading: 50,
-                    altitude: 200,
-                    zoom: 12,
+                this.mapView.fitToCoordinates(result.coordinates, {
+                  edgePadding: {
+                    right: width / 50,
+                    bottom: height / 50,
+                    left: width / 50,
+                    top: height / 50,
                   },
-                  1000,
-                );
+                });
+                // this.mapView.animateCamera(
+                //   {
+                //     center: {
+                //       ...this.props.origin,
+
+                //     },
+                //     pitch: 20,
+                //     heading: 50,
+                //     altitude: 12,
+                //     zoom: 11,
+                //   },
+                //   1000,
+                // );
               }}
               onError={errorMessage => {
                 console.log('GOT AN ERROR');
@@ -564,6 +548,7 @@ class DeliveryDestinationMap extends Component {
                         origin: this.state.originName,
                         destination: this.state.destinationName,
                       },
+                      distance: this.state.distance,
                     })
                   : null,
               )

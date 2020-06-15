@@ -95,6 +95,7 @@ class Register extends Component {
     }
   };
   render() {
+    const {showPassword} = this.state;
     return (
       <View style={styles.container}>
         <Toolbar
@@ -149,21 +150,45 @@ class Register extends Component {
           maxLength={10}
           //defaultValue={text}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry={true}
-          onChangeText={text => this.onPasswordChange(text)}
-          //defaultValue={text}
-        />
-
-        {/* <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            secureTextEntry={true}
-            // onChangeText={text}
+        <View
+          style={{
+            flexDirection: 'row',
+            backgroundColor: '#fafafa',
+            borderRadius: 3,
+            elevation: 0,
+            borderColor: '#8f9883',
+            borderWidth: 1.2,
+            marginBottom: 15,
+            marginHorizontal: 30,
+          }}>
+          <TextInput
+            style={styles.inputPassword}
+            placeholder="Password"
+            secureTextEntry={!showPassword}
+            onChangeText={text => this.onPasswordChange(text)}
             //defaultValue={text}
-          /> */}
+          />
+
+          <TouchableOpacity onPress={() => this.toggleSwitch()}>
+            {showPassword ? (
+              <Icon
+                name="eye-off"
+                style={styles.eyeIcon}
+                color="#8f9883"
+                size={24}
+              />
+            ) : (
+              <Icon
+                name="eye"
+                style={styles.eyeIcon}
+                color="#8f9883"
+                size={24}
+              />
+            )}
+          </TouchableOpacity>
+        </View>
+
+       
         {this.state.loading ? (
           <ActivityIndicator size="large" color="#e7564c" />
         ) : null}
@@ -198,6 +223,9 @@ const styles = StyleSheet.create({
     width: windowWidth,
     flex: 1,
     backgroundColor: '#f7f9fc',
+  },
+  eyeIcon: {
+    padding: 10,
   },
   input: {
     height: 50,
@@ -241,6 +269,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     marginLeft: 30,
     marginRight: 30,
+  },
+  inputPassword: {
+    height: 50,
+    padding: 10,
+    borderRadius: 4,
+    borderRadius: 3,
+    flex: 1,
+    backgroundColor: '#fafafa',
   },
   errorText: {
     marginLeft: 8,

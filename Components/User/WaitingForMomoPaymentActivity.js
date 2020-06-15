@@ -105,7 +105,7 @@ class WaitingForMomoPaymentActivity extends Component {
       if (response.data.status === 'success') {
         this.setState({hasPaid: true});
         //console.log('yess');
-        await this.UploadRideDetails();
+        await this.SumbitRiderOrder();
         await AsyncStorage.removeItem('paymentCheck');
         this.props.navigation.dispatch(
           StackActions.replace('BookProcessingActivity'),
@@ -129,8 +129,10 @@ class WaitingForMomoPaymentActivity extends Component {
         network: this.state.network,
       };
       console.log(JSON.stringify(payload));
-
-      const sendPayment = await axios.post(BASE_URL + '/paywithMomo/', payload);
+      const config = {
+        headers: {Authorization: `Bearer ${user.user.token}`},
+      };
+      const sendPayment = await axios.post(BASE_URL + '/paywithMomo/', payload,config);
       this.setState({paymentID: sendPayment.data.paymentid});
       //console.log(sendPayment.data.paymentid);
       return sendPayment.data.paymentid;
@@ -154,8 +156,9 @@ class WaitingForMomoPaymentActivity extends Component {
       </View>
     );
   };
-  UploadRideDetails = async () => {
-    const {receipientPhone,locationName}=this.props.route.params
+  SumbitRiderOrder = async () => {
+   
+    const {receipientPhone, locationName} = this.props.route.params;
     let startId = Math.floor(1000 + Math.random() * 9000);
     let endId = Math.floor(1000 + Math.random() * 9000);
     const {id} = this.props.authStatus.user;
@@ -175,24 +178,25 @@ class WaitingForMomoPaymentActivity extends Component {
           ...this.props.destination,
           endLocationID: endId,
         },
-        requestTime: Date.now(),
-        startTime: Date.now(),
         deliveryStatus: 'processing',
         deliveryTime: '',
         code: code,
         paymentId: this.state.paymentID,
         receipientTel: receipientPhone,
         dest_name: locationName.destination,
-        origin_name: locationName.origin
+        origin_name: locationName.origin,
+        distance:3
       };
       console.log(deliveryPayload);
+     
       const response = await axios.post(
         BASE_URL + '/bookride/',
         deliveryPayload,
+      
       );
       console.log(response.data);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
   render() {
