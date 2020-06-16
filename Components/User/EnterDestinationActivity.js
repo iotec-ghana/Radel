@@ -151,6 +151,9 @@ class EnterDestinationActivity extends Component {
           keyboardAppearance={'light'} // Can be left out for default keyboardAppearance https://facebook.github.io/react-native/docs/textinput.html#keyboardappearance
           listViewDisplayed="auto" // true/false/undefined
           fetchDetails={true}
+          //renderLeftButton={() => <TouchableOpacity><Text>me</Text></TouchableOpacity>}
+          //currentLocation={true}
+          suppressDefaultStyles={true}
           renderDescription={row => row.description} // custom description render
           onPress={async (data, details = null) => {
             // 'details' is provided when fetchDetails = true
@@ -196,6 +199,9 @@ class EnterDestinationActivity extends Component {
               height: 200,
              
             },
+            description:{
+             marginLeft:10
+            }
           }}
           //currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
           // currentLocationLabel="Current location"

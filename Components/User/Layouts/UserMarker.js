@@ -10,12 +10,13 @@ export default class UserMarker extends Component {
   }
 
   componentDidMount() {
+    
     Animated.loop(
       Animated.sequence([
         Animated.delay(100),
         Animated.timing(this.state.animatedValue, {
-          toValue: 0.4,
-          duration: 2000,
+          toValue: 0.5,
+          duration: 1000,
           easing: Easing.inOut(Easing.ease),
         }),
       ]), 
@@ -33,7 +34,8 @@ export default class UserMarker extends Component {
             height: 50,
             width: 50,
             borderRadius: 125,
-            opacity: this.state.animatedValue,
+            opacity:this.state.animatedValue,
+           
           }}
         />
 
@@ -63,6 +65,7 @@ export default class UserMarker extends Component {
               opacity: 0.8,
               borderRadius: 105,
               bottom:10,
+              
              
                
               

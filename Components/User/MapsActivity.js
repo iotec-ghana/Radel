@@ -108,9 +108,10 @@ class MapsActivity extends Component {
   componentWillUnmount() {
     disconnect({userid: 5, user: true});
     //this._unsubscribe();
+    this.watchID.remove();
+    this.watchHeading.remove();
+    // Location.clearWatch(this.watchID);
 
-   // Location.clearWatch(this.watchID);
-   
     // console.log("unmounted");
   }
   UNSAFE_componentWillMount() {
@@ -164,17 +165,21 @@ class MapsActivity extends Component {
     };
 
     await this.props.getCurrentLocation(data);
-    this.map.animateToRegion(this.getCurrentRegion(), 2000);
+    // this.map.animateToCoordinate(this.getCurrentRegion(), 5000);
     this.setState({showBS: true});
     this.getAllRiders();
     this.removeDisconnectedRiderFromMap();
     this.animateRiderMovement();
-
+    this.watchHeading = await Location.watchHeadingAsync(heading => {
+      this.setState({bearing: heading.magHeading.toFixed(2)});
+      // console.log(heading.trueHeading.toFixed(0));
+    });
+    console.log(this.watchHeading);
     this.watchID = await Location.watchPositionAsync(
       {
         enableHighAccuracy: true,
         distanceInterval: 1,
-        timeInterval: 1,
+        timeInterval: 1000,
       },
       async position => {
         const {latitude, longitude} = position.coords;
@@ -197,6 +202,7 @@ class MapsActivity extends Component {
       },
       error => console.log(error),
     );
+    console.log(this.watchID);
   };
 
   animateRiderMovement = () => {
@@ -294,11 +300,17 @@ class MapsActivity extends Component {
           }>
           <View style={styles.container}>
             <MapView
+              ref={ref => {
+                this.map = ref;
+              }}
               provider={PROVIDER_GOOGLE}
               showUserLocation={true}
               showsMyLocationButton={true}
               scrollEnabled={true}
-              loadingEnabled
+              // loadingEnabled
+              onMapReady={ready => {
+                this.map.animateToCoordinate(this.getCurrentRegion(), 2000);
+              }}
               onRegionChangeComplete={changed => {
                 const currentregion = this.getCurrentRegion();
 
@@ -314,27 +326,24 @@ class MapsActivity extends Component {
                 }
               }}
               initialRegion={this.getCurrentRegion()}
-              style={{...StyleSheet.absoluteFillObject}}
-              ref={ref => {
-                this.map = ref;
-              }}>
+              style={{...StyleSheet.absoluteFillObject}}>
               <MapView.Marker.Animated
                 tracksViewChanges={false}
                 ref={marker => {
                   this.markerUser = marker;
                 }}
                 style={{
-                  transform: [
-                    {
-                      rotate:
-                        this.state.bearing === undefined
-                          ? '0deg'
-                          : `${this.state.bearing}deg`,
-                    },
-                  ],
+                  // transform: [
+                  //   {
+                  //     rotate:
+                  //       this.state.bearing === undefined
+                  //         ? '0deg'
+                  //         : `${this.state.bearing}deg`,
+                  //   },
+                  // ],
                 }}
                 coordinate={{latitude: latitude, longitude: longitude}}>
-                <UserMarker />
+                <UserMarker /> 
               </MapView.Marker.Animated>
 
               {riders.map(riders => (
@@ -375,7 +384,9 @@ class MapsActivity extends Component {
                   borderRadius: 70,
                   elevation: 94,
                 }}>
-               <Text style={{fontSize:15,fontWeight:"bold"}}>Re-center</Text>
+                <Text style={{fontSize: 15, fontWeight: 'bold'}}>
+                  Re-center
+                </Text>
               </TouchableOpacity>
             ) : null}
             {this.state.showBS ? (
@@ -389,8 +400,7 @@ class MapsActivity extends Component {
                 shadow={true}>
                 {this.renderContent()}
               </BottomDrawer>
-            ) : 
-            null}
+            ) : null}
           </View>
         </Drawer>
       </View>
@@ -429,4 +439,5 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     backgroundColor: 'transparent',
   },
+  
 });

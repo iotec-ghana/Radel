@@ -30,23 +30,8 @@ class BookProcessingActivity extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showCancelBtn: false,
-      btnText: 'Cancel',
-      processing: false,
-      currentloclat: this.props.origin.latitude,
-      currentloclong: this.props.origin.longitude,
-      Destlatitude: this.props.destination.latitude,
-      Destlongitude: this.props.destination.longitude,
-      distance: 0,
-      duration: 0,
-      originName: this.props.originName.substr(
-        0,
-        this.props.originName.indexOf(','),
-      ),
-      destinationName: this.props.destinationName.substr(
-        0,
-        this.props.destinationName.indexOf(','),
-      ),
+      origin: null,
+      destination: null,
       bottomDrawerParams: {
         offset: 0,
         height: height / 3,
@@ -66,89 +51,10 @@ class BookProcessingActivity extends Component {
     setTimeout(this.process, 4000);
   }
   DriverDetailsLayout = () => {
-    return (
-      <View style={{flex: 1, alignItems: 'center',}}>
-        <Text style={{fontWeight: 'bold', fontSize: 16, marginTop: 15}}>
-          WE HAVE FOUND YOU A RIDER
-        </Text>
-        <Text
-          style={{
-            fontWeight: 'bold',
-            color: '#e7564c',
-            fontSize: 14,
-            marginTop: 10,
-          }}>
-          Rider will pickup your items in {'02:45'}
-        </Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            marginTop: 15,
-            alignItems: 'center',
-          }}>
-          <View
-            style={{
-              padding: 20,
-              backgroundColor: '#fafafa',
-              borderRadius: 40,
-              marginRight: 30,
-            }}>
-            <Icon name="phone" size={24} color="#000" style={{margin: 2}} />
-          </View>
-
-          <View style={{}}>
-            <Image
-              source={require('../../assets/deedat.jpg')}
-              style={{height: 100, width: 100, borderRadius: 100}}
-            />
-          </View>
-          <View
-            style={{
-              padding: 20,
-              backgroundColor: '#fafafa',
-              borderRadius: 40,
-              marginLeft: 30,
-            }}>
-            <Icon name="phone" size={24} color="#000" style={{}} />
-          </View>
-        </View>
-
-        <Text
-          style={{
-            fontWeight: 'bold',
-            color: '#000',
-            fontSize: 16,
-            marginTop: 10,
-          }}>
-          Deedat Billa
-        </Text>
-        <Text
-          style={{
-            fontWeight: 'bold',
-            color: '#000',
-            fontSize: 16,
-            marginTop: 20,
-          }}>
-          {'GR-34-18'} - {'Honda'}
-        </Text>
-      </View>
-    );
+  
   };
   loadingLayout = () => {
-    return (
-      <View style={{flex: 1, alignItems: 'center'}}>
-        <Image
-          source={require('../../assets/spinner.gif')}
-          style={{height: 100, width: 100}}
-        />
-        <Text style={{fontWeight: 'bold', fontSize: 18}}>
-          WE ARE PROCESSING YOUR BOOKING
-        </Text>
-        <Text style={{fontWeight: 'bold', fontSize: 14, marginTop: 20}}>
-          Your rider will be there soon
-        </Text>
-      </View>
-    );
+  
   };
 
   getDestinationRegion = () => ({

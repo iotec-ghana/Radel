@@ -21,6 +21,7 @@ import MapView, {
   Polyline,
 } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
+import ctionButtonsForBooking from './Layouts/ActionButtonsForBooking';
 import {connect} from 'react-redux';
 import {
   getCurrentLocation,
@@ -45,6 +46,7 @@ import io from 'socket.io-client';
 import {requestRide, socket} from '../../socketFunctions';
 import {StackActions} from '@react-navigation/native';
 import {captureRef} from 'react-native-view-shot';
+import ActionButtonsForBooking from './Layouts/ActionButtonsForBooking';
 //addy.substr(0, addy.indexOf(','));
 
 class DeliveryDestinationMap extends Component {
@@ -496,19 +498,7 @@ class DeliveryDestinationMap extends Component {
                     top: height / 50,
                   },
                 });
-                // this.mapView.animateCamera(
-                //   {
-                //     center: {
-                //       ...this.props.origin,
-
-                //     },
-                //     pitch: 20,
-                //     heading: 50,
-                //     altitude: 12,
-                //     zoom: 11,
-                //   },
-                //   1000,
-                // );
+               
               }}
               onError={errorMessage => {
                 console.log('GOT AN ERROR');
@@ -532,7 +522,9 @@ class DeliveryDestinationMap extends Component {
             : this.loadingLayout()}
         </BottomDrawer>
         {this.topCard()}
+        {this.state.found?
         <View style={styles.buttons}>
+        
           <TouchableOpacity
             disabled={this.state.buttonDisabled}
             style={styles.bookButton}
@@ -561,10 +553,17 @@ class DeliveryDestinationMap extends Component {
               <ActivityIndicator size="small" color="#fff" />
             )}
           </TouchableOpacity>
-        </View>
+        </View>:null}
       </View>
     );
   }
+  // renderButton(){
+  //   // will refactor later
+  //   const {found}=this.state
+  //   if(found){
+  //     return (<ActionButtonsForBooking text={"CONFIRM"}/>)
+  //   }
+  // }
 }
 
 const mapStateToProps = state => ({
