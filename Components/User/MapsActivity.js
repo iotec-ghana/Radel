@@ -51,6 +51,7 @@ import {
   disconnect,
   socket,
 } from '../../socketFunctions';
+import * as Analytics from 'expo-firebase-analytics';
 import * as Location from 'expo-location';
 import io from 'socket.io-client';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -108,8 +109,12 @@ class MapsActivity extends Component {
   componentWillUnmount() {
     disconnect({userid: 5, user: true});
     //this._unsubscribe();
-    this.watchID.remove();
-    this.watchHeading.remove();
+    if (this.watchID) {
+      this.watchID.remove();
+    }
+    if (this.watchHeading) {
+      this.watchHeading.remove();
+    }
     // Location.clearWatch(this.watchID);
 
     // console.log("unmounted");
@@ -150,7 +155,7 @@ class MapsActivity extends Component {
     if (!this.props.authStatus.isAuthenticated) {
       this.props.navigation.dispatch(StackActions.replace('Intro'));
     }
-
+    await Analytics.setCurrentScreen('MapsActivity', MapsActivity);
     let {status} = await Location.requestPermissionsAsync();
     if (status !== 'granted') {
       setErrorMsg('Permission to access location was denied');
@@ -174,7 +179,7 @@ class MapsActivity extends Component {
       this.setState({bearing: heading.magHeading.toFixed(2)});
       // console.log(heading.trueHeading.toFixed(0));
     });
-    console.log(this.watchHeading);
+
     this.watchID = await Location.watchPositionAsync(
       {
         enableHighAccuracy: true,
@@ -202,7 +207,6 @@ class MapsActivity extends Component {
       },
       error => console.log(error),
     );
-    console.log(this.watchID);
   };
 
   animateRiderMovement = () => {
@@ -332,18 +336,20 @@ class MapsActivity extends Component {
                 ref={marker => {
                   this.markerUser = marker;
                 }}
-                style={{
-                  // transform: [
-                  //   {
-                  //     rotate:
-                  //       this.state.bearing === undefined
-                  //         ? '0deg'
-                  //         : `${this.state.bearing}deg`,
-                  //   },
-                  // ],
-                }}
+                style={
+                  {
+                    // transform: [
+                    //   {
+                    //     rotate:
+                    //       this.state.bearing === undefined
+                    //         ? '0deg'
+                    //         : `${this.state.bearing}deg`,
+                    //   },
+                    // ],
+                  }
+                }
                 coordinate={{latitude: latitude, longitude: longitude}}>
-                <UserMarker /> 
+                <UserMarker />
               </MapView.Marker.Animated>
 
               {riders.map(riders => (
@@ -439,5 +445,4 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     backgroundColor: 'transparent',
   },
-  
 });

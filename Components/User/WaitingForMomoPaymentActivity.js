@@ -132,7 +132,11 @@ class WaitingForMomoPaymentActivity extends Component {
       const config = {
         headers: {Authorization: `Bearer ${user.user.token}`},
       };
-      const sendPayment = await axios.post(BASE_URL + '/paywithMomo/', payload,config);
+      const sendPayment = await axios.post(
+        BASE_URL + '/paywithMomo/',
+        payload,
+        config,
+      );
       this.setState({paymentID: sendPayment.data.paymentid});
       //console.log(sendPayment.data.paymentid);
       return sendPayment.data.paymentid;
@@ -157,8 +161,13 @@ class WaitingForMomoPaymentActivity extends Component {
     );
   };
   SumbitRiderOrder = async () => {
-   
-    const {receipientPhone, locationName} = this.props.route.params;
+    const {
+      receipientPhone,
+      locationName,
+      distance,
+      price,
+      riderDetails,
+    } = this.props.route.params;
     let startId = Math.floor(1000 + Math.random() * 9000);
     let endId = Math.floor(1000 + Math.random() * 9000);
     const {id} = this.props.authStatus.user;
@@ -167,7 +176,7 @@ class WaitingForMomoPaymentActivity extends Component {
       const code = getCode.data.code.replace(',', '');
       const deliveryPayload = {
         userId: id,
-        riderId: this.props.route.params.riderDetails.id,
+        riderId: riderDetails.id,
         startLocationID: startId,
         endLocationID: endId,
         startlocationCoordinates: {
@@ -185,14 +194,14 @@ class WaitingForMomoPaymentActivity extends Component {
         receipientTel: receipientPhone,
         dest_name: locationName.destination,
         origin_name: locationName.origin,
-        distance:3
+        distance: distance,
+        price: price,
       };
       console.log(deliveryPayload);
-     
+
       const response = await axios.post(
         BASE_URL + '/bookride/',
         deliveryPayload,
-      
       );
       console.log(response.data);
     } catch (error) {

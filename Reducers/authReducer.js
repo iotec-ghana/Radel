@@ -4,7 +4,9 @@ import {
   SIGN_OUT,
   REGISTER,
   CHECK_LOGIN_STATUS,
+  UPDATE_DETAILS
 } from '../Actions/types';
+import { act } from 'react-test-renderer';
 
 const initialState = {
   error2: '',
@@ -41,9 +43,15 @@ export default function(state = initialState, action) {
         isAuthenticated: action.payload.isAuthenticated,
         user: action.payload.user,
       };
+      case UPDATE_DETAILS:
+        return{
+          ...state,
+          isAuthenticated: action.payload.isAuthenticated,
+          user:action.payload.user
+        }
     default:
       // console.log(state);
 
-      return state;
+      return state; 
   }
 }

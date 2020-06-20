@@ -23,6 +23,7 @@ DerivedData
 google-services.json
 # Android/IntelliJ
 #
+googleplacessnipper.txt
 coverage
 build/
 .idea

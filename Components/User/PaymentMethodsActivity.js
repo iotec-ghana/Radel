@@ -4,8 +4,6 @@ import {
   Text,
   StyleSheet,
   Dimensions,
-  TouchableOpacity,
-  Alert,
   SafeAreaView,
   RefreshControl,
   ActivityIndicator,
@@ -14,6 +12,7 @@ import {
   Image,
 } from 'react-native';
 const {width, height} = Dimensions.get('window');
+import * as Analytics from 'expo-firebase-analytics';
 
 import Toolbar from './Layouts/Toolbar';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -71,6 +70,10 @@ export default class PaymentMethodsActivity extends Component {
   };
 
   componentDidMount = async () => {
+    await Analytics.setCurrentScreen(
+      'PaymentmethodsActivity',
+      'PaymentMethodsActivity',
+    );
     this.loadPayments();
   };
   noItemsLayout = () => {
@@ -155,6 +158,8 @@ export default class PaymentMethodsActivity extends Component {
                 item={item}
                 price={this.props.route.params.price}
                 riderDetails={this.props.route.params.riderDetails}
+                distance={this.props.route.params.distance}
+                locationNames={this.props.route.params.locationNames}
               />
             </View>
           )}

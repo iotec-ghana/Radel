@@ -7,10 +7,12 @@ import {
   StatusBar,
   TouchableOpacity,
 } from 'react-native';
+import {isSignedIn} from '../../../Actions/authAction';
+import {connect} from 'react-redux';
 import {AsyncStorage} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-export default class SideBarHeader extends Component {
+class SideBarHeader extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -18,9 +20,13 @@ export default class SideBarHeader extends Component {
     };
   }
 
-  componentDidMount = async () => {};
+  componentDidMount = async () => {
+    console.log(this.props.authStatus,"dsf")
+    
+  };
 
   render() {
+    const {picture} = this.props.authStatus.user;
     const img = '../../../assets/city.jpg';
 
     return (
@@ -33,7 +39,11 @@ export default class SideBarHeader extends Component {
         <View style={{flexDirection: 'row'}}>
           <TouchableOpacity
             onPress={() => this.props.navigation.navigate('ProfileActivity')}>
-            <Image style={styles.image} source={require(img)} />
+            {picture !== '' ? (
+              <Image style={styles.image} source={{uri: picture}} />
+            ) : (
+              <Image style={styles.image} source={require(img)} />
+            )}
           </TouchableOpacity>
         </View>
         {this.props.authdata.isAuthenticated ? (
@@ -88,3 +98,14 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
 });
+const mapStateToProps = state => ({
+  authStatus: state.auth,
+  //error: state.locationData.error,
+});
+
+export default connect(
+  mapStateToProps,
+  {
+    isSignedIn,
+  },
+)(SideBarHeader);

@@ -11,14 +11,16 @@ import {
   Image,
   StatusBar,
   Dimensions,
-  KeyboardAvoidingView,
+  AsyncStorage,
 } from 'react-native';
+import axios from 'axios';
+import {BASE_URL} from '../../constants';
 import Toolbar from './Layouts/Toolbar';
 import * as ImagePicker from 'expo-image-picker';
 const windowWidth = Dimensions.get('window').width;
 import {StatusBarColor} from '../../constants';
 import Constants from 'expo-constants';
-import {isSignedIn} from '../../Actions/authAction';
+import {isSignedIn, Update} from '../../Actions/authAction';
 import {connect} from 'react-redux';
 import {Toast} from 'native-base';
 import Icon from 'react-native-vector-icons/Feather';
@@ -36,7 +38,7 @@ class ProfileActivity extends Component {
       number: '',
       oldpassword: '',
       newpassword: '',
-      imageUri: null,
+      imageUri: '',
       passwordVisible1: false,
       passwordVisible2: false,
     };
@@ -67,13 +69,15 @@ class ProfileActivity extends Component {
   };
 
   pickImage = async () => {
+    //ImagePicker.requestCameraRollPermissionsAsync()
+
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+      // aspect: [4, 3],
+      quality: 0.3,
     });
-    console.log(result);
+    // console.log(result);
 
     if (!result.cancelled) {
       this.setState({imageUri: result.uri});
@@ -95,15 +99,62 @@ class ProfileActivity extends Component {
       passwordVisible2: !this.state.passwordVisible2,
     });
   }
+  async updatePic() {
+    const {token} = this.props.authStatus.user;
+    try {
+      let uri = this.state.imageUri;
+      let uriParts = uri.split('.');
+      let fileType = uriParts[uriParts.length - 1];
+      const formData = new FormData();
+      formData.append('file', {
+        uri: uri,
+        name: `photo.${fileType}`,
+        type: `image/${fileType}`,
+      });
+      const config = {
+        headers: {Authorization: `Bearer ${token}`},
+      };
+      //console.log(token);
+      const resp = await axios.post(
+        BASE_URL + '/upload-image/',
+        formData,
+        config,
+      );
+
+      const update = {
+        ...this.props.authStatus,
+        user: {
+          ...this.props.authStatus.user,
+          picture: resp.data.image_url,
+        },
+      };
+      
+      await AsyncStorage.setItem('authdata', JSON.stringify(update));
+      this.props.Update(update);
+      //console.log(resp.data);
+    } catch (e) {
+      console.log(e.message);
+    }       
+  } 
   async componentDidMount() {
     console.log(this.props.authStatus);
-    const {first_name, last_name, phone_number, email} = this.props.authStatus;
+    const {
+      first_name,
+      last_name,
+      phone_number,
+      email,
+      picture,
+    } = this.props.authStatus.user;
     this.setState({
       fname: first_name,
       lname: last_name,
       email: email,
       phone: phone_number,
+      imageUri: picture,
     });
+  }
+  async UpdateDetails() {
+    await this.updatePic();
   }
   render() {
     const img = '../../assets/city.jpg';
@@ -146,7 +197,14 @@ class ProfileActivity extends Component {
           <TouchableOpacity
             disabled={!editable}
             onPress={() => this.pickImage()}>
-            <Image style={styles.image} source={{uri: imageUri}} />
+            {imageUri !== '' ? (
+              <Image style={styles.image} source={{uri: imageUri}} />
+            ) : (
+              <Image
+                style={styles.image}
+                source={require('../../assets/city.jpg')}
+              />
+            )}
           </TouchableOpacity>
         </View>
 
@@ -266,7 +324,9 @@ class ProfileActivity extends Component {
             <TouchableOpacity
               style={styles.UpdateButton}
               onPress={
-                () => {}
+                () => {
+                  this.UpdateDetails();
+                }
                 // this.props.navigation.navigate('PhoneVerificationActivity')
                 // this.onSubmit()
               }>
@@ -392,7 +452,7 @@ const styles = StyleSheet.create({
   },
 });
 const mapStateToProps = state => ({
-  authStatus: state.auth.user,
+  authStatus: state.auth,
   //error: state.locationData.error,
 });
 
@@ -400,5 +460,6 @@ export default connect(
   mapStateToProps,
   {
     isSignedIn,
+    Update,
   },
 )(ProfileActivity);

@@ -75,6 +75,8 @@ class DeliveryDestinationMap extends Component {
         latitudeDelta: LATITUDE_DELTA,
         longitudeDelta: LONGITUDE_DELTA,
       }),
+      onRegionChange: true,
+      result: null,
       originName: this.props.originName.substr(
         0,
         this.props.originName.indexOf(','),
@@ -87,7 +89,17 @@ class DeliveryDestinationMap extends Component {
 
     this.mapView = null;
   }
-
+  reCenter() {
+    this.mapView.fitToCoordinates(this.state.result.coordinates, {
+      edgePadding: {
+        right: width / 50,
+        bottom: height / 50,
+        left: width / 50,
+        top: height / 50,
+      },
+    });
+    this.setState({onRegionChange: false});
+  }
   async componentDidMount() {
     try {
       this.calculatePrice();
@@ -416,6 +428,15 @@ class DeliveryDestinationMap extends Component {
           loadingEnabled
           initialRegion={this.getCurrentRegion()}
           ref={c => (this.mapView = c)}
+          onRegionChangeComplete={changed => {
+            // const currentregion = this.getCurrentRegion();
+            // console.log(this.state.result.coordinates[0]);
+            // if (this.state.result) {
+            //   this.setState({onRegionChange: false});
+            // } else {
+            //   this.setState({onRegionChange: true});
+            // }
+          }}
           style={{...StyleSheet.absoluteFillObject}}>
           {this.props.riders
             ? this.props.riders.map(riders => (
@@ -484,9 +505,9 @@ class DeliveryDestinationMap extends Component {
                 await this.setState({
                   distance: result.distance,
                   duration: result.duration,
+                  result: result,
                 });
 
-                
                 // console.log(`Distance: ${result.distance} km`);
                 // console.log(`Duration: ${result.duration} min.`);
 
@@ -498,7 +519,6 @@ class DeliveryDestinationMap extends Component {
                     top: height / 50,
                   },
                 });
-               
               }}
               onError={errorMessage => {
                 console.log('GOT AN ERROR');
@@ -506,7 +526,23 @@ class DeliveryDestinationMap extends Component {
             />
           )}
         </MapView>
-
+        {/* {this.state.onRegionChange ? (
+          <TouchableOpacity
+            onPress={() => {
+              this.reCenter();
+            }}
+            style={{
+              position: 'absolute',
+              bottom: height / 4 + 120,
+              right: 15,
+              padding: 10,
+              backgroundColor: '#fff',
+              borderRadius: 70,
+              elevation: 94,
+            }}>
+            <Text style={{fontSize: 15, fontWeight: 'bold'}}>Re-center</Text>
+          </TouchableOpacity>
+        ) : null} */}
         <BottomDrawer
           containerHeight={height}
           offset={TAB_BAR_HEIGHT}
@@ -522,38 +558,39 @@ class DeliveryDestinationMap extends Component {
             : this.loadingLayout()}
         </BottomDrawer>
         {this.topCard()}
-        {this.state.found?
-        <View style={styles.buttons}>
-        
-          <TouchableOpacity
-            disabled={this.state.buttonDisabled}
-            style={styles.bookButton}
-            onPress={() =>
-              this.setState(
-                {loadingLayout: true},
-                this.state.found
-                  ? this.props.navigation.navigate('PaymentMethodsActivity', {
-                      receipientPhone: this.props.route.params.receipientPhone,
-                      price: this.state.price,
-                      riderDetails: this.props.selected,
-                      locationNames: {
-                        origin: this.state.originName,
-                        destination: this.state.destinationName,
-                      },
-                      distance: this.state.distance,
-                    })
-                  : null,
-              )
-            }>
-            {!this.state.loadingLayout && !this.state.found ? (
-              <Text style={styles.bookButtonText}>SELECT RIDER</Text>
-            ) : this.state.found ? (
-              <Text style={styles.bookButtonText}>CONFRIM</Text>
-            ) : (
-              <ActivityIndicator size="small" color="#fff" />
-            )}
-          </TouchableOpacity>
-        </View>:null}
+        {this.state.found ? (
+          <View style={styles.buttons}>
+            <TouchableOpacity
+              disabled={this.state.buttonDisabled}
+              style={styles.bookButton}
+              onPress={() =>
+                this.setState(
+                  {loadingLayout: true},
+                  this.state.found
+                    ? this.props.navigation.navigate('PaymentMethodsActivity', {
+                        receipientPhone: this.props.route.params
+                          .receipientPhone,
+                        price: this.state.price,
+                        riderDetails: this.props.selected,
+                        locationNames: {
+                          origin: this.state.originName,
+                          destination: this.state.destinationName,
+                        },
+                        distance: this.state.distance,
+                      })
+                    : null,
+                )
+              }>
+              {!this.state.loadingLayout && !this.state.found ? (
+                <Text style={styles.bookButtonText}>SELECT RIDER</Text>
+              ) : this.state.found ? (
+                <Text style={styles.bookButtonText}>CONFRIM</Text>
+              ) : (
+                <ActivityIndicator size="small" color="#fff" />
+              )}
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </View>
     );
   }

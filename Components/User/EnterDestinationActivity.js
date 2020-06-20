@@ -22,6 +22,7 @@ import {
   getDestinationCoordinates,
 } from '../../Actions/locationAction';
 import Toolbar from './Layouts/Toolbar';
+import Startendicon from './Layouts/Startendicon';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -52,9 +53,9 @@ class EnterDestinationActivity extends Component {
     }
   };
   getPhoneNumber = async () => {
-    const { status } = await Contacts.requestPermissionsAsync();
+    const {status} = await Contacts.requestPermissionsAsync();
     if (status === 'granted') {
-      const { data } = await Contacts.getContactsAsync({
+      const {data} = await Contacts.getContactsAsync({
         fields: [Contacts.Fields.Emails],
       });
 
@@ -80,51 +81,122 @@ class EnterDestinationActivity extends Component {
           navigation={this.props.navigation}
         />
         <StatusBar barStyle="light-content" backgroundColor={StatusBarColor} />
-        <TextInput
-          style={styles.input}
-          placeholder={'Pickup Location'}
-          value={this.state.originName}
-        />
+
         <View
           style={{
             flexDirection: 'row',
-            marginLeft: 10,
-            marginRight: 10,
-            marginBottom: 10, 
+            backgroundColor: '#fff',
+            
+           
+            elevation: 10,
+            padding: 10,
           }}>
-          <TextInput 
-            style={{
-              flex: 1,
-              height: 50,
-              borderRadius:5,
-              padding: 10,
-              elevation:10,
-              backgroundColor: '#fafafa',
-            }}
-            placeholder={'Reciepient phone number'}
-            value={this.state.rphone}
-            keyboardType={'numeric'}
-            onChangeText={txt => this.rchange(txt)}
-          />
-          {/* <TouchableOpacity
-            style={{padding: 10}}
-            onPress={async () => this.getPhoneNumber()}> */}
-          {/* <Icon
-              name={'user-plus'}
-              size={30}
-              color="#000"
-              style={{margin: 6}}
-            /> */}
-          {/* <Text
+          <Startendicon />
+
+          <View style={{flex: 10}}>
+            <TextInput
+              style={styles.input}
+              placeholder={'Pickup Location'}
+              value={this.state.originName}
+            />
+            <TextInput
               style={{
-                margin: 6,
-                fontWeight: 'bold',
-                textAlignVertical: 'center',
-                textAlign: 'center',
-              }}>
-              Choose contact
-            </Text>
-          </TouchableOpacity> */}
+                height: 40,
+                borderRadius: 5,
+                padding: 10,
+
+                backgroundColor: '#fafafa',
+              }}
+              placeholder={'Reciepient phone number'}
+              value={this.state.rphone}
+              keyboardType={'numeric'}
+              onChangeText={txt => this.rchange(txt)}
+            />
+
+            <GooglePlacesAutocomplete
+              placeholder="Enter delivery destination"
+              minLength={2} // minimum length of text to search
+              autoFocus={false}
+              returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
+              keyboardAppearance={'light'} // Can be left out for default keyboardAppearance https://facebook.github.io/react-native/docs/textinput.html#keyboardappearance
+              listViewDisplayed="auto" // true/false/undefined
+              fetchDetails={true}
+              //renderLeftButton={() => <TouchableOpacity><Text>me</Text></TouchableOpacity>}
+              //currentLocation={true}
+              suppressDefaultStyles={true}
+              //renderDescription={row => row.description} // custom description render
+              onPress={async (data, details = null) => {
+                // 'details' is provided when fetchDetails = true
+
+                const dest = {
+                  latitude: details.geometry.location.lat,
+                  longitude: details.geometry.location.lng,
+                  destinationName: details.formatted_address,
+                };
+                await this.props.getDestinationCoordinates(dest);
+                if (details.formatted_address !== null) {
+                  this.setState({disableButton: false});
+                }
+              }}
+              getDefaultValue={() => ''}
+              query={{
+                // available options: https://developers.google.com/places/web-service/autocomplete
+                key: GOOGLE_MAPS_APIKEY,
+                language: 'en', // language of the results
+                components: 'country:gh',
+                // radius: 5000,
+                // types: '(cities)', // default: 'geocode'
+              }}
+              styles={{
+                textInputContainer: {
+                  backgroundColor: 'rgba(0,0,0,0)',
+                  borderTopWidth: 0,
+                  borderBottomWidth: 0,
+                },
+                textInput: {
+                  height: 40,
+                  padding: 10,
+                  backgroundColor: '#fafafa',
+
+                  borderRadius: 0,
+                  marginTop: 10,
+
+                  borderRadius: 5,
+                },
+                predefinedPlacesDescription: {
+                  color: '#1faadb',
+                  height: 200,
+                },
+                description: {
+                  marginLeft: 10,
+                },
+              }}
+              //currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
+              // currentLocationLabel="Current location"
+              nearbyPlacesAPI="GooglePlacesSearch" // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
+              // GoogleReverseGeocodingQuery={
+              //   {
+              //     // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
+              //   }
+              // }
+              // GooglePlacesSearchQuery={{
+              //   // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
+              //   rankby: 'distance',
+              //   type: 'cafe',
+              // }}
+              // GooglePlacesDetailsQuery={{
+              //   // available options for GooglePlacesDetails API : https://developers.google.com/places/web-service/details
+              //   fields: 'formatted_address',
+              // }}
+              // filterReverseGeocodingByTypes={[
+              //   'locality',
+              //   'administrative_area_level_3',
+              // ]} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
+              // predefinedPlaces={[homePlace, workPlace]}
+              debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
+              // renderRightButton={() => <Text>Custom text after the input</Text>}
+            />
+          </View>
         </View>
 
         <View style={styles.button}>
@@ -142,92 +214,6 @@ class EnterDestinationActivity extends Component {
             <Text style={styles.setButtonText}>SET DESTINATION</Text>
           </TouchableOpacity>
         </View>
-
-        <GooglePlacesAutocomplete
-          placeholder="Enter delivery destination"
-          minLength={2} // minimum length of text to search
-          autoFocus={false}
-          returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
-          keyboardAppearance={'light'} // Can be left out for default keyboardAppearance https://facebook.github.io/react-native/docs/textinput.html#keyboardappearance
-          listViewDisplayed="auto" // true/false/undefined
-          fetchDetails={true}
-          //renderLeftButton={() => <TouchableOpacity><Text>me</Text></TouchableOpacity>}
-          //currentLocation={true}
-          suppressDefaultStyles={true}
-          renderDescription={row => row.description} // custom description render
-          onPress={async (data, details = null) => {
-            // 'details' is provided when fetchDetails = true
-
-            const dest = {
-              latitude: details.geometry.location.lat,
-              longitude: details.geometry.location.lng,
-              destinationName: details.formatted_address,
-            };
-            await this.props.getDestinationCoordinates(dest);
-            if (details.formatted_address !== null) {
-              this.setState({disableButton: false});
-            }
-          }}
-          getDefaultValue={() => ''}
-          query={{
-            // available options: https://developers.google.com/places/web-service/autocomplete
-            key: GOOGLE_MAPS_APIKEY,
-            language: 'en', // language of the results
-            components: 'country:gh',
-            // radius: 5000,
-            // types: '(cities)', // default: 'geocode'
-          }}
-          styles={{
-            textInputContainer: {
-              backgroundColor: 'rgba(0,0,0,0)',
-              borderTopWidth: 0,
-              borderBottomWidth: 0,
-              
-              
-            },
-            textInput: {
-              height: 50,
-              padding: 10,
-              backgroundColor: '#fafafa',
-              margin: 10,
-              borderRadius: 0,
-              elevation:10,borderRadius:5
-              
-            },
-            predefinedPlacesDescription: {
-              color: '#1faadb',
-              height: 200,
-             
-            },
-            description:{
-             marginLeft:10
-            }
-          }}
-          //currentLocation={true} // Will add a 'Current location' button at the top of the predefined places list
-          // currentLocationLabel="Current location"
-          nearbyPlacesAPI="GooglePlacesSearch" // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
-          // GoogleReverseGeocodingQuery={
-          //   {
-          //     // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
-          //   }
-          // }
-          // GooglePlacesSearchQuery={{
-          //   // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
-          //   rankby: 'distance',
-          //   type: 'cafe',
-          // }}
-          // GooglePlacesDetailsQuery={{
-          //   // available options for GooglePlacesDetails API : https://developers.google.com/places/web-service/details
-          //   fields: 'formatted_address',
-          // }}
-          // filterReverseGeocodingByTypes={[
-          //   'locality',
-          //   'administrative_area_level_3',
-          // ]} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
-          // predefinedPlaces={[homePlace, workPlace]}
-          debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
-          // renderRightButton={() => <Text>Custom text after the input</Text>}
-        />
 
         {/* <SafeAreaView>
               <FlatList
@@ -261,21 +247,18 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    height: 50,
+    height: 40,
     padding: 10,
     backgroundColor: '#fafafa',
-    marginLeft: 10,
-    marginRight: 10,
+
     marginBottom: 10,
-    elevation:10,
-    borderRadius:5
+    borderRadius: 5,
   },
   button: {
     width: windowWidth,
     position: 'absolute',
     bottom: 0,
     zIndex: 3,
-   
   },
   setButton: {
     margin: 10,

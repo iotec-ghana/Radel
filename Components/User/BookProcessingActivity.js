@@ -41,14 +41,12 @@ class BookProcessingActivity extends Component {
     this.mapView = null;
   }
 
-  process = async () => {
-    //fetch driver details
-    this.setState({
-      processing: true,
-    });
-  };
+  fetchBookingDetails=()=>{
+    
+  }
+  
   componentDidMount() {
-    setTimeout(this.process, 4000);
+   
   }
   DriverDetailsLayout = () => {
   

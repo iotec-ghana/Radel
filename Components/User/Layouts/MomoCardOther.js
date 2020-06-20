@@ -22,36 +22,40 @@ export default class MomoCardOther extends Component {
     return (
       <TouchableOpacity
         style={styles.container}
-        onPress={() => {this.props.price?
-          Alert.alert(
-            'Confirm',
-            `proceed to pay with ${this.props.item.details.number}?`,
-            [
-              {
-                text: 'Cancel',
-                onPress: () => console.log('Cancel Pressed'),
-                style: 'cancel',
-              },
-              {
-                text: 'Yes',
-                onPress: () =>
-                  this.props.navigation.navigate(
-                    'WaitingForMomoPaymentActivity',
-                    {
-                      type: 'momo',
-                      network: this.props.item.details.network,
-                      number: this.props.item.details.number,
-                      receipientPhone: this.props.route.params.receipientPhone,
-                      locationNames:this.props.route.params.locationNames,
-                      price: this.props.route.params.price,
-                      riderDetails: this.props.route.params.riderDetails,
-                    },
-                  ),
-              },
-            ],
-            {cancelable: false},
-          )
-       :null} }>
+        onPress={() => {
+          this.props.price
+            ? Alert.alert(
+                'Confirm',
+                `proceed to pay with ${this.props.item.details.number}?`,
+                [
+                  {
+                    text: 'Cancel',
+                    onPress: () => console.log('Cancel Pressed'),
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Yes',
+                    onPress: () =>
+                      this.props.navigation.navigate(
+                        'WaitingForMomoPaymentActivity',
+                        {
+                          type: 'momo',
+                          network: this.props.item.details.network,
+                          number: this.props.item.details.number,
+                          receipientPhone: this.props.route.params
+                            .receipientPhone,
+                          locationNames: this.props.locationNames,
+                          price: this.props.price,
+                          riderDetails: this.props.riderDetails,
+                          distance: this.props.price,
+                        },
+                      ),
+                  },
+                ],
+                {cancelable: false},
+              )
+            : null;
+        }}>
         {this.props.item.details.network === 'MTN' ? (
           <Image
             source={require('../../../assets/mtn.png')}

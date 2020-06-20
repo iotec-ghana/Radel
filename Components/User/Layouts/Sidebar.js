@@ -43,11 +43,12 @@ export default class Sidebar extends Component {
     super(props);
     this.state = {};
   }
-
+  async componentDidMount() {
+    await this.props.authdata;
+  }
   render() {
     return (
       <View style={styles.container}>
-        
         <SideBarHeader
           image={'../../../assets/deedat.jpg'}
           navigation={this.props.navigation}
@@ -65,11 +66,10 @@ export default class Sidebar extends Component {
       </View>
     );
   }
-} 
+}
 
 const styles = StyleSheet.create({
   container: {
-   
     flex: 4,
     backgroundColor: '#fff',
   },

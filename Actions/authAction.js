@@ -1,4 +1,4 @@
-import {SIGN_IN, SIGN_OUT, REGISTER, CHECK_LOGIN_STATUS} from './types';
+import {SIGN_IN, SIGN_OUT, REGISTER, CHECK_LOGIN_STATUS,UPDATE_DETAILS} from './types';
 import axios from 'axios';
 import {BASE_URL} from '../constants';
 import {AsyncStorage} from 'react-native';
@@ -50,15 +50,6 @@ export const isSignedIn = data => async dispatch => {
 
 export const isSignedOut = navigation => async dispatch => {
   try {
-    // set header authorization token
-    // const config = {
-    //   headers: {Authorization: `Bearer ${t.token}`},
-    // };
-    // const response = await axios.post(
-    //   BASE_URL + 'users/me/logout',
-    //   t.user,
-    //   config,
-    // );
 
     await AsyncStorage.removeItem('authdata');
 
@@ -76,6 +67,14 @@ export const loginStatus = () => async dispatch => {
 
     dispatch({
       type: CHECK_LOGIN_STATUS,
+      payload: data,
+    });
+  } catch (e) {}
+};
+export const Update = (data) => async dispatch => {
+  try {
+    dispatch({
+      type: UPDATE_DETAILS,
       payload: data,
     });
   } catch (e) {}
