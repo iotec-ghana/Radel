@@ -45,7 +45,7 @@ import {getRiders} from '../../Actions/getAllRidersAction';
 import io from 'socket.io-client';
 import {requestRide, socket} from '../../socketFunctions';
 import {StackActions} from '@react-navigation/native';
-import {captureRef} from 'react-native-view-shot';
+// import {captureRef} from 'react-native-view-shot';
 import ActionButtonsForBooking from './Layouts/ActionButtonsForBooking';
 //addy.substr(0, addy.indexOf(','));
 

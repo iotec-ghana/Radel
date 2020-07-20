@@ -6,6 +6,7 @@ import {
   Image,
   StatusBar,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import {isSignedIn} from '../../../Actions/authAction';
 import {connect} from 'react-redux';
@@ -21,54 +22,60 @@ class SideBarHeader extends Component {
   }
 
   componentDidMount = async () => {
-    console.log(this.props.authStatus,"dsf")
-    
+    //console.log(this.props.authStatus,"dsf")
   };
 
   render() {
-    const {picture} = this.props.authStatus.user;
-    const img = '../../../assets/city.jpg';
+    if (this.props.authStatus.user) {
+      const {
+        //picture,
+        first_name,
+        last_name,
+        phone_number,
+        isVerified,
+        picture,
+      } = this.props.authStatus.user;
+      const img = '../../../assets/city.jpg';
 
-    return (
-      <View style={styles.container}>
-        <StatusBar
-          barStyle="dark-content"
-          translucent={true}
-          backgroundColor={'transparent'}
-        />
-        <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity
-            onPress={() => this.props.navigation.navigate('ProfileActivity')}>
-            {picture !== '' ? (
-              <Image style={styles.image} source={{uri: picture}} />
-            ) : (
-              <Image style={styles.image} source={require(img)} />
-            )}
-          </TouchableOpacity>
+      return (
+        <View style={styles.container}>
+          <StatusBar
+            barStyle="dark-content"
+            translucent={true}
+            backgroundColor={'transparent'}
+          />
+          <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate('ProfileActivity')}>
+              {picture !== '' ? (
+                <Image style={styles.image} source={{uri: picture}} />
+              ) : (
+                <Image style={styles.image} source={require(img)} />
+              )}
+            </TouchableOpacity>
+          </View>
+          {this.props.authStatus.isAuthenticated ? (
+            <Text style={styles.nameText}>
+              {first_name} {last_name}
+            </Text>
+          ) : null}
+
+          {this.props.authStatus.isAuthenticated ? (
+            <Text style={styles.idText}>{phone_number}</Text>
+          ) : null}
+          {this.props.authStatus.isAuthenticated ? (
+            <TouchableOpacity>
+              <Text style={styles.idText}>
+                {!isVerified ? (
+                  <Text style={styles.idText}>Acount not verified </Text>
+                ) : null}{' '}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          {/* <Icon name="verified" size={20} color="#000" style={{margin: 2}} /> */}
         </View>
-        {this.props.authdata.isAuthenticated ? (
-          <Text style={styles.nameText}>
-            {this.props.authdata.user.first_name}{' '}
-            {this.props.authdata.user.last_name}
-          </Text>
-        ) : null}
-
-        {this.props.authdata.isAuthenticated ? (
-          <Text style={styles.idText}>
-            {this.props.authdata.user.phone_number}
-          </Text>
-        ) : null}
-        {this.props.authdata.isAuthenticated ? (
-          <Text style={styles.idText}>
-            {!this.props.authdata.user.isVerified ? (
-              <Text style={styles.idText}>Acount not verified </Text>
-            ) : null}{' '}
-          </Text>
-        ) : null}
-
-        {/* <Icon name="verified" size={20} color="#000" style={{margin: 2}} /> */}
-      </View>
-    );
+      );
+    } else return <ActivityIndicator size="large" color="#e7564c" />;
   }
 }
 const styles = StyleSheet.create({
@@ -89,7 +96,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginTop: 5,
   },
-
   image: {
     borderColor: '#fff',
     height: 80,
