@@ -42,7 +42,7 @@ import {isSignedIn, loginStatus} from '../../Actions/authAction';
 import {connect} from 'react-redux';
 import {getRiders} from '../../Actions/getAllRidersAction';
 import {Toast} from 'native-base';
-const TAB_BAR_HEIGHT = -6;
+const TAB_BAR_HEIGHT = -20;
 const {width, height} = Dimensions.get('window');
 import {Ionicons} from '@expo/vector-icons';
 import {
@@ -151,21 +151,23 @@ class MapsActivity extends Component {
   };
 
   componentDidMount = async () => {
-    
     await this.props.loginStatus();
     if (!this.props.authStatus.isAuthenticated) {
       this.props.navigation.dispatch(StackActions.replace('Intro'));
     }
     //await Analytics.setCurrentScreen('MapsActivity', MapsActivity);
-   
+
     let {status} = await Location.requestPermissionsAsync();
- 
+
     if (status !== 'granted') {
       console.log('Permission to access location was denied');
     }
-    let pos = await Location.getCurrentPositionAsync({});
-    
-    console.log("sdfcfhfgh")
+
+    let pos = await Location.getCurrentPositionAsync({
+      enableHighAccuracy: true,
+    })          
+
+    // alert(pos)
     const Oname = await this.getLocationName(pos);
     const data = {
       latitude: pos.coords.latitude,
@@ -308,7 +310,13 @@ class MapsActivity extends Component {
             />
           }>
           <View style={styles.container}>
-          
+          {!this.state.showBS ? (
+              <Spinner
+                visible={true}
+                textContent={'Loading...'}
+                textStyle={styles.spinnerTextStyle}
+              />
+            ) : (
             <MapView
               ref={ref => {
                 this.map = ref;
@@ -316,7 +324,7 @@ class MapsActivity extends Component {
               provider={PROVIDER_GOOGLE}
               showUserLocation={true}
               showsMyLocationButton={true}
-              scrollEnabled={true}
+              scrollEnabled
               // loadingEnabled
               onMapReady={ready => {
                 this.map.animateToCoordinate(this.getCurrentRegion(), 2000);
@@ -375,7 +383,7 @@ class MapsActivity extends Component {
                 </Marker.Animated>
               ))}
             </MapView>
-
+ )}
             <Toolbar
               icon={'menu'}
               notbackAction={true}

@@ -102,7 +102,7 @@ class DeliveryDestinationMap extends Component {
   }
   async componentDidMount() {
     try {
-      this.calculatePrice();
+     
       const userid = this.props.authStatus.id;
       socket.on('rider-decision-' + userid, riderdecision => {
         if (riderdecision.isAvailable) {
@@ -358,10 +358,10 @@ class DeliveryDestinationMap extends Component {
       const dist = {
         distance: this.state.distance,
       };
-      //console.log(dist);
+      // alert(dist.distance);
       if (this.props.riders.length > 0) {
         const res = await axios.post(BASE_URL + '/pricing/', dist);
-
+        // alert(res.data);
         this.setState({
           price: res.data.rounded_price,
           buttonDisabled: false,
@@ -371,7 +371,7 @@ class DeliveryDestinationMap extends Component {
       }
       // console.log(res.data);
     } catch (e) {
-      // console.log(e.message);
+       console.log(e.message,"yes"); 
       //alert('please check your internet connection');
     }
   };
@@ -502,12 +502,13 @@ class DeliveryDestinationMap extends Component {
                 // );
               }}
               onReady={async result => {
-                await this.setState({
+                // alert(result.distance)
+                 await this.setState({
                   distance: result.distance,
                   duration: result.duration,
                   result: result,
                 });
-
+                this.calculatePrice();
                 // console.log(`Distance: ${result.distance} km`);
                 // console.log(`Duration: ${result.duration} min.`);
 

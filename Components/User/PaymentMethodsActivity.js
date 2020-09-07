@@ -54,7 +54,7 @@ export default class PaymentMethodsActivity extends Component {
             this.setState({default: element});
           } else {
             this.setState({momo: this.state.momo.concat(element)});
-          }
+          }   
         }
         if (element.paymentType === 'card') {
           this.setState({cards: this.state.cards.concat(element)});
