@@ -9,6 +9,7 @@ import {
   ScrollView,
   ActivityIndicator,
   TouchableOpacity,
+  KeyboardAvoidingView
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Toolbar from './Layouts/Toolbar';
@@ -77,15 +78,16 @@ export default class AddCardActivity extends Component {
     } catch (e) {
       console.log(e.message);
       alert('there was a problem');
-      this.setState({loading: false});
+      this.setState({loading: false}); 
     }
   };
 
   render() {
     return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView style={styles.container}
+      behavior={Platform.OS == "ios" ? "padding" : "height"}>
         <View style={styles.button}>
-          {/* <Text
+          <Text
             // eslint-disable-next-line react-native/no-inline-styles
             style={{
               fontSize: 14,
@@ -94,24 +96,34 @@ export default class AddCardActivity extends Component {
               fontWeight: 'bold',
               opacity: 0.5,
             }}>
-            Accepted Cards
-          </Text> */}
-          {/* <View style={{flex: 1, flexDirection: 'row'}}>
+            Accepted Cards  
+          </Text> 
+          <View style={{ flexDirection: 'row',flexWrap: "wrap"}}>
             <Icon
               name="cc-mastercard"
               size={40}
               color="#ffaa00"
-              style={{marginLeft: 30, flex: 2}}
+              style={{flexGrow: 2,textAlign:"center"}}
             />
-            <Icon name="cc-visa" size={40} color="#192061" style={{flex: 2}} />
+            <Icon
+              name="cc-visa"
+              size={40}
+              color="#192061"
+              style={{flexGrow: 2,textAlign:"center"}}
+            />
             <Icon
               name="cc-discover"
               size={40}
               color="#ffaa00"
-              style={{flex: 2}}
+              style={{flexGrow: 2,textAlign:"center"}}
             />
-            <Icon name="cc-amex" size={40} color="#27AEE3" style={{flex: 2}} />
-          </View> */}
+            <Icon
+              name="cc-amex"
+              size={40}
+              color="#27AEE3"
+              style={{flexGrow: 2,textAlign:"center"}}
+            />
+          </View>
           <TouchableOpacity
             style={styles.setButton}
             onPress={() => this.onSubmit()}>
@@ -127,8 +139,13 @@ export default class AddCardActivity extends Component {
           rightTextColor={'#e7564c'}
           navigation={this.props.navigation}
         />
-        <CreditCardInput requiresName onChange={this._onChange} />
-      </View>
+        <CreditCardInput
+          cardScale={1}
+          allowScroll={true}
+          requiresName
+          onChange={this._onChange}
+        />
+      </KeyboardAvoidingView>
     );
   }
 }
@@ -181,6 +198,7 @@ const styles = StyleSheet.create({
     width: width,
     position: 'absolute', //Here is the trick
     bottom: 0, //Here is the trick
+    
   },
   setButton: {
     margin: 10,

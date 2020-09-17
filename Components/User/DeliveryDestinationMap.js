@@ -559,7 +559,7 @@ class DeliveryDestinationMap extends Component {
             : this.loadingLayout()}
         </BottomDrawer>
         {this.topCard()}
-        {this.state.found ? (
+        
           <View style={styles.buttons}>
             <TouchableOpacity
               disabled={this.state.buttonDisabled}
@@ -591,7 +591,7 @@ class DeliveryDestinationMap extends Component {
               )}
             </TouchableOpacity>
           </View>
-        ) : null}
+        
       </View>
     );
   }

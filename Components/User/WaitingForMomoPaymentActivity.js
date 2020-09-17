@@ -12,7 +12,7 @@ import {
   getCurrentLocation,
   getDestinationCoordinates,
 } from '../../Actions/locationAction';
-
+import PaystackWebView from "react-native-paystack-webview";
 class WaitingForMomoPaymentActivity extends Component {
   constructor(props) {
     super(props);
@@ -40,6 +40,7 @@ class WaitingForMomoPaymentActivity extends Component {
     console.log('unmounted');
   }
   componentDidMount = async () => {
+    // RNPaystack.
     console.log(this.props.route.params.receipientPhone);
     try {
       await AsyncStorage.removeItem('paymentCheck');

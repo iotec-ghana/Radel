@@ -22,13 +22,15 @@
       "./assets/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.iotec.radel"
     },
     "android": {
       "package": "com.iotec.radel",
       "versionCode": 1,
       "googleServicesFile": "./google-services.json"
     },
-    "description": "alphatest1"
+    "description": "alphatest1",
+    "entryPoint": "node_modules/expo/AppEntry.js"
   }
 }

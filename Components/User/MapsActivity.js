@@ -165,7 +165,7 @@ class MapsActivity extends Component {
 
     let pos = await Location.getCurrentPositionAsync({
       enableHighAccuracy: true,
-    })          
+    }).catch(error=>alert(error.message))     
 
     // alert(pos)
     const Oname = await this.getLocationName(pos);
@@ -310,22 +310,22 @@ class MapsActivity extends Component {
             />
           }>
           <View style={styles.container}>
-          {!this.state.showBS ? (
+          {/* {!this.state.showBS ? (
               <Spinner
                 visible={true}
                 textContent={'Loading...'}
                 textStyle={styles.spinnerTextStyle}
               />
-            ) : (
-            <MapView
+            ) : ( */}
+            <MapView   
               ref={ref => {
                 this.map = ref;
               }}
               provider={PROVIDER_GOOGLE}
-              showUserLocation={true}
+              showUserLocation={true}   
               showsMyLocationButton={true}
-              scrollEnabled
-              // loadingEnabled
+              // scrollEnabled
+              loadingEnabled
               onMapReady={ready => {
                 this.map.animateToCoordinate(this.getCurrentRegion(), 2000);
               }}
@@ -383,7 +383,7 @@ class MapsActivity extends Component {
                 </Marker.Animated>
               ))}
             </MapView>
- )}
+ {/* )} */}
             <Toolbar
               icon={'menu'}
               notbackAction={true}

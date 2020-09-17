@@ -56,7 +56,7 @@ export default class SelectPaymentActivity extends Component {
         />
         <StatusBar backgroundColor={StatusBarColor} barStyle="light-content" />
 
-        {/* {this.ccLayout()} */}
+        {this.ccLayout()}
         {this.mmLayout()}
       </View>
     );
